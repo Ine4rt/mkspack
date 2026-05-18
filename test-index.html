@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de commande Mks</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Gestion des commandes Mks</h1>
+    </header>
+    <main>
+        <section id="commandes">
+            <h2>Liste des commandes</h2>
+            <table id="order-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Catégorie</th>
+                        <th>Téléphone</th>
+                        <th>Email</th>
+                        <th>Taille</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Les commandes seront insérées ici -->
+                </tbody>
+            </table>
+        </section>
+        <section id="modification">
+            <h2>Modifier la commande</h2>
+            <form id="edit-form">
+                <label for="name">Nom:</label>
+                <input type="text" id="name" name="name">
+
+                <label for="firstname">Prénom:</label>
+                <input type="text" id="firstname" name="firstname">
+
+                <label for="category">Catégorie:</label>
+                <input type="text" id="category" name="category">
+
+                <label for="phone">Téléphone:</label>
+                <input type="text" id="phone" name="phone">
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+
+                <label for="size">Taille:</label>
+                <input type="text" id="size" name="size">
+
+                <button type="submit">Enregistrer</button>
+                <button type="button" id="cancel">Annuler</button>
+            </form>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

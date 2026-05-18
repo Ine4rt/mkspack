@@ -1,0 +1,47 @@
+<h1>Commandes Client</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Catégorie</th>
+            <th>Email</th>
+            <th>Taille Maillot</th>
+            <th>Taille Short</th>
+            <th>Taille Bas</th>
+            <th>Taille Veste</th>
+            <th>Taille Pantalon</th>
+            <th>Initiales</th>
+            <th>Créé le</th>
+        </tr>
+    </thead>
+    <tbody id="orders"></tbody>
+</table>
+
+<script>
+    fetch('get_orders.php')
+        .then(response => response.json())
+        .then(orders => {
+            const tableBody = document.getElementById('orders');
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.id}</td>
+                    <td>${order.name}</td>
+                    <td>${order.firstname}</td>
+                    <td>${order.category}</td>
+                    <td>${order.email}</td>
+                    <td>${order.jersey_size}</td>
+                    <td>${order.short_size}</td>
+                    <td>${order.socks_size}</td>
+                    <td>${order.jacket_size}</td>
+                    <td>${order.pants_size}</td>
+                    <td>${order.initials ? order.initials_text : 'Non'}</td>
+                    <td>${order.created_at}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Erreur:', error));
+</script>

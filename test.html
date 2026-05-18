@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de mise à jour</title>
+    <script>
+        function saveOrderChange(orderId, field, value) {
+            // Vérifier que les données sont bien envoyées
+            console.log("Saving data", orderId, field, value);
+
+            fetch('update_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    field: field,
+                    value: value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Mise à jour réussie!");
+                    console.log("Réponse du serveur:", data);
+                } else {
+                    alert("Erreur lors de la mise à jour.");
+                    console.error("Erreur:", data.message);
+                }
+            })
+            .catch(error => {
+                alert("Erreur de communication.");
+                console.error("Erreur réseau:", error);
+            });
+        }
+
+        // Exemple d'envoi de données (données fictives)
+        function testUpdate() {
+            // Exemple d'envoi : mise à jour du champ 'completed' à 1 pour la commande 123
+            saveOrderChange(123, 'completed', 1);
+        }
+    </script>
+</head>
+<body>
+    <h1>Test de mise à jour de commande</h1>
+    <button onclick="testUpdate()">Tester mise à jour (orderId: 123)</button>
+</body>
+</html>

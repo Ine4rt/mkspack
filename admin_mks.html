@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande pack - Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            margin: 20px 0;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 50px;
+        }
+        .logo-container a {
+            text-decoration: none;
+        }
+        .logo-container img {
+            width: 150px;
+            height: auto;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+		.logo-container img.logo-uh {
+    width: 80px;
+    height: auto;
+}
+
+.logo-container img.logo-ellas {
+    width: 130px;
+    height: auto;
+}
+        .logo-container img:hover {
+            transform: scale(1.1);
+        }
+        /* Style pour la boîte de mot de passe */
+        .password-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+        .password-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .password-form input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+        }
+        .password-form button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+		.logo-uh {
+    width: auto;
+    height: 50px; /* conserve les proportions */
+
+}
+    </style>
+</head>
+<body>
+    <div class="password-box" id="passwordBox">
+        <div class="password-form">
+            <h2>Entrez le mot de passe</h2>
+            <input type="password" id="password" placeholder="Mot de passe" onkeydown="checkEnter(event)">
+            <button onclick="checkPassword()">Valider</button>
+        </div>
+    </div>
+
+    <h1 id="pageTitle" style="display:none;">Commande pack - Admin</h1>
+    <div class="logo-container" id="logoContainer" style="display:none;">
+        <a href="https://football_orders.marksports.eu/bas-oha.php">
+            <img src="bas-oha.png" alt="Club 1">
+        </a>
+        <a href="https://football_orders.marksports.eu/sprimont.php">
+            <img src="sprimont.png" alt="Club 2">
+        </a>
+        <a href="https://football_orders.marksports.eu/ellas.php">
+            <img src="ellas.png" alt="Ellas" class="logo-ellas">
+        </a>
+		<a href="https://football_orders.marksports.eu/uh.php">
+    <img src="uh.png" alt="Union Hutoise" class="logo-uh">
+</a>
+
+<a href="https://football_orders.marksports.eu/jsn.php">
+    <img src="jsn.png" alt="JSN" class="logo-jsn">
+</a>
+
+<a href="https://football_orders.marksports.eu/hannut.php">
+    <img src="hannut.png" alt="Hannut" class="logo-hannut">
+</a>
+		
+    </div>
+
+   <script>
+    const correctPassword = "100361"; // Mot de passe réel
+
+    // Vérifie à l'ouverture si le mot de passe a déjà été validé
+    window.onload = function () {
+        if (localStorage.getItem("isAuthenticated") === "true") {
+            showPageContent();
+        }
+    };
+
+    function checkPassword() {
+        const password = document.getElementById("password").value;
+        if (password === correctPassword) {
+            localStorage.setItem("isAuthenticated", "true"); // Enregistre l'authentification
+            showPageContent();
+        } else {
+            alert("Mot de passe incorrect !");
+        }
+    }
+
+    function showPageContent() {
+        document.getElementById("passwordBox").style.display = "none";
+        document.getElementById("pageTitle").style.display = "block";
+        document.getElementById("logoContainer").style.display = "flex";
+    }
+
+    function checkEnter(event) {
+        if (event.key === "Enter") {
+            checkPassword();
+        }
+    }
+</script>
+
+</body>
+</html>

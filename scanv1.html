@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Scan QR Code</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Scan MKS">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      background: #f9f9f9;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    #reader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #reader > div:first-child {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    #reader__scan_region {
+      position: relative;
+      width: 50vmin;
+      height: 50vmin;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    #reader__scan_region > video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #scanner-frame {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50vmin;
+      height: 50vmin;
+      transform: translate(-50%, -50%);
+      border: 2px solid #007BFF;
+      box-shadow: 
+        0 0 0 1px rgba(0, 123, 255, 0.2),
+        0 0 20px rgba(0, 123, 255, 0.3);
+      z-index: 10;
+      border-radius: 20px;
+      pointer-events: none;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 
+          0 0 0 1px rgba(0, 123, 255, 0.2),
+          0 0 20px rgba(0, 123, 255, 0.3);
+      }
+      50% {
+        box-shadow: 
+          0 0 0 1px rgba(0, 123, 255, 0.4),
+          0 0 25px rgba(0, 123, 255, 0.5);
+      }
+    }
+
+    #reader__dashboard_section_csr,
+    #reader__scan_region > div {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    #scanner-frame::before,
+    #scanner-frame::after {
+      content: '';
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      border: 2px solid #007BFF;
+    }
+
+    #scanner-frame::before {
+      top: -4px;
+      left: -4px;
+      border-right: none;
+      border-bottom: none;
+      border-top-left-radius: 20px;
+    }
+
+    #scanner-frame::after {
+      bottom: -4px;
+      right: -4px;
+      border-left: none;
+      border-top: none;
+      border-bottom-right-radius: 20px;
+    }
+
+    /* Modal plein écran */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      animation: fadeInModal 0.3s ease;
+    }
+
+    @keyframes fadeInModal {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 0;
+      padding: 15px;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: auto;
+      animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .modal-content::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+    }
+
+    .modal-content p#modalText {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #333;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .modal-content strong {
+      color: #333;
+      font-weight: 600;
+    }
+
+    .modal-buttons {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      padding-bottom: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-ok {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-ok:active {
+      transform: scale(0.98);
+      background: #218838;
+    }
+
+    .btn-validate {
+      background: #007BFF;
+      color: white;
+    }
+
+    .btn-validate:active {
+      transform: scale(0.98);
+      background: #0056b3;
+    }
+
+    .btn-reprise {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .btn-reprise:active {
+      transform: scale(0.98);
+      background: #d97706;
+    }
+
+    /* Articles Grid - 2 colonnes */
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+
+    .article-box {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      background: white;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      min-height: 100px;
+    }
+
+    .article-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .article-box:active {
+      transform: scale(0.97);
+    }
+
+    .article-box:active::before {
+      transform: scaleX(1);
+    }
+
+    .article-label {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 6px;
+      text-align: center;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .article-size {
+      font-size: 1.4rem;
+      color: #334155;
+      font-weight: 700;
+      text-align: center;
+      padding: 14px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+    }
+
+    .missing {
+      background: #ffcccc !important;
+      border-color: #cc0000 !important;
+      animation: shake 0.5s ease;
+    }
+
+    .missing .article-label {
+      background: #cc0000;
+    }
+
+    .missing .article-size {
+      color: #cc0000;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .order-header {
+      background: white;
+      border-radius: 25px;
+      padding: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      border: 2px solid #ccc;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .order-header strong:first-child {
+      display: block;
+      font-size: 1.4rem;
+      color: #333;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    @keyframes scan-line {
+      0% {
+        top: 0;
+      }
+      50% {
+        top: 100%;
+      }
+      100% {
+        top: 0;
+      }
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(0, 123, 255, 0.8), 
+        transparent);
+      animation: scan-line 2s linear infinite;
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    /* Modal Signature */
+    #signatureModal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .signature-content {
+      background: white;
+      border-radius: 0;
+      padding: 15px;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .signature-header {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .signature-header h2 {
+      font-size: 1.5rem;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .signature-header p {
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+
+    /* Champs nom / prénom */
+    .sig-fields {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .sig-fields input {
+      flex: 1;
+      padding: 11px 14px;
+      font-size: 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      outline: none;
+      font-family: inherit;
+      color: #0f172a;
+    }
+    .sig-fields input:focus { border-color: #007BFF; }
+    .sig-fields input::placeholder { color: #94a3b8; }
+
+    /* Canvas : PAS de width/height CSS — contrôlés uniquement en JS */
+    #signatureCanvas {
+      border: 3px solid #e2e8f0;
+      border-radius: 12px;
+      background: white;
+      touch-action: none;
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    .signature-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 10px;
+    }
+
+    .btn-clear {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-clear:active {
+      transform: scale(0.98);
+      background: #5a6268;
+    }
+
+    .btn-confirm-signature {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-confirm-signature:active {
+      transform: scale(0.98);
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div id="reader"></div>
+  <div id="scanner-frame">
+    <div class="scan-line"></div>
+  </div>
+
+  <!-- Modal Principal -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <p id="modalText">Commande terminée ?</p>
+      <div class="modal-buttons">
+        <button class="btn btn-validate" id="validateBtn">Valider</button>
+        <button class="btn btn-ok" id="okBtn">Terminé</button>
+        <button class="btn btn-reprise" id="repriseBtn">Repris</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Signature -->
+  <div id="signatureModal">
+    <div class="signature-content">
+      <div class="signature-header">
+        <h2>Signature requise</h2>
+        <p>Veuillez signer ci-dessous</p>
+      </div>
+      <div class="sig-fields">
+        <input type="text" id="sigPrenom" placeholder="Prénom" autocomplete="off">
+        <input type="text" id="sigNom"    placeholder="Nom"    autocomplete="off">
+      </div>
+      <canvas id="signatureCanvas"></canvas>
+      <div class="signature-buttons">
+        <button class="btn btn-clear" id="clearSignature">Effacer</button>
+        <button class="btn btn-confirm-signature" id="confirmSignature">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── Variables globales ───────────────────────────────────────────────────
+    let currentOrderId   = null;
+    let currentEmail     = null;
+    let currentOrderData = null;
+
+    // ─── Variables signature ──────────────────────────────────────────────────
+    let sigCanvas  = null;
+    let sigCtx     = null;
+    let sigDrawing = false;
+
+    // =========================================================================
+    // SIGNATURE
+    // =========================================================================
+
+    function openSignatureModal() {
+      // Vider les champs
+      document.getElementById('sigPrenom').value = '';
+      document.getElementById('sigNom').value    = '';
+      document.getElementById('confirmModal').style.display   = 'none';
+      document.getElementById('signatureModal').style.display = 'flex';
+      // Double rAF : le flex est appliqué et le layout calculé avant de mesurer
+      requestAnimationFrame(() => requestAnimationFrame(setupCanvas));
+    }
+
+    function setupCanvas() {
+      // Mesurer l'espace réellement disponible pour le canvas
+      const content  = document.querySelector('.signature-content');
+      const header   = document.querySelector('.signature-header');
+      const fields   = document.querySelector('.sig-fields');
+      const buttons  = document.querySelector('.signature-buttons');
+      const paddings = 30 + 15 + 15; // padding haut+bas .signature-content + marges canvas
+
+      const W = content.clientWidth  - 6;   // -6 pour les bordures
+      const H = content.clientHeight
+              - header.offsetHeight
+              - fields.offsetHeight
+              - buttons.offsetHeight
+              - paddings;
+
+      // ── Créer un canvas NEUF (clone sans données) pour éviter les listeners en double ──
+      const old   = document.getElementById('signatureCanvas');
+      const fresh = document.createElement('canvas');
+      fresh.id            = 'signatureCanvas';
+      fresh.width         = Math.max(W, 100);
+      fresh.height        = Math.max(H, 150);
+      fresh.style.cssText = old.style.cssText; // conserver les styles inline éventuels
+      old.parentNode.replaceChild(fresh, old);
+
+      sigCanvas = fresh;
+      sigCtx    = sigCanvas.getContext('2d');
+      sigCtx.strokeStyle = '#0f172a';
+      sigCtx.lineWidth   = 2.5;
+      sigCtx.lineCap     = 'round';
+      sigCtx.lineJoin    = 'round';
+      sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+      sigDrawing = false;
+
+      // ── Attacher les listeners sur le canvas frais ──────────────────────────
+      sigCanvas.addEventListener('touchstart',  onSigStart, { passive: false });
+      sigCanvas.addEventListener('touchmove',   onSigDraw,  { passive: false });
+      sigCanvas.addEventListener('touchend',    onSigStop,  { passive: false });
+      sigCanvas.addEventListener('touchcancel', onSigStop,  { passive: false });
+      sigCanvas.addEventListener('mousedown',   onSigStart);
+      sigCanvas.addEventListener('mousemove',   onSigDraw);
+      sigCanvas.addEventListener('mouseup',     onSigStop);
+      sigCanvas.addEventListener('mouseleave',  onSigStop);
+    }
+
+    function getSigPos(e) {
+      const r   = sigCanvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      // Ratio CSS→pixel (gère le devicePixelRatio et tout scaling CSS)
+      return {
+        x: (src.clientX - r.left) * (sigCanvas.width  / r.width),
+        y: (src.clientY - r.top)  * (sigCanvas.height / r.height)
+      };
+    }
+
+    function onSigStart(e) {
+      e.preventDefault(); e.stopPropagation();
+      sigDrawing = true;
+      const p = getSigPos(e);
+      sigCtx.beginPath();
+      sigCtx.moveTo(p.x, p.y);
+    }
+    function onSigDraw(e) {
+      e.preventDefault(); e.stopPropagation();
+      if (!sigDrawing) return;
+      const p = getSigPos(e);
+      sigCtx.lineTo(p.x, p.y);
+      sigCtx.stroke();
+    }
+    function onSigStop(e) {
+      e.preventDefault();
+      sigDrawing = false;
+      sigCtx.beginPath();
+    }
+
+    document.getElementById('clearSignature').addEventListener('click', () => {
+      if (sigCtx && sigCanvas) sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+    });
+
+    document.getElementById('confirmSignature').addEventListener('click', () => {
+      // ── Vérifier nom / prénom ─────────────────────────────────────────────
+      const prenom = document.getElementById('sigPrenom').value.trim();
+      const nom    = document.getElementById('sigNom').value.trim();
+      if (!prenom || !nom) {
+        alert('Veuillez entrer votre prénom et votre nom.');
+        return;
+      }
+
+      // ── Vérifier qu'il y a un dessin ─────────────────────────────────────
+      const pixels = sigCtx.getImageData(0, 0, sigCanvas.width, sigCanvas.height).data;
+      let signed = false;
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] > 10) { signed = true; break; }
+      }
+      if (!signed) {
+        alert('Veuillez signer avant de confirmer.');
+        return;
+      }
+
+      // ── Écrire le nom sous la signature, sur le canvas ───────────────────
+      const fullName = prenom + ' ' + nom.toUpperCase();
+      const fs       = Math.max(14, Math.round(sigCanvas.width / 22));
+      const lineY    = sigCanvas.height - fs - 18;
+
+      // Bande blanche en bas
+      sigCtx.fillStyle = '#ffffff';
+      sigCtx.fillRect(0, lineY - 4, sigCanvas.width, sigCanvas.height - lineY + 4);
+
+      // Trait de séparation
+      sigCtx.strokeStyle = '#cbd5e1';
+      sigCtx.lineWidth   = 1;
+      sigCtx.beginPath();
+      sigCtx.moveTo(12, lineY - 2);
+      sigCtx.lineTo(sigCanvas.width - 12, lineY - 2);
+      sigCtx.stroke();
+
+      // Texte centré
+      sigCtx.fillStyle    = '#1e293b';
+      sigCtx.font         = 'bold ' + fs + 'px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+      sigCtx.textAlign    = 'center';
+      sigCtx.textBaseline = 'top';
+      sigCtx.fillText(fullName, sigCanvas.width / 2, lineY + 2);
+
+      // ── Exporter et fermer ────────────────────────────────────────────────
+      const imgData = sigCanvas.toDataURL('image/png');
+      document.getElementById('signatureModal').style.display = 'none';
+      saveSignatureAndUpdateOrder(currentOrderId, currentEmail, imgData);
+    });
+
+    function saveSignatureAndUpdateOrder(orderId, email, imgData) {
+      if (!currentOrderData) { alert('Erreur : données commande manquantes'); return; }
+
+      const date     = new Date().toISOString().split('T')[0];
+      const num      = String(currentOrderData.order_number || 'N-A').replace(/[\/]/g, '_');
+      const club     = String(currentOrderData.club      || 'club').replace(/[^a-zA-Z0-9_\-]/g, '_');
+      const dbName   = String(currentOrderData.name      || 'nom').replace(/[^a-zA-Z0-9_\-]/g, '_');
+      const dbFname  = String(currentOrderData.firstname || 'prenom').replace(/[^a-zA-Z0-9_\-]/g, '_');
+      const filename = club + '-' + dbName + '-' + dbFname + '-' + num + '-' + date + '.png';
+
+      fetch('save_signature.php', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ orderId: orderId, signature: imgData, filename: filename })
+      })
+      .then(r => r.text())
+      .then(raw => {
+        let resp;
+        try { resp = JSON.parse(raw); }
+        catch(e) { console.error('save_signature non-JSON:', raw); startScanner(); return; }
+
+        if (!resp.success) {
+          console.error('save_signature error:', resp.message);
+          startScanner();
+          return;
+        }
+
+        // Mettre reprise = 1 en DB (fire-and-forget, on n'attend pas)
+        fetch('update_order.php', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ orderId: orderId, field: 'reprise', value: 1, email: email })
+        }).catch(e => console.error('update reprise:', e));
+
+        alert('Signature validée ✓');
+        startScanner();
+      })
+      .catch(err => { console.error('réseau save_signature:', err); startScanner(); });
+    }
+
+    // =========================================================================
+    // MODAL PRINCIPAL – boutons
+    // =========================================================================
+
+    function hideModal() {
+      document.getElementById('confirmModal').style.display = 'none';
+    }
+
+    // Bouton VALIDER → ferme modal + relance scanner
+    document.getElementById('validateBtn').addEventListener('click', () => {
+      hideModal();
+      startScanner();
+    });
+
+    // Bouton TERMINÉ → completed=1 DB + email + relance scanner
+    document.getElementById('okBtn').addEventListener('click', () => {
+      if (!confirm('Es-tu sûr de vouloir marquer cette commande comme terminée ?')) return;
+
+      const orderId = currentOrderId;
+      const email   = currentEmail;
+      hideModal();
+
+      // 1) Mettre completed = 1 dans la DB
+      fetch('update_order.php', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ orderId: orderId, field: 'completed', value: 1, email: email })
+      })
+      .then(r => r.text())
+      .then(raw => {
+        let resp;
+        try { resp = JSON.parse(raw); }
+        catch(e) { alert('Erreur serveur update_order:\n' + raw.substring(0, 200)); startScanner(); return; }
+
+        if (!resp.success) {
+          alert('Erreur DB completed : ' + (resp.message || 'Inconnue'));
+          startScanner();
+          return;
+        }
+
+        // 2) Envoyer l'email
+        fetch('send_email.php', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body:    'orderId=' + encodeURIComponent(orderId) + '&email=' + encodeURIComponent(email)
+        })
+        .then(r => r.text())
+        .then(raw2 => {
+          let res;
+          try { res = JSON.parse(raw2); }
+          catch(e) { alert('Commande terminée !\n(Réponse email non parsable)'); startScanner(); return; }
+          alert(res.success
+            ? 'Commande terminée !\nEmail envoyé à ' + email
+            : 'Commande terminée mais erreur email : ' + (res.error || raw2.substring(0,100)));
+          startScanner();
+        })
+        .catch(() => { alert('Commande terminée mais erreur réseau email.'); startScanner(); });
+      })
+      .catch(err => { alert('Erreur réseau update_order : ' + err.message); startScanner(); });
+    });
+
+    // Bouton REPRIS → ouvre modal signature
+    document.getElementById('repriseBtn').addEventListener('click', () => {
+      openSignatureModal();
+    });
+
+    // =========================================================================
+    // CONFIG ARTICLES
+    // =========================================================================
+    const articleValueMapping = {
+      "Veste":        "jacket_size",
+      "Pantalon":     "pants_size",
+      "Kit":          "kit_size",
+      "Sous-maillot": "under_shirt_size",
+      "Bas":          "bas_size",
+      "Maillot":      "jersey_size",
+      "Short":        "short_size",
+      "Polo":         "polo_size",
+      "K-Way":        "option_kway",
+      "Bas2":         "option_bas",
+      "Initiales":    "initials_requested",
+      "Sweat":        "jacket_size",
+      "T-shirt":      "jersey_size",
+      "Gants":        "bas_size"
+    };
+
+    const roleArticlesConfig = {
+      "Joueur":          ["Veste","Pantalon","Maillot","Short","Bas"],
+      "Joueur-WBO":      ["Veste","Pantalon","Bas","Sous-maillot","Maillot","Short","K-Way","Bas2"],
+      "Keeper-WBO":      ["Veste","Pantalon","Bas","Sous-maillot","Maillot","Short","K-Way","Bas2"],
+      "U10-U21":         ["Veste","Pantalon","Polo","Bas","Short","Maillot"],
+      "Entraineur":      ["Veste","Pantalon","Short","Maillot"],
+      "Ellas-Entraineur":["Veste","Pantalon","Short","Polo"],
+      "Ellas-Keeper":    ["Veste","Pantalon","Kit"],
+      "Ellas-Joueur":    ["Veste","Pantalon","Kit","Bas"],
+      "Joueur-JSN":      ["Veste","Pantalon"],
+      "Entraineur-JSN":  ["Veste","Pantalon"],
+      "Joueur-Hannut":   ["Veste","Pantalon","Bas","Maillot"],
+      "Keeper-Hannut":   ["Veste","Pantalon","Bas","Maillot"],
+      "Keeper-MKSGK":    ["Sweat","T-shirt","Gants"]
+    };
+
+    function renderArticle(label, size, isMissing) {
+      const cls = isMissing ? ' missing' : '';
+      return '<div class="article-box' + cls + '" data-label="' + label + '">'
+           + '<div class="article-label">' + label + '</div>'
+           + '<div class="article-size">' + (size || '—') + '</div>'
+           + '</div>';
+    }
+
+    // =========================================================================
+    // SCANNER — nouvelle instance à chaque démarrage (seul moyen fiable)
+    // =========================================================================
+    const scanConfig = { fps: 10 };
+
+    function startScanner() {
+      // Vider le div pour que Html5Qrcode repart à zéro
+      const readerEl = document.getElementById('reader');
+      readerEl.innerHTML = '';
+
+      const scanner = new Html5Qrcode('reader');
+
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } })
+        .then(stream => {
+          const deviceId = stream.getVideoTracks()[0].getSettings().deviceId;
+          stream.getTracks().forEach(t => t.stop());
+
+          scanner.start(
+            { deviceId: { exact: deviceId } },
+            scanConfig,
+            (decodedText) => {
+              scanner.stop()
+                .then(() => handleScan(decodedText))
+                .catch(()  => handleScan(decodedText));
+            },
+            () => { /* erreurs de scan en cours ignorées */ }
+          );
+        })
+        .catch(err => {
+          console.error('Caméra refusée :', err);
+          alert("Impossible d'accéder à la caméra. Vérifie les permissions.");
+        });
+    }
+
+    function handleScan(decodedText) {
+      navigator.vibrate?.(200);
+
+      let data;
+      try { data = JSON.parse(decodedText); }
+      catch(e) { alert('QR Code invalide (JSON attendu).'); startScanner(); return; }
+
+      const { orderId, email } = data;
+      if (!orderId || !email) { alert('QR Code incomplet.'); startScanner(); return; }
+
+      // Marquer scan = 1 (fire and forget)
+      fetch('update_scan.php', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ orderId: orderId, scan: 1 })
+      }).catch(e => console.warn('update_scan:', e));
+
+      // Charger les détails
+      fetch('get_order_details.php?orderId=' + encodeURIComponent(orderId))
+        .then(r => r.json())
+        .then(response => {
+          if (!response.success) { alert('Erreur : ' + response.message); startScanner(); return; }
+
+          const order    = response.order;
+          const articles = roleArticlesConfig[order.role] || [];
+          let   html     = '';
+
+          articles.forEach(label => {
+            const key  = articleValueMapping[label];
+            let value  = order[key];
+            let isMiss = false;
+
+            if (label === 'K-Way') {
+              value  = order.option_kway || 'Non';
+              isMiss = order.kway_missing == 1;
+            } else if (label === 'Initiales') {
+              value  = order.initials_requested ? order.initials : 'Non';
+              isMiss = order.initials_missing == 1;
+            } else {
+              const base = key.replace('_size', '');
+              isMiss = order[base + '_missing'] == 1;
+            }
+            html += renderArticle(label, value, isMiss);
+          });
+
+          document.getElementById('modalText').innerHTML =
+            '<div class="order-header">'
+            + '<strong>' + order.club + '</strong>'
+            + '<strong>Nom :</strong> ' + order.firstname + ' ' + order.name + '<br>'
+            + '<strong>Catégorie :</strong> ' + order.category + '<br>'
+            + '<strong>Rôle :</strong> ' + order.role
+            + '</div>'
+            + '<div class="articles-grid">' + html + '</div>';
+
+          currentOrderId   = order.id;
+          currentEmail     = order.email;
+          currentOrderData = order;
+
+          document.getElementById('confirmModal').style.display = 'flex';
+
+          // Toggle missing
+          document.querySelectorAll('.article-box').forEach(box => {
+            box.addEventListener('click', () => {
+              const lbl     = box.dataset.label;
+              const field   = articleValueMapping[lbl];
+              const base    = field.replace('_size','').replace('option_','');
+              const mKey    = base + '_missing';
+              const nowMiss = !box.classList.contains('missing');
+              box.classList.toggle('missing', nowMiss);
+
+              fetch('update_order.php', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ orderId: currentOrderId, field: mKey, value: nowMiss ? 1 : 0 })
+              }).catch(e => console.error('toggle_missing:', e));
+            });
+          });
+        })
+        .catch(err => { alert('Erreur récupération commande : ' + err.message); startScanner(); });
+    }
+
+    // Démarrer au chargement
+    startScanner();
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+{
+  "_comment": "Références articles par club et par rôle. Format: club → rôle → article → référence",
+  "_articles": ["Veste", "Pantalon", "Maillot", "Short", "Bas", "Sous-maillot", "Kit", "Polo", "K-Way", "Bas2"],
+
+  "Bas-Oha": {
+    "Joueur-WBO": {
+      "Veste":        "100226941",
+      "Pantalon":     "100522102",
+      "Maillot":      "100226741",
+      "Short":        "100530641",
+      "Bas":          "100369706",
+      "Sous-maillot": "100307814",
+      "K-Way":        "",
+      "Bas2":         "100369706"
+    },
+    "Keeper-WBO": {
+       "Veste":        "100226941",
+      "Pantalon":     "100522102",
+      "Maillot":      "",
+      "Short":        "100530641",
+      "Bas":          "100369706",
+      "Sous-maillot": "100307814",
+      "K-Way":        "",
+      "Bas2":         "100369706"
+    }
+  },
+
+  "Ellas": {
+    "Ellas-Joueur": {
+      "Veste":    "",
+      "Pantalon": "",
+      "Kit":      "",
+      "Bas":      ""
+    },
+    "Ellas-Keeper": {
+      "Veste":    "",
+      "Pantalon": "",
+      "Kit":      ""
+    },
+    "Ellas-Entraineur": {
+      "Veste":    "",
+      "Pantalon": "",
+      "Short":    "",
+      "Polo":     ""
+    }
+  },
+
+  "RFCB Sprimont": {
+    "U10-U21": {
+      "Veste":    "",
+      "Pantalon": "",
+      "Polo":     "",
+      "Bas":      "",
+      "Short":    "",
+      "Maillot":  ""
+    },
+    "Entraineur": {
+      "Veste":    "",
+      "Pantalon": "",
+      "Short":    "",
+      "Maillot":  ""
+    }
+  },
+
+  "Union Hutoise": {
+    "Joueur": {
+      "Veste":    "",
+      "Pantalon": "",
+      "Maillot":  "",
+      "Short":    "",
+      "Bas":      ""
+    },
+    "Entraineur": {
+      "Veste":    "",
+      "Pantalon": "",
+      "Short":    "",
+      "Maillot":  ""
+    }
+  },
+
+  "JSN": {
+    "Joueur-JSN": {
+      "Veste":    "",
+      "Pantalon": ""
+    },
+    "Entraineur-JSN": {
+      "Veste":    "",
+      "Pantalon": ""
+    }
+  },
+
+  "Hannut": {
+    "Joueur-Hannut": {
+      "Veste":    "",
+      "Pantalon": "",
+      "Bas":      "",
+      "Maillot":  ""
+    },
+    "Keeper-Hannut": {
+      "Veste":    "",
+      "Pantalon": "",
+      "Bas":      "",
+      "Maillot":  ""
+    }
+  },
+
+  "MKSGK": {
+    "Keeper-MKSGK": {
+      "Veste":   "",
+      "Maillot": "",
+      "Bas":     ""
+    }
+  }
+}

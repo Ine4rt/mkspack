@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande Pack Football</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #clubLogos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .club-logo {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+        }
+
+#roleSelection {
+    display: none; /* Caché par défaut */
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+
+.role-buttons {
+    display: flex;
+    gap: 20px; /* Espacement entre les boutons */
+    justify-content: center;
+}
+
+.role-button {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    flex: 1; /* Permet aux boutons de s'aligner harmonieusement */
+    max-width: 150px; /* Limite la largeur pour éviter qu'ils ne s'étendent trop */
+    text-align: center;
+}
+
+.role-button:hover {
+    background-color: #0056b3;
+}
+
+
+        .form-container {
+            display: none;
+            margin-top: 40px;
+        }
+
+        h1, h3 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+.optional-section {
+    background-color: #ffe6e6; /* Rouge très clair */
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+img[alt="Club Ellas"] {
+    width: 90px; /* ou ce que tu veux */
+    height: auto; /* pour respecter les proportions */
+}
+
+img[alt="Union Hutoise"] {
+    width: 60px; /* ou ce que tu veux */
+    height: auto; /* pour respecter les proportions */
+}
+    </style>
+</head>
+<body>
+
+<h1>Commande de Pack inclus dans la cotisation</h1>
+
+<div id="clubLogos">
+    	<img src="hannut.png" alt="Hannut" class="club-logo" onclick="selectClub('Hannut')">
+
+</div>
+
+<div id="roleSelection">
+    <h3>Choisissez un rôle pour le club <span id="selectedClub"></span> :</h3>
+    <div class="role-buttons">
+        <button class="role-button" onclick="chooseRole('Joueur')">Joueur</button>
+        <button class="role-button" onclick="chooseRole('Keeper')">Keeper</button>
+    </div>
+</div>
+
+
+<div id="formContainer" class="form-container">
+    <h3>Formulaire pour le club <span id="clubName"></span></h3>
+    <form action="add_order.php" method="POST">
+        <input type="hidden" id="club" name="club">
+        <input type="hidden" id="role" name="role">
+
+        <label for="name">Nom Joueur:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="firstname">Prénom Joueur:</label>
+        <input type="text" id="firstname" name="firstname" required>
+
+        <label for="category">Catégorie :</label>
+        <input type="text" id="category" name="category" required>
+
+        <label for="phone">Téléphone :</label>
+        <input type="tel" id="phone" name="phone" required>
+
+        <label for="email">E-mail :</label>
+        <input type="email" id="email" name="email" required>
+
+        <h3>Pack :</h3>
+        <!-- Veste -->
+        <label for="jacket_size">Taille Veste :</label>
+        <select id="jacket_size" name="jacket_size" required>
+            <option value="" disabled selected>Choisir une taille</option>
+            <option value="116">116</option>
+            <option value="128">128</option>
+            <option value="140">140</option>
+            <option value="152">152</option>
+            <option value="164">164</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+			<option value="XXXL">XXXL</option>
+        </select>
+
+        <!-- Pantalon -->
+        <label for="pants_size">Taille Pantalon :</label>
+        <select id="pants_size" name="pants_size" required>
+            <option value="" disabled selected>Choisir une taille</option>
+            <option value="116">116</option>
+            <option value="128">128</option>
+            <option value="140">140</option>
+            <option value="152">152</option>
+            <option value="164">164</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+        </select>
+
+        <!-- Kit -->
+        <label for="kit_size">Taille Kit :</label>
+        <select id="kit_size" name="kit_size" required>
+            <option value="" disabled selected>Choisir une taille</option>
+            <option value="116">116</option>
+            <option value="128">128</option>
+            <option value="140">140</option>
+            <option value="152">152</option>
+            <option value="164">164</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+			<option value="XXXL">XXXL</option>
+        </select>
+		
+		<!-- Maillot -->
+		<label for="jersey_size">Taille Maillot :</label>
+        <select id="jersey_size" name="jersey_size" required>
+            <option value="" disabled selected>Choisir une taille</option>
+            <option value="116">116</option>
+            <option value="128">128</option>
+            <option value="140">140</option>
+            <option value="152">152</option>
+            <option value="164">164</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+			<option value="XXXL">XXXL</option>
+        </select>
+
+        <!-- Bas -->
+        <label for="bas_size">Taille Bas :</label>
+        <select id="bas_size" name="bas_size" required>
+            <option value="" disabled selected>Choisir une taille</option>
+            <option value="28-32">28-32</option>
+            <option value="33-36">33-36</option>
+            <option value="37-40">37-40</option>
+            <option value="41-44">41-44</option>
+            <option value="45-47">45-47</option>
+
+        </select>
+		
+		        <!-- Short -->
+        <label for="short_size">Taille Short :</label>
+        <select id="short_size" name="short_size" required>
+            <option value="" disabled selected>Choisir une taille</option>
+            <option value="116">116</option>
+            <option value="128">128</option>
+            <option value="140">140</option>
+            <option value="152">152</option>
+            <option value="164">164</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+        </select>
+
+        <!-- Sous-Pull -->
+        <label for="under_shirt_size">Taille Sous-Pull :</label>
+        <select id="under_shirt_size" name="under_shirt_size" required>
+            <option value="" disabled selected>Choisir une taille</option>
+            <option value="116">116</option>
+            <option value="128">128</option>
+            <option value="140">140</option>
+            <option value="152">152</option>
+            <option value="164">164</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+        </select>
+
+        <label for="polo_size">Taille Polo :</label>
+        <select id="polo_size" name="polo_size" required>
+            <option value="" disabled selected>Choisir une taille</option>
+            <option value="128">128</option>
+            <option value="140">140</option>
+            <option value="152">152</option>
+            <option value="164">164</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+        </select>
+		
+        <!-- Option Payante -->
+       <div class="optional-section">
+    <h3>Option Payante</h3>
+    <label for="option_kway">Taille Kway 19€:</label>
+    <select id="option_kway" name="option_kway">
+        <option value="" disabled selected>Choisir une taille</option>
+        <option value="116">116</option>
+        <option value="128">128</option>
+        <option value="140">140</option>
+        <option value="152">152</option>
+        <option value="164">164</option>
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
+    </select>
+	
+	 <label for="option_bas">Taille Bas 6€ :</label>
+    <select id="option_bas" name="option_bas">
+        <option value="" disabled selected>Choisir une taille</option>
+        <option value="28-32">28-32</option>
+            <option value="33-36">33-36</option>
+            <option value="37-40">37-40</option>
+            <option value="41-44">41-44</option>
+            <option value="45-47">45-47</option>
+    </select>
+
+<label for="initials_requested">Ajouter des initiales ?</label>
+
+<select id="initials_requested" name="initials_requested" onchange="toggleInitialsInput(this)">
+    <option value="0" selected>Non</option>
+    <option value="1">Oui</option>
+</select>
+
+<input type="text" id="initials" name="initials" placeholder="Initiales" style="display: none;">
+
+
+
+<div id="initialsPrice" style="display: none; color: red; font-weight: bold; margin-top: 10px; margin-bottom: 20px; text-align: center;">
+    <span style="color: black; font-weight: normal; font-size: 0.9em;"> 
+        Les initiales seront imprimées exactement comme vous les saisissez. Veuillez vérifier l’orthographe, les majuscules et la ponctuation.
+    </span><br>
+    Prix des initiales : <span id="initialsPriceValue"></span> €<br>
+</div>
+
+
+
+        <button type="submit">Envoyer</button>
+    </form>
+<span style="color: black; font-weight: normal; text-align: center; font-size: 0.7em;"> En cliquant sur "Envoyer", vous acceptez que Marksports utilise vos coordonnées pour vous contacter, uniquement concernant le pack susmentionné. </span>
+</div>
+
+
+
+<script>
+let selectedClubName = "";
+
+// Définir les articles spécifiques à chaque club
+const clubArticles = {
+    'Bas-Oha': {
+        jacket: true,
+        pants: true,
+        jersey: true,
+        kit: false,
+        bas: true,
+        short: true,
+        under_shirt: true,
+        polo: false,
+        kway: true,
+		option_bas: true,
+    },
+
+    'RFCB Sprimont': {
+        jacket: true,
+        pants: true,
+        jersey: true,
+        short: true,
+        kit: false,
+        bas: true,
+        under_shirt: false,
+        polo: true,
+        kway: false,
+    },
+    'Ellas': {  // Nouveau club Ellas
+        jacket: true,
+        pants: true,
+        jersey: false,
+        kit: true,
+        bas: true,
+        short: false,  // Joueur a aussi short
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    },
+	'Union Hutoise': {
+    jacket: true,
+    pants: true,
+    jersey: true,
+    short: true,
+    kit: false,
+    bas: true,
+    under_shirt: false,
+    polo: false,
+    kway: false,
+},
+
+    'JSN': {
+        jacket: false,
+        pants: true,
+        kit: true,
+        bas: true,
+        under_shirt: true,
+        kway: false,
+    },
+    'Hannut': {
+        jacket: true,
+        pants: true,
+        jersey: true,
+        kit: false,
+        bas: true,
+        short: false,
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    }
+};
+
+// Définir les rôles spécifiques pour chaque club
+const roleArticles = {
+    'Joueur': {
+        jacket: true,
+        pants: true,
+        jersey: true,
+        kit: false,
+        bas: true,
+        short: true,
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    },
+    'Keeper': {
+        jacket: true,
+        pants: true,
+        jersey: true,
+        kit: false,
+        bas: true,
+        short: false,
+        under_shirt: true,
+        polo: true,
+        kway: true,
+    },
+    'Ellas-Joueur': {  // Spécifique pour le rôle Joueur d'Ellas
+        jacket: true,
+        pants: true,
+        jersey: false,
+        kit: true,
+        bas: true,
+        short: false,
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    },
+    'Ellas-Keeper': {  // Spécifique pour le rôle Keeper d'Ellas
+        jacket: true,
+        pants: true,
+        jersey: false,
+        kit: true,
+        bas: false,
+        short: false,
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    },
+	 'Ellas-Entraineur': {  // Spécifique pour le rôle Keeper d'Ellas
+        jacket: true,
+        pants: true,
+        jersey: false,
+        kit: false,
+        bas: false,
+        short: true,
+        under_shirt: false,
+        polo: true,
+        kway: false,
+    },
+    'Entraineur': {
+        jacket: true,
+        pants: true,
+        jersey: true,
+        kit: false,
+        bas: false,
+        short: true,
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    },
+    'U10-U21': {
+        jacket: true,
+        pants: true,
+        jersey: true,
+        kit: false,
+        bas: true,
+        short: true,
+        under_shirt: false,
+        polo: true,
+        kway: false,
+    },
+	'Joueur-JSN': {
+        jacket: true,
+        pants: true,
+        jersey: false,
+        kit: false,
+        bas: false,
+        short: false,
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    },
+	
+	'Entraineur-JSN': {
+        jacket: true,
+        pants: true,
+        jersey: false,
+        kit: false,
+        bas: false,
+        short: false,
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    },
+	
+	'Joueur-WBO': {
+    jacket: true,
+    pants: true,
+    jersey: true,
+    kit: false,
+    bas: true,
+    short: true,
+    under_shirt: true,
+    polo: false,
+    kway: true,
+		option_bas: true,
+},
+'Keeper-WBO': {
+    jacket: true,
+    pants: true,
+    jersey: true,
+    kit: false,
+    bas: true,
+    short: true,
+    under_shirt: true,
+    polo: false,
+    kway: true,
+		option_bas: true,
+},
+'Joueur-Hannut': {
+        jacket: true,
+        pants: true,
+        jersey: true,
+        kit: false,
+        bas: true,
+        short: false,
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    },
+    'Keeper-Hannut': {
+        jacket: true,
+        pants: true,
+        jersey: true,
+        kit: false,
+        bas: true,
+        short: false,
+        under_shirt: false,
+        polo: false,
+        kway: false,
+    },
+};
+
+const initialsPrices = {
+    'Bas-Oha': 15,
+    'RFCB Sprimont': 30,
+    'Ellas': 20,
+    'Union Hutoise': 20,
+    'JSN': 10,
+	'Hannut': 15
+};
+
+function selectClub(clubName) {
+    selectedClubName = clubName;
+    document.getElementById('selectedClub').textContent = clubName;
+    document.getElementById('roleSelection').style.display = 'flex';
+    document.getElementById('formContainer').style.display = 'none';
+    
+    // Modifier les boutons de sélection de rôle pour Ellas
+    if (clubName === 'Ellas') {
+        const roleButtons = `
+            <button class="role-button" onclick="chooseRole('Ellas-Joueur')">Joueur</button>
+            <button class="role-button" onclick="chooseRole('Ellas-Keeper')">Keeper</button>
+			<button class="role-button" onclick="chooseRole('Ellas-Entraineur')">Entraineur</button>
+        `;
+        document.querySelector('.role-buttons').innerHTML = roleButtons;
+    } else if (clubName === 'RFCB Sprimont') {
+        const roleButtons = `
+            <button class="role-button" onclick="chooseRole('U10-U21')">Joueur</button>
+            <button class="role-button" onclick="chooseRole('Entraineur')">Entraineur</button>
+        `;
+        document.querySelector('.role-buttons').innerHTML = roleButtons;
+    } else if (clubName === 'JSN') {
+        const roleButtons = `
+            <button class="role-button" onclick="chooseRole('Joueur-JSN')">Joueur</button>
+            <button class="role-button" onclick="chooseRole('Entraineur-JSN')">Entraineur</button>
+        `;
+        document.querySelector('.role-buttons').innerHTML = roleButtons;
+    } else if (clubName === 'Union Hutoise') {
+        const roleButtons = `
+            <button class="role-button" onclick="chooseRole('Joueur')">Joueur</button>
+        `;
+        document.querySelector('.role-buttons').innerHTML = roleButtons;
+    } else if (clubName === 'Bas-Oha') {
+    const roleButtons = `
+        <button class="role-button" onclick="chooseRole('Joueur-WBO')">Joueur</button>
+        <button class="role-button" onclick="chooseRole('Keeper-WBO')">Keeper</button>
+    `;
+    document.querySelector('.role-buttons').innerHTML = roleButtons;
+	} else if (clubName === 'Hannut') {
+    const roleButtons = `
+        <button class="role-button" onclick="chooseRole('Joueur-Hannut')">Joueur</button>
+        <button class="role-button" onclick="chooseRole('Keeper-Hannut')">Keeper</button>
+    `;
+    document.querySelector('.role-buttons').innerHTML = roleButtons;
+	}
+	else {
+        const roleButtons = `
+            <button class="role-button" onclick="chooseRole('Joueur')">Joueur</button>
+            <button class="role-button" onclick="chooseRole('Keeper')">Keeper</button>
+        `;
+        document.querySelector('.role-buttons').innerHTML = roleButtons;
+    }
+}
+
+function chooseRole(role) {
+    console.log("Rôle sélectionné:", role);
+    document.getElementById('roleSelection').style.display = 'none';
+    document.getElementById('formContainer').style.display = 'block';
+    document.getElementById('clubName').textContent = selectedClubName;
+    document.getElementById('club').value = selectedClubName;
+    document.getElementById('role').value = role;
+
+    // Utiliser les paramètres du rôle si disponibles, sinon ceux du club
+	console.log("Role choisi :", role);
+    const items = roleArticles[role] || clubArticles[selectedClubName];
+    console.log("Articles à afficher:", items);
+
+    // Afficher ou masquer les éléments selon les paramètres du rôle ou du club
+    toggleElementVisibility('jacket_size', items.jacket);
+    toggleElementVisibility('jersey_size', items.jersey);
+    toggleElementVisibility('pants_size', items.pants);
+    toggleElementVisibility('kit_size', items.kit);
+    toggleElementVisibility('bas_size', items.bas);
+    toggleElementVisibility('short_size', items.short);
+    toggleElementVisibility('under_shirt_size', items.under_shirt);
+    toggleElementVisibility('polo_size', items.polo);
+    toggleElementVisibility('option_kway', items.kway);
+	toggleElementVisibility('option_bas', items.kway);
+}
+
+
+
+function applyArticleRestrictions() {
+    const selectedClub = selectedClubName;
+    const selectedRole = document.getElementById('role').value;
+    
+    // Vérification des valeurs des configurations de club et de rôle
+    console.log("Club sélectionné:", selectedClub);
+    console.log("Rôle sélectionné:", selectedRole);
+
+    if (!selectedClub || !selectedRole) return;
+
+    const clubSettings = clubArticles[selectedClub] || {};
+    const roleSettings = roleArticles[selectedRole] || {};
+
+    console.log("Configuration du club:", clubSettings);
+    console.log("Configuration du rôle:", roleSettings);
+
+    const items = ['jacket', 'pants', 'jersey', 'kit', 'bas', 'short', 'under_shirt', 'polo', 'kway'];
+
+    // Appliquer les restrictions pour chaque article en fonction de la configuration du club et du rôle
+    items.forEach(item => {
+        const clubAvailable = clubSettings[item];
+        const roleAvailable = roleSettings[item];
+
+        const isVisible = clubAvailable && roleAvailable;
+        toggleElementVisibility(`${item}_size`, isVisible);
+    });
+}
+
+
+function toggleElementVisibility(elementId, shouldShow) {
+    const element = document.getElementById(elementId);
+    const label = document.querySelector(`label[for='${elementId}']`); // Sélectionne le label associé à l'élément
+
+    if (element) {
+        // Masquer ou afficher l'élément
+        if (shouldShow) {
+            element.style.display = 'block';
+            element.disabled = false; // Activer l'élément
+        } else {
+            element.style.display = 'none';
+            element.disabled = true; // Désactiver l'élément
+        }
+
+        // Masquer ou afficher le label
+        if (label) {
+            if (shouldShow) {
+                label.style.display = 'block';
+            } else {
+                label.style.display = 'none';
+            }
+        }
+    }
+}
+
+function toggleInitialsInput(selectElement) {
+    const initialsInput = document.getElementById('initials');
+    
+    if (selectElement.value === '1') {
+        initialsInput.style.display = 'block'; // Affiche le champ des initiales
+    } else {
+        initialsInput.style.display = 'none'; // Cache le champ des initiales
+    }
+}
+
+document.getElementById('initials_requested').addEventListener('change', function() {
+    const initialsRequested = this.value; // Récupère la valeur sélectionnée
+    document.getElementById('initials_requested').value = initialsRequested; // Assure que la valeur du champ soit correctement mise à jour
+});
+
+// À l'initialisation de la page, vérifier l'état du select et ajuster l'affichage
+document.addEventListener('DOMContentLoaded', () => {
+    const initialsSelect = document.getElementById('initials_requested');
+    const initialsInput = document.getElementById('initials');
+    if (initialsSelect.value === "1") {
+        initialsInput.style.display = 'block'; // Si l'option "Oui" est sélectionnée, afficher le champ
+    } else {
+        initialsInput.style.display = 'none'; // Sinon, le cacher
+    }
+});
+
+
+function toggleInitialsInput(selectElement) {
+    const value = selectElement.value;
+    const initialsInput = document.getElementById("initials");
+    const initialsPriceDiv = document.getElementById("initialsPrice");
+    const initialsPriceValue = document.getElementById("initialsPriceValue");
+
+    if (value === "1") {
+        initialsInput.style.display = "block";
+        initialsPriceDiv.style.display = "block";
+        
+        const price = initialsPrices[selectedClubName] || 0;
+        initialsPriceValue.textContent = price.toFixed(2);
+    } else {
+        initialsInput.style.display = "none";
+        initialsPriceDiv.style.display = "none";
+    }
+}
+
+</script>
+
+
+
+</body>
+</html>
