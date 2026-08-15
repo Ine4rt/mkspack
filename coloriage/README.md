@@ -89,20 +89,32 @@ une règle des navigateurs).
    séparément, puis maximum. Un contour rouge sur vert est détecté même quand les
    deux ont la même luminosité — ce qu'une conversion en niveaux de gris rate.
 4. Différence de gaussiennes (DoG) pour rattraper les détails fins.
-5. **Seuillage par hystérésis** (principe de Canny) : les pixels très marqués
+5. **Encre déjà présente** : un dessin animé, un logo ou un clipart possède déjà
+   ses traits noirs. Se contenter d'y chercher des gradients ferait ressortir
+   chaque trait en **double** — un contour de chaque côté, avec un creux blanc au
+   milieu — et ces fins intervalles deviendraient des zones parasites que le
+   pinceau magique accrocherait à la place de la vraie zone. On repère donc les
+   pixels franchement sombres **et** plus sombres que leur voisinage large : ils
+   deviennent le trait lui-même, et les contours de gradient qui les longent sont
+   effacés. Le test étant relatif, l'intérieur d'une grande surface sombre (un
+   vêtement bleu nuit) n'est pas noirci : seul son bord l'est, et elle reste
+   coloriable.
+6. **Seuillage par hystérésis** (principe de Canny) : les pixels très marqués
    amorcent les traits, puis on prolonge le long des pixels moyennement marqués.
    Sans cela, une image riche en petits détails consomme tout le budget de traits
    et les grands contours disparaissent.
-6. Nettoyage morphologique : suppression du bruit, fermeture des trous du contour
+7. Suppression des amas de traits trop petits pour vouloir dire quelque chose —
+   les « poussières » qui parsèment sinon le dessin.
+8. Nettoyage morphologique : suppression du bruit, fermeture des trous du contour
    (dilatation + érosion), puis épaississement selon le réglage choisi.
 
 ### Dessin → zones coloriables
 
-7. Étiquetage en composantes connexes : chaque surface blanche fermée par des
+9. Étiquetage en composantes connexes : chaque surface blanche fermée par des
    traits devient une **zone** avec son identifiant.
-8. Fusion des zones minuscules avec leur plus gros voisin (union-find, 3 passes) :
+10. Fusion des zones minuscules avec leur plus gros voisin (union-find, 3 passes) :
    c'est le réglage « niveau de détail ».
-9. Couleur moyenne de chaque zone calculée sur la photo d'origine, légèrement
+11. Couleur moyenne de chaque zone calculée sur la photo d'origine, légèrement
    avivée → c'est ce qui alimente le mode 🌈.
 
 ### Coloriage

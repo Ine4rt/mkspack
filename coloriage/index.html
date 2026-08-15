@@ -511,6 +511,30 @@ function despeckle(mask,w,h,tmp){
   }
 }
 
+/* supprime les amas de traits trop petits pour vouloir dire quelque chose :
+   ce sont les « poussieres » qui parsement sinon le dessin. */
+function removeTinyInk(mask,w,h,minSize){
+  var n=w*h, seen=new Uint8Array(n), stack=new Int32Array(n), comp=new Int32Array(n), i;
+  for(i=0;i<n;i++){
+    if(!mask[i]||seen[i]) continue;
+    var sp=0, cn=0;
+    stack[sp++]=i; seen[i]=1;
+    while(sp>0){
+      var p=stack[--sp], x=p%w, y=(p-x)/w, dx, dy, nx, ny, q;
+      comp[cn++]=p;
+      for(dy=-1;dy<=1;dy++){
+        ny=y+dy; if(ny<0||ny>=h) continue;
+        for(dx=-1;dx<=1;dx++){
+          nx=x+dx; if(nx<0||nx>=w||(!dx&&!dy)) continue;
+          q=ny*w+nx;
+          if(mask[q]&&!seen[q]){ seen[q]=1; stack[sp++]=q; }
+        }
+      }
+    }
+    if(cn<minSize){ for(var k=0;k<cn;k++) mask[comp[k]]=0; }
+  }
+}
+
 /* ------------------------------------------- etiquetage des zones (CCL) -- */
 function labelRegions(mask,w,h){
   var n=w*h, labels=new Int32Array(n), stack=new Int32Array(n), cur=0, i;
@@ -680,6 +704,30 @@ function buildMask(rgba,w,h,detail,thickness){
   var g2=blur(gs,w,h,Math.max(dogR+1,Math.round(dogR*2.5)),tmpA,tmpB);
   var dog=new Float32Array(n);
   for(i=0;i<n;i++){ var d=g2[i]-g1[i]; dog[i]=d>0?d:0; }
+
+  /* ENCRE DEJA PRESENTE.
+     Un dessin anime, un logo ou un clipart possede deja ses traits noirs. Si on
+     se contente d'y chercher des gradients, chaque trait ressort en DOUBLE (un
+     contour de chaque cote) avec un creux blanc au milieu : c'est laid, et ces
+     fins intervalles deviennent des zones coloriables parasites.
+     On repere donc les pixels franchement sombres ET plus sombres que leur
+     voisinage large : ils deviennent le trait lui-meme. Le test est relatif,
+     donc l'interieur d'une grande surface sombre (un vetement bleu nuit) n'est
+     pas noirci — seul son bord l'est, et il reste coloriable. */
+  var mean=0;
+  for(i=0;i<n;i++) mean+=gray[i];
+  mean/=n;
+  var darkAbs=Math.min(118,Math.max(45,mean*0.52)), ink=new Float32Array(n), inkN=0;
+  for(i=0;i<n;i++){
+    var da=(darkAbs-gray[i])/darkAbs;          /* 1 = tres noir, 0 = clair */
+    if(da<=0) continue;
+    var dr=(g2[i]-gray[i]-8)/32;               /* plus sombre que son voisinage */
+    if(dr<=0) continue;
+    var v=(da>1?1:da)*(dr>1?1:dr);
+    ink[i]=v;
+    if(v>0.40) inkN++;
+  }
+  if(inkN>n*0.35){ ink=new Float32Array(n); inkN=0; }  /* image sombre : on renonce */
   gs=g1=null; tmpA=null; tmpB=null;
 
   report(0.60,'Choix des traits…');
@@ -687,6 +735,8 @@ function buildMask(rgba,w,h,detail,thickness){
   var line=new Float32Array(n);
   for(i=0;i<n;i++){
     var a=sob[i]*sScale, b2=dog[i]*dScale, m=a>b2?a:b2;
+    var ik=ink[i]*1.7;            /* l'encre existante amorce le trait */
+    if(ik>m) m=ik;
     line[i]=m>2?2:m;
   }
   sob=null; dog=null;
@@ -697,10 +747,23 @@ function buildMask(rgba,w,h,detail,thickness){
 
   report(0.70,'Nettoyage du dessin…');
   var tmpM=new Uint8Array(n);
+  if(inkN){
+    /* on efface les contours de gradient colles a l'encre (les fameux doubles
+       traits) puis on repose l'encre elle-meme. */
+    var inkSure=new Uint8Array(n);
+    for(i=0;i<n;i++) inkSure[i]=ink[i]>0.40?1:0;
+    despeckle(inkSure,w,h,tmpM);
+    var inkD=inkSure.slice(), rSup=preR+1;
+    for(i=0;i<rSup;i++) dilate3(inkD,w,h,tmpM);
+    for(i=0;i<n;i++) if(inkD[i]&&ink[i]<0.12) mask[i]=0;
+    for(i=0;i<n;i++) if(inkSure[i]) mask[i]=1;
+    inkD=null; inkSure=null;
+  }
   despeckle(mask,w,h,tmpM);
   dilate3(mask,w,h,tmpM);  /* fermeture : rebouche les trous du contour */
   erode3(mask,w,h,tmpM);
   despeckle(mask,w,h,tmpM);
+  removeTinyInk(mask,w,h,Math.max(8,Math.round(n*0.000008)));
   var extra=THICK[thickness]!==undefined?THICK[thickness]:1;
   for(i=0;i<extra;i++) dilate3(mask,w,h,tmpM);
   return {mask:mask,minArea:Math.max(24,Math.round(P.minR*n))};
