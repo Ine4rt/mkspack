@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mon Coloriage Magique</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Transforme tes photos en dessins a colorier. Tout se passe dans ton navigateur.">
+<meta name="theme-color" content="#7C5CFF">
+<meta name="color-scheme" content="light">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Coloriage">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+/* ---------------------------------------------------------------- base --- */
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --v:#7C5CFF; --v2:#5B3DF5; --pink:#FF5FA2; --ink:#2B2340; --ink-soft:#6D6480;
+  --card:#FFFFFF; --line:#EDE7FA; --ok:#2FB55A;
+  --r:22px; --shadow:0 6px 18px rgba(80,50,160,.14);
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
+}
+html,body{height:100%;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  position:fixed;inset:0;overflow:hidden;overscroll-behavior:none;touch-action:manipulation;
+  font-family:ui-rounded,"SF Pro Rounded","Segoe UI Variable Display","Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color:var(--ink);background:#FDF7FF;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+img{display:block;max-width:100%}
+.hidden{display:none !important}
+
+/* ------------------------------------------------------------- screens --- */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;
+  padding:calc(var(--safe-t)) calc(var(--safe-r)) calc(var(--safe-b)) calc(var(--safe-l))}
+.screen.active{display:flex}
+.scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.pad{padding:18px}
+
+.bg-fun{background:
+  radial-gradient(1100px 620px at 12% -8%, #FFE3F1 0%, rgba(255,227,241,0) 60%),
+  radial-gradient(900px 560px at 100% 0%, #E1E7FF 0%, rgba(225,231,255,0) 62%),
+  radial-gradient(900px 700px at 50% 115%, #FFF3D6 0%, rgba(255,243,214,0) 60%),
+  #FDF7FF}
+
+/* --------------------------------------------------------------- home ---- */
+.home-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center}
+.logo{width:104px;height:104px;border-radius:30px;box-shadow:var(--shadow);
+  background:linear-gradient(135deg,var(--v),var(--pink));display:grid;place-items:center;font-size:54px;
+  animation:pop .5s cubic-bezier(.2,1.4,.4,1) both}
+h1.title{margin:6px 0 0;font-size:clamp(28px,7.5vw,42px);font-weight:900;letter-spacing:-.5px;
+  background:linear-gradient(120deg,var(--v),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.subtitle{margin:0 0 10px;color:var(--ink-soft);font-size:16px;font-weight:600;max-width:22em}
+.big-btn{width:min(440px,100%);min-height:74px;border-radius:26px;display:flex;align-items:center;gap:14px;
+  padding:14px 22px;font-size:21px;font-weight:800;background:var(--card);box-shadow:var(--shadow);
+  transition:transform .12s ease, box-shadow .12s ease}
+.big-btn .ico{font-size:32px;line-height:1}
+.big-btn:active{transform:scale(.96)}
+.big-btn.primary{background:linear-gradient(135deg,var(--v),var(--pink));color:#fff;
+  box-shadow:0 10px 26px rgba(124,92,255,.45)}
+.big-btn.ghost{background:rgba(255,255,255,.72);box-shadow:0 3px 12px rgba(80,50,160,.10)}
+.foot-note{margin-top:8px;color:var(--ink-soft);font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+
+/* --------------------------------------------------------------- bars ---- */
+.topbar{display:flex;align-items:center;gap:8px;padding:10px 12px;min-height:60px}
+.topbar h2{margin:0;font-size:19px;font-weight:800;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rbtn{width:46px;height:46px;min-width:46px;border-radius:16px;display:grid;place-items:center;font-size:22px;
+  background:var(--card);box-shadow:0 2px 8px rgba(80,50,160,.12);transition:transform .1s ease,opacity .15s}
+.rbtn:active{transform:scale(.9)}
+.rbtn[disabled]{opacity:.32;pointer-events:none}
+.rbtn.on{background:linear-gradient(135deg,var(--v),var(--pink));color:#fff}
+
+/* -------------------------------------------------------------- import --- */
+.drop{width:min(560px,100%);margin:0 auto;border:3px dashed #D8CBFF;border-radius:var(--r);background:rgba(255,255,255,.7);
+  padding:26px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.drop.hot{border-color:var(--v);background:#F3EEFF;transform:scale(1.01)}
+.drop .emoji{font-size:56px}
+.hint{color:var(--ink-soft);font-size:14px;font-weight:600;line-height:1.45}
+.preview-card{width:min(560px,100%);margin:14px auto 0;background:var(--card);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:12px;text-align:center}
+.preview-card img{width:100%;border-radius:14px;max-height:44vh;object-fit:contain;background:#F6F2FF}
+
+/* ------------------------------------------------------------- prepare --- */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(720px,100%);margin:0 auto}
+@media (max-width:420px){.compare{grid-template-columns:1fr 1fr;gap:8px}}
+.compare figure{margin:0;background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:8px;text-align:center;overflow:hidden}
+.compare figcaption{font-size:13px;font-weight:800;color:var(--ink-soft);padding:6px 0 2px}
+.compare .box{position:relative;width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#F6F2FF;display:grid;place-items:center}
+.compare canvas,.compare img{width:100%;height:100%;object-fit:contain}
+.opt{width:min(720px,100%);margin:14px auto 0}
+.opt h3{margin:0 0 8px;font-size:15px;font-weight:800;color:var(--ink-soft);display:flex;align-items:center;gap:8px}
+.seg{display:flex;gap:8px;background:rgba(255,255,255,.75);padding:6px;border-radius:20px;box-shadow:0 2px 10px rgba(80,50,160,.10)}
+.seg button{flex:1;min-height:50px;border-radius:15px;font-weight:800;font-size:15px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;transition:transform .1s}
+.seg button small{font-size:11px;font-weight:700;color:var(--ink-soft)}
+.seg button.on{background:linear-gradient(135deg,var(--v),var(--pink));color:#fff}
+.seg button.on small{color:rgba(255,255,255,.85)}
+.seg button:active{transform:scale(.95)}
+.row-actions{display:flex;gap:10px;width:min(720px,100%);margin:16px auto 6px;flex-wrap:wrap}
+.row-actions .big-btn{flex:1;min-width:180px;min-height:64px;font-size:18px;justify-content:center}
+
+/* -------------------------------------------------------------- editor --- */
+#editor{background:#F4EFFB}
+.stage{flex:1;position:relative;overflow:hidden;background:
+  linear-gradient(135deg,#EFE8FB,#F7F1FF);touch-action:none}
+#board{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.zoomctl{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:4}
+.zoomctl .rbtn{width:42px;height:42px;min-width:42px;font-size:19px;background:rgba(255,255,255,.92)}
+.toolbar{background:rgba(255,255,255,.96);box-shadow:0 -6px 22px rgba(80,50,160,.13);
+  border-radius:24px 24px 0 0;padding:8px 8px 6px}
+.tools{display:flex;gap:6px;justify-content:space-between}
+.tool{flex:1;min-width:0;height:58px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;background:#F4F0FF;transition:transform .1s}
+.tool span.i{font-size:24px;line-height:1}
+.tool span.t{font-size:10px;font-weight:800;color:var(--ink-soft);letter-spacing:-.2px}
+.tool.on{background:linear-gradient(135deg,var(--v),var(--pink));color:#fff;box-shadow:0 4px 14px rgba(124,92,255,.4)}
+.tool.on span.t{color:rgba(255,255,255,.92)}
+.tool:active{transform:scale(.94)}
+.sizes{display:flex;gap:6px;align-items:center;padding:6px 2px 2px}
+.sizes .lab{font-size:11px;font-weight:800;color:var(--ink-soft);min-width:52px}
+.sizes button{flex:1;height:38px;border-radius:14px;background:#F4F0FF;display:grid;place-items:center}
+.sizes button.on{background:#E4DAFF;box-shadow:inset 0 0 0 2px var(--v)}
+.sizes .dot{background:var(--ink);border-radius:50%}
+.palette{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 4px;scrollbar-width:none;overscroll-behavior-x:contain}
+.palette::-webkit-scrollbar{display:none}
+.swatch{width:46px;height:46px;min-width:46px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.14);
+  transition:transform .12s cubic-bezier(.2,1.4,.4,1);position:relative}
+.swatch.on{transform:scale(1.16);box-shadow:0 0 0 3px #fff,0 0 0 6px var(--v)}
+.swatch:active{transform:scale(.9)}
+.swatch.rainbow{background:conic-gradient(#E63946,#FF7A1A,#FFCF33,#2FB55A,#45B6FF,#8B5CF6,#FF6FB5,#E63946);
+  display:grid;place-items:center;font-size:20px}
+.swatch.pick{background:conic-gradient(from .5turn,#eee,#ddd);display:grid;place-items:center;font-size:20px;overflow:hidden}
+.swatch.pick input{position:absolute;inset:0;opacity:0;width:100%;height:100%;border:0;padding:0}
+.recent-sep{width:2px;min-width:2px;border-radius:2px;background:var(--line);margin:6px 2px}
+.progress-line{height:6px;border-radius:6px;background:var(--line);overflow:hidden;margin:2px 4px 0}
+.progress-line i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--v),var(--pink));transition:width .35s ease}
+
+/* ------------------------------------------------------------- gallery --- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.card .thumb{width:100%;aspect-ratio:1/1;object-fit:contain;background:#fff;border-bottom:1px solid var(--line)}
+.card .meta{padding:6px 10px 2px;font-size:12px;font-weight:700;color:var(--ink-soft)}
+.card .acts{display:flex;gap:2px;padding:4px}
+.card .acts button{flex:1;height:40px;border-radius:12px;font-size:19px;display:grid;place-items:center;background:#F6F2FF}
+.card .acts button:active{transform:scale(.92)}
+.empty{text-align:center;color:var(--ink-soft);font-weight:700;padding:40px 20px;font-size:16px;line-height:1.6}
+
+/* ------------------------------------------------------------ overlays --- */
+.overlay{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:20px;
+  background:rgba(43,35,64,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.overlay.show{display:flex}
+.sheet{width:min(460px,100%);background:var(--card);border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.3);
+  padding:22px;text-align:center;animation:pop .32s cubic-bezier(.2,1.4,.4,1) both;max-height:88vh;overflow:auto}
+.sheet h3{margin:6px 0 4px;font-size:24px;font-weight:900}
+.sheet p{margin:0 0 14px;color:var(--ink-soft);font-weight:600;line-height:1.5}
+.sheet .big-btn{margin:8px auto 0;min-height:62px;font-size:18px;justify-content:center}
+.sheet .big-btn.danger{background:#FFE9E9;color:#C62828}
+.spinner{width:74px;height:74px;margin:0 auto 14px;border-radius:50%;
+  background:conic-gradient(from 0deg,var(--v),var(--pink),#FFCF33,var(--v));
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 10px),#000 0);
+  mask:radial-gradient(farthest-side,transparent calc(100% - 10px),#000 0);animation:spin 1s linear infinite}
+.loading-txt{color:#fff;font-weight:800;font-size:19px;text-align:center;text-shadow:0 2px 10px rgba(0,0,0,.3)}
+.bar{width:min(320px,80vw);height:10px;border-radius:10px;background:rgba(255,255,255,.28);margin:12px auto 0;overflow:hidden}
+.bar i{display:block;height:100%;width:10%;border-radius:10px;background:#fff;transition:width .25s ease}
+.toast{position:fixed;left:50%;bottom:calc(22px + var(--safe-b));transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;padding:13px 20px;border-radius:16px;font-weight:800;font-size:15px;z-index:80;
+  opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{from{opacity:0;transform:scale(.86) translateY(10px)}to{opacity:1;transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.floaty{animation:floaty 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+
+/* paysage : on serre les marges verticales */
+@media (orientation:landscape) and (max-height:520px){
+  .home-wrap{gap:10px;padding:10px}
+  .logo{width:72px;height:72px;border-radius:22px;font-size:38px}
+  .big-btn{min-height:60px;font-size:18px}
+  .tool{height:50px}
+}
+</style>
+</head>
+<body class="bg-fun">
+
+<!-- ============================================================ ACCUEIL == -->
+<section class="screen active" id="s-home">
+  <div class="home-wrap">
+    <div class="logo floaty">🎨</div>
+    <h1 class="title">MON COLORIAGE</h1>
+    <p class="subtitle">Transforme une photo en dessin, puis colorie avec le doigt&nbsp;!</p>
+    <button class="big-btn primary" id="go-import"><span class="ico">📷</span><span>Importer une image</span></button>
+    <button class="big-btn" id="go-gallery"><span class="ico">🖼️</span><span>Mes coloriages</span></button>
+    <button class="big-btn ghost" id="go-settings"><span class="ico">⚙️</span><span>Paramètres</span></button>
+    <p class="foot-note">🔒 Tes photos restent dans ton appareil</p>
+  </div>
+</section>
+
+<!-- =========================================================== IMPORTER == -->
+<section class="screen" id="s-import">
+  <div class="topbar">
+    <button class="rbtn" data-back="s-home" aria-label="Retour">⬅️</button>
+    <h2>Importer une image</h2>
+    <span style="width:46px"></span>
+  </div>
+  <div class="scroll pad">
+    <div class="drop" id="drop">
+      <div class="emoji floaty">📷</div>
+      <button class="big-btn primary" id="pick-file" style="min-height:66px;justify-content:center">
+        <span class="ico">📁</span><span>Choisir une photo</span></button>
+      <button class="big-btn ghost" id="pick-camera" style="min-height:60px;justify-content:center">
+        <span class="ico">📸</span><span>Prendre une photo</span></button>
+      <p class="hint">Ou glisse une image ici.<br>JPG · PNG · WEBP · GIF · BMP</p>
+    </div>
+    <div class="preview-card hidden" id="import-preview">
+      <img id="import-img" alt="Aperçu de l'image importée">
+      <button class="big-btn primary" id="to-prepare" style="margin-top:12px;justify-content:center;min-height:66px">
+        <span class="ico">✨</span><span>Transformer en dessin</span></button>
+    </div>
+  </div>
+  <input type="file" id="file-input" accept="image/*" class="hidden">
+  <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden">
+</section>
+
+<!-- ============================================================ REGLAGES == -->
+<section class="screen" id="s-prepare">
+  <div class="topbar">
+    <button class="rbtn" data-back="s-import" aria-label="Retour">⬅️</button>
+    <h2>Ton dessin</h2>
+    <span style="width:46px"></span>
+  </div>
+  <div class="scroll pad">
+    <div class="compare">
+      <figure><div class="box"><img id="prep-orig" alt="Image originale"></div><figcaption>📷 Original</figcaption></figure>
+      <figure><div class="box"><canvas id="prep-line"></canvas></div><figcaption>✏️ Résultat</figcaption></figure>
+    </div>
+    <div class="opt">
+      <h3>✏️ Épaisseur des traits</h3>
+      <div class="seg" id="seg-thick">
+        <button data-v="fin">Fin<small>léger</small></button>
+        <button data-v="normal" class="on">Normal<small>conseillé</small></button>
+        <button data-v="epais">Épais<small>petits</small></button>
+      </div>
+    </div>
+    <div class="opt">
+      <h3>🔍 Niveau de détail</h3>
+      <div class="seg" id="seg-detail">
+        <button data-v="simple">Simple<small>tout-petits</small></button>
+        <button data-v="normal" class="on">Normal<small>conseillé</small></button>
+        <button data-v="detaille">Détaillé<small>grands</small></button>
+      </div>
+    </div>
+    <div class="row-actions">
+      <button class="big-btn ghost" data-back="s-import"><span class="ico">⬅️</span><span>Modifier</span></button>
+      <button class="big-btn primary" id="use-drawing"><span class="ico">✨</span><span>Utiliser ce dessin</span></button>
+    </div>
+    <p class="hint" style="text-align:center;margin:6px 0 20px">Astuce&nbsp;: «&nbsp;Simple&nbsp;» donne de grandes zones faciles à colorier.</p>
+  </div>
+</section>
+
+<!-- ============================================================ COLORIAGE = -->
+<section class="screen" id="s-editor">
+  <div class="topbar">
+    <button class="rbtn" id="ed-home" aria-label="Accueil">🏠</button>
+    <button class="rbtn" id="ed-undo" aria-label="Annuler" disabled>↩️</button>
+    <button class="rbtn" id="ed-redo" aria-label="Rétablir" disabled>↪️</button>
+    <span style="flex:1"></span>
+    <button class="rbtn" id="ed-reset" aria-label="Tout effacer">🔄</button>
+    <button class="rbtn" id="ed-save" aria-label="Enregistrer">💾</button>
+    <button class="rbtn" id="ed-dl" aria-label="Télécharger">📥</button>
+  </div>
+  <div class="stage" id="stage">
+    <canvas id="board"></canvas>
+    <div class="zoomctl">
+      <button class="rbtn" id="z-in" aria-label="Zoom avant">➕</button>
+      <button class="rbtn" id="z-out" aria-label="Zoom arrière">➖</button>
+      <button class="rbtn" id="z-fit" aria-label="Voir tout">⛶</button>
+    </div>
+  </div>
+  <div class="toolbar">
+    <div class="progress-line"><i id="prog"></i></div>
+    <div class="tools" id="tools">
+      <button class="tool on" data-tool="magic"><span class="i">🪄</span><span class="t">Magique</span></button>
+      <button class="tool" data-tool="bucket"><span class="i">🪣</span><span class="t">Remplir</span></button>
+      <button class="tool" data-tool="brush"><span class="i">🖌️</span><span class="t">Pinceau</span></button>
+      <button class="tool" data-tool="eraser"><span class="i">🧽</span><span class="t">Gomme</span></button>
+    </div>
+    <div class="sizes" id="sizes">
+      <span class="lab">Taille</span>
+      <button data-size="0"><i class="dot" style="width:8px;height:8px"></i></button>
+      <button data-size="1" class="on"><i class="dot" style="width:15px;height:15px"></i></button>
+      <button data-size="2"><i class="dot" style="width:24px;height:24px"></i></button>
+    </div>
+    <div class="palette" id="palette"></div>
+  </div>
+</section>
+
+<!-- ============================================================= GALERIE == -->
+<section class="screen" id="s-gallery">
+  <div class="topbar">
+    <button class="rbtn" data-back="s-home" aria-label="Retour">⬅️</button>
+    <h2>Mes coloriages</h2>
+    <button class="rbtn" id="gal-new" aria-label="Nouveau coloriage">➕</button>
+  </div>
+  <div class="scroll pad"><div class="grid" id="gal-grid"></div></div>
+</section>
+
+<!-- ============================================================ OVERLAYS == -->
+<div class="overlay" id="ov-loading">
+  <div>
+    <div class="spinner"></div>
+    <div class="loading-txt" id="load-txt">✨ Création de ton dessin…</div>
+    <div class="bar"><i id="load-bar"></i></div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-done">
+  <div class="sheet">
+    <div style="font-size:64px" class="floaty">🎉</div>
+    <h3>Bravo&nbsp;!</h3>
+    <p>Ton dessin est terminé&nbsp;!</p>
+    <button class="big-btn primary" id="done-save"><span class="ico">💾</span><span>Enregistrer</span></button>
+    <button class="big-btn" id="done-dl"><span class="ico">📥</span><span>Télécharger</span></button>
+    <button class="big-btn ghost" id="done-continue"><span class="ico">🎨</span><span>Continuer à colorier</span></button>
+    <button class="big-btn ghost" id="done-home"><span class="ico">🏠</span><span>Accueil</span></button>
+  </div>
+</div>
+
+<div class="overlay" id="ov-settings">
+  <div class="sheet">
+    <div style="font-size:52px">⚙️</div>
+    <h3>Paramètres</h3>
+    <div class="opt" style="text-align:left">
+      <h3 style="font-size:14px">🌈 Mode «&nbsp;couleurs originales&nbsp;»</h3>
+      <div class="seg" id="seg-reveal">
+        <button data-v="flat" class="on">À plat<small>couleur unie</small></button>
+        <button data-v="photo">Photo<small>texture réelle</small></button>
+      </div>
+    </div>
+    <div class="opt" style="text-align:left">
+      <h3 style="font-size:14px">🔊 Effets</h3>
+      <div class="seg" id="seg-fx">
+        <button data-v="on" class="on">Animations<small>activées</small></button>
+        <button data-v="off">Sobre<small>sans effets</small></button>
+      </div>
+    </div>
+    <p class="hint" style="margin:16px 0 6px">Tes images ne quittent jamais cet appareil&nbsp;: tout est calculé dans le navigateur et stocké en local.</p>
+    <button class="big-btn danger" id="wipe"><span class="ico">🗑️</span><span>Supprimer toutes mes données</span></button>
+    <button class="big-btn ghost" data-close-ov><span class="ico">✅</span><span>Fermer</span></button>
+    <p class="hint" id="about-line" style="margin-top:12px">Mon Coloriage Magique · 100&nbsp;% hors-ligne</p>
+  </div>
+</div>
+
+<div class="overlay" id="ov-confirm">
+  <div class="sheet">
+    <div style="font-size:52px" id="cf-emoji">❓</div>
+    <h3 id="cf-title">Confirmer</h3>
+    <p id="cf-text"></p>
+    <button class="big-btn primary" id="cf-ok"><span class="ico">✅</span><span>Oui</span></button>
+    <button class="big-btn ghost" id="cf-no"><span class="ico">❌</span><span>Non</span></button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<canvas class="confetti hidden" id="confetti"></canvas>
+
+<script>
+/* ==========================================================================
+   ProcessorLib — traitement d'image (contours + segmentation en zones).
+   Ce code est stringifie pour tourner dans un Web Worker, et sert aussi de
+   repli synchrone sur le thread principal si les Workers sont indisponibles
+   (ex. ouverture directe en file://).
+   ========================================================================== */
+function ProcessorLib(){
+'use strict';
+
+var report = function(){};
+function setReporter(fn){ report = fn || function(){}; }
+
+/* ------------------------------------------------------------ flou boite -- */
+function boxH(src,dst,w,h,r){
+  if(r<1){dst.set(src);return;}
+  var iarr=1/(r+r+1);
+  for(var y=0;y<h;y++){
+    var ti=y*w, li=ti, ri=ti+r, fv=src[ti], lv=src[ti+w-1], val=(r+1)*fv, j;
+    for(j=0;j<r;j++) val+=src[ti+j];
+    for(j=0;j<=r;j++){ val+=src[ri++]-fv; dst[ti++]=val*iarr; }
+    for(j=r+1;j<w-r;j++){ val+=src[ri++]-src[li++]; dst[ti++]=val*iarr; }
+    for(j=w-r;j<w;j++){ val+=lv-src[li++]; dst[ti++]=val*iarr; }
+  }
+}
+function boxV(src,dst,w,h,r){
+  if(r<1){dst.set(src);return;}
+  var iarr=1/(r+r+1);
+  for(var x=0;x<w;x++){
+    var ti=x, li=ti, ri=ti+r*w, fv=src[ti], lv=src[ti+w*(h-1)], val=(r+1)*fv, j;
+    for(j=0;j<r;j++) val+=src[ti+j*w];
+    for(j=0;j<=r;j++){ val+=src[ri]-fv; dst[ti]=val*iarr; ri+=w; ti+=w; }
+    for(j=r+1;j<h-r;j++){ val+=src[ri]-src[li]; dst[ti]=val*iarr; li+=w; ri+=w; ti+=w; }
+    for(j=h-r;j<h;j++){ val+=lv-src[li]; dst[ti]=val*iarr; li+=w; ti+=w; }
+  }
+}
+/* 3 passes de flou boite ~= flou gaussien */
+function blur(src,w,h,r,tmpA,tmpB){
+  var out=tmpA, tmp=tmpB;
+  r=Math.max(0,Math.min(r|0, Math.floor((Math.min(w,h)-1)/2)));
+  if(r<1){ out.set(src); return out; }
+  boxH(src,tmp,w,h,r); boxV(tmp,out,w,h,r);
+  boxH(out,tmp,w,h,r); boxV(tmp,out,w,h,r);
+  boxH(out,tmp,w,h,r); boxV(tmp,out,w,h,r);
+  return out;
+}
+
+/* ------------------------------------------------------------- gradients -- */
+function sobelInto(S,w,h,out,first){
+  for(var y=1;y<h-1;y++){
+    var row=y*w;
+    for(var x=1;x<w-1;x++){
+      var i=row+x,
+          a=S[i-w-1], b=S[i-w], c=S[i-w+1],
+          d=S[i-1],             f=S[i+1],
+          g=S[i+w-1], hh=S[i+w], k=S[i+w+1],
+          gx=(c+2*f+k)-(a+2*d+g),
+          gy=(g+2*hh+k)-(a+2*b+c),
+          m=(gx<0?-gx:gx)+(gy<0?-gy:gy);
+      if(first){ out[i]=m; } else if(m>out[i]){ out[i]=m; }
+    }
+  }
+}
+
+/* valeur seuil telle que ~pct des pixels soient au-dessus */
+function percentile(arr,pct){
+  var n=arr.length, max=0, i;
+  for(i=0;i<n;i++) if(arr[i]>max) max=arr[i];
+  if(max<=0) return 0;
+  var bins=new Uint32Array(256), s=255/max;
+  for(i=0;i<n;i++){ var v=arr[i]; if(v>0) bins[(v*s)|0]++; }
+  var want=n*pct, acc=0, b=255;
+  for(;b>0;b--){ acc+=bins[b]; if(acc>=want) break; }
+  return (b+0.5)/s;
+}
+
+/* Seuillage par hysteresis : les pixels tres marques amorcent le trait, puis
+   on prolonge le long des pixels moyennement marques. Sans cela, une image
+   riche en petits details (du texte par exemple) « mange » tout le budget de
+   traits et les grands contours disparaissent. */
+function hysteresis(line,w,h,thrHi,thrLo){
+  var n=w*h, mask=new Uint8Array(n), stack=new Int32Array(n), sp=0, i;
+  for(i=0;i<n;i++) if(line[i]>thrHi){ mask[i]=1; stack[sp++]=i; }
+  while(sp>0){
+    var p=stack[--sp], x=p%w, y=(p-x)/w, dx, dy, nx, ny, q;
+    for(dy=-1;dy<=1;dy++){
+      ny=y+dy; if(ny<0||ny>=h) continue;
+      for(dx=-1;dx<=1;dx++){
+        nx=x+dx; if(nx<0||nx>=w||(!dx&&!dy)) continue;
+        q=ny*w+nx;
+        if(!mask[q]&&line[q]>thrLo){ mask[q]=1; stack[sp++]=q; }
+      }
+    }
+  }
+  return mask;
+}
+
+/* -------------------------------------------------- morphologie binaire -- */
+function dilate3(mask,w,h,tmp){
+  tmp.set(mask);
+  for(var y=0;y<h;y++){
+    var row=y*w, up=y>0?-w:0, dn=y<h-1?w:0;
+    for(var x=0;x<w;x++){
+      var i=row+x;
+      if(tmp[i]){ mask[i]=1; continue; }
+      var l=x>0?-1:0, r=x<w-1?1:0;
+      mask[i]=(tmp[i+up]|tmp[i+dn]|tmp[i+l]|tmp[i+r]|
+               tmp[i+up+l]|tmp[i+up+r]|tmp[i+dn+l]|tmp[i+dn+r])?1:0;
+    }
+  }
+}
+function erode3(mask,w,h,tmp){
+  tmp.set(mask);
+  for(var y=0;y<h;y++){
+    var row=y*w, up=y>0?-w:0, dn=y<h-1?w:0;
+    for(var x=0;x<w;x++){
+      var i=row+x;
+      if(!tmp[i]){ mask[i]=0; continue; }
+      var l=x>0?-1:0, r=x<w-1?1:0;
+      mask[i]=(tmp[i+up]&tmp[i+dn]&tmp[i+l]&tmp[i+r]&
+               tmp[i+up+l]&tmp[i+up+r]&tmp[i+dn+l]&tmp[i+dn+r])?1:0;
+    }
+  }
+}
+/* supprime les pixels de trait isoles (bruit) */
+function despeckle(mask,w,h,tmp){
+  tmp.set(mask);
+  for(var y=1;y<h-1;y++){
+    var row=y*w;
+    for(var x=1;x<w-1;x++){
+      var i=row+x;
+      if(!tmp[i]) continue;
+      var n=tmp[i-1]+tmp[i+1]+tmp[i-w]+tmp[i+w]+tmp[i-w-1]+tmp[i-w+1]+tmp[i+w-1]+tmp[i+w+1];
+      if(n<2) mask[i]=0;
+    }
+  }
+}
+
+/* ------------------------------------------- etiquetage des zones (CCL) -- */
+function labelRegions(mask,w,h){
+  var n=w*h, labels=new Int32Array(n), stack=new Int32Array(n), cur=0, i;
+  for(i=0;i<n;i++){
+    if(mask[i]||labels[i]) continue;
+    cur++;
+    var sp=0; stack[sp++]=i; labels[i]=cur;
+    while(sp>0){
+      var p=stack[--sp], x=p%w, y=(p-x)/w, q;
+      if(x>0){ q=p-1; if(!mask[q]&&!labels[q]){labels[q]=cur;stack[sp++]=q;} }
+      if(x<w-1){ q=p+1; if(!mask[q]&&!labels[q]){labels[q]=cur;stack[sp++]=q;} }
+      if(y>0){ q=p-w; if(!mask[q]&&!labels[q]){labels[q]=cur;stack[sp++]=q;} }
+      if(y<h-1){ q=p+w; if(!mask[q]&&!labels[q]){labels[q]=cur;stack[sp++]=q;} }
+    }
+  }
+  return {labels:labels,count:cur};
+}
+
+/* fusionne les zones minuscules avec leur plus gros voisin */
+function mergeSmall(labels,w,h,count,minArea){
+  var n=w*h, parent=new Int32Array(count+1), area=new Int32Array(count+1), k,i;
+  for(k=0;k<=count;k++) parent[k]=k;
+  function find(a){ while(parent[a]!==a){ parent[a]=parent[parent[a]]; a=parent[a]; } return a; }
+  for(i=0;i<n;i++){ var l=labels[i]; if(l) area[l]++; }
+
+  for(var pass=0;pass<3;pass++){
+    var rarea=new Int32Array(count+1);
+    for(k=1;k<=count;k++) rarea[find(k)]+=area[k];
+    var votes=new Map(), small=0;
+    for(var y=0;y<h;y++){
+      var row=y*w;
+      for(var x=0;x<w;x++){
+        i=row+x;
+        var lb=labels[i]; if(!lb) continue;
+        var r=find(lb); if(rarea[r]>=minArea) continue;
+        var m=votes.get(r); if(!m){ m=new Map(); votes.set(r,m); small++; }
+        if(x>0) vote(m,r,labels[i-1],find);
+        if(x<w-1) vote(m,r,labels[i+1],find);
+        if(y>0) vote(m,r,labels[i-w],find);
+        if(y<h-1) vote(m,r,labels[i+w],find);
+      }
+    }
+    if(!small) break;
+    var changed=false;
+    votes.forEach(function(m,r){
+      if(!m.size) return;
+      var best=-1,bestScore=-1;
+      m.forEach(function(c,r2){
+        var rr=find(r2), sc=c*1e7+Math.min(rarea[rr],9e6);
+        if(sc>bestScore){ bestScore=sc; best=rr; }
+      });
+      if(best<0) return;
+      var a=find(r), b=find(best);
+      if(a===b) return;
+      if(rarea[a]>rarea[b]) parent[b]=a; else parent[a]=b;
+      changed=true;
+    });
+    if(!changed) break;
+  }
+  /* compactage des identifiants */
+  var remapRoot=new Int32Array(count+1), nc=0;
+  for(k=1;k<=count;k++){ var r2=find(k); if(!remapRoot[r2]) remapRoot[r2]=++nc; }
+  var finalMap=new Int32Array(count+1);
+  for(k=1;k<=count;k++) finalMap[k]=remapRoot[find(k)];
+  for(i=0;i<n;i++){ var lv=labels[i]; if(lv) labels[i]=finalMap[lv]; }
+  return nc;
+}
+function vote(m,r,l2,find){
+  if(!l2) return;
+  var r2=find(l2); if(r2===r) return;
+  m.set(r2,(m.get(r2)||0)+1);
+}
+
+/* ------------------------------------------ statistiques + couleurs zone -- */
+function rgb2hsl(r,g,b){
+  r/=255;g/=255;b/=255;
+  var mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,hh=0,s=0,l=(mx+mn)/2;
+  if(d>0){
+    s=l>0.5?d/(2-mx-mn):d/(mx+mn);
+    if(mx===r) hh=((g-b)/d+(g<b?6:0));
+    else if(mx===g) hh=(b-r)/d+2;
+    else hh=(r-g)/d+4;
+    hh/=6;
+  }
+  return [hh,s,l];
+}
+function hue2rgb(p,q,t){
+  if(t<0)t+=1; if(t>1)t-=1;
+  if(t<1/6) return p+(q-p)*6*t;
+  if(t<1/2) return q;
+  if(t<2/3) return p+(q-p)*(2/3-t)*6;
+  return p;
+}
+function hsl2rgb(h,s,l){
+  if(s===0){ var v=Math.round(l*255); return [v,v,v]; }
+  var q=l<0.5?l*(1+s):l+s-l*s, p=2*l-q;
+  return [Math.round(hue2rgb(p,q,h+1/3)*255),
+          Math.round(hue2rgb(p,q,h)*255),
+          Math.round(hue2rgb(p,q,h-1/3)*255)];
+}
+function regionStats(labels,rgba,w,h,count){
+  var n=w*h, area=new Uint32Array(count+1),
+      sr=new Float64Array(count+1), sg=new Float64Array(count+1), sb=new Float64Array(count+1),
+      bbox=new Int32Array(4*(count+1)), i,k;
+  for(k=1;k<=count;k++){ bbox[4*k]=w; bbox[4*k+1]=h; bbox[4*k+2]=-1; bbox[4*k+3]=-1; }
+  for(var y=0;y<h;y++){
+    var row=y*w;
+    for(var x=0;x<w;x++){
+      i=row+x; var l=labels[i]; if(!l) continue;
+      var j=i<<2;
+      area[l]++; sr[l]+=rgba[j]; sg[l]+=rgba[j+1]; sb[l]+=rgba[j+2];
+      var o=4*l;
+      if(x<bbox[o]) bbox[o]=x;
+      if(y<bbox[o+1]) bbox[o+1]=y;
+      if(x>bbox[o+2]) bbox[o+2]=x;
+      if(y>bbox[o+3]) bbox[o+3]=y;
+    }
+  }
+  var colors=new Uint8Array(3*(count+1)), colorable=0;
+  for(k=1;k<=count;k++){
+    var a=area[k]||1; colorable+=area[k];
+    var r=sr[k]/a, g=sg[k]/a, b=sb[k]/a;
+    var hsl=rgb2hsl(r,g,b);
+    /* on avive legerement la couleur moyenne : plus joli en coloriage */
+    var s=Math.min(0.95,hsl[1]*1.22), l=Math.min(0.93,Math.max(0.16,hsl[2]*1.03));
+    var out=hsl2rgb(hsl[0],s,l);
+    colors[3*k]=out[0]; colors[3*k+1]=out[1]; colors[3*k+2]=out[2];
+  }
+  return {area:area,bbox:bbox,colors:colors,colorable:colorable};
+}
+
+/* --------------------------------------------------------- pipeline main -- */
+var DETAIL={
+  simple:   {pre:2, dog:4, frac:0.030, minR:0.00220},
+  normal:   {pre:2, dog:3, frac:0.048, minR:0.00090},
+  detaille: {pre:1, dog:2, frac:0.075, minR:0.00032}
+};
+var THICK={ fin:0, normal:1, epais:2 };
+
+function buildMask(rgba,w,h,detail,thickness){
+  var n=w*h, i;
+  var P=DETAIL[detail]||DETAIL.normal;
+  /* les rayons suivent la taille de l'image (reference : 1000 px de large) */
+  var k=Math.max(0.6,Math.min(1.8,Math.sqrt(n)/1000));
+  var preR=Math.max(1,Math.round(P.pre*k)), dogR=Math.max(1,Math.round(P.dog*k));
+
+  report(0.06,'Analyse des couleurs…');
+  var gray=new Float32Array(n), R=new Float32Array(n), G=new Float32Array(n), B=new Float32Array(n);
+  for(i=0;i<n;i++){
+    var j=i<<2, r=rgba[j], g=rgba[j+1], b=rgba[j+2];
+    R[i]=r; G[i]=g; B[i]=b;
+    gray[i]=0.299*r+0.587*g+0.114*b;
+  }
+  var tmpA=new Float32Array(n), tmpB=new Float32Array(n);
+
+  report(0.16,'Lissage…');
+  var sob=new Float32Array(n), ch;
+  ch=blur(R,w,h,preR,tmpA,tmpB); sobelInto(ch,w,h,sob,true);  R=null;
+  report(0.26,'Détection des contours…');
+  ch=blur(G,w,h,preR,tmpA,tmpB); sobelInto(ch,w,h,sob,false); G=null;
+  ch=blur(B,w,h,preR,tmpA,tmpB); sobelInto(ch,w,h,sob,false); B=null;
+  ch=null;
+
+  report(0.48,'Détection des détails…');
+  var gs=blur(gray,w,h,preR,tmpA,tmpB).slice();
+  var g1=blur(gs,w,h,dogR,tmpA,tmpB).slice();
+  var g2=blur(gs,w,h,Math.max(dogR+1,Math.round(dogR*2.5)),tmpA,tmpB);
+  var dog=new Float32Array(n);
+  for(i=0;i<n;i++){ var d=g2[i]-g1[i]; dog[i]=d>0?d:0; }
+  gs=g1=null; tmpA=null; tmpB=null;
+
+  report(0.60,'Choix des traits…');
+  var sScale=1/(percentile(sob,0.020)||1), dScale=1/(percentile(dog,0.020)||1);
+  var line=new Float32Array(n);
+  for(i=0;i<n;i++){
+    var a=sob[i]*sScale, b2=dog[i]*dScale, m=a>b2?a:b2;
+    line[i]=m>2?2:m;
+  }
+  sob=null; dog=null;
+
+  var thrHi=Math.max(0.20,percentile(line,P.frac));
+  var mask=hysteresis(line,w,h,thrHi,thrHi*0.42);
+  line=null;
+
+  report(0.70,'Nettoyage du dessin…');
+  var tmpM=new Uint8Array(n);
+  despeckle(mask,w,h,tmpM);
+  dilate3(mask,w,h,tmpM);  /* fermeture : rebouche les trous du contour */
+  erode3(mask,w,h,tmpM);
+  despeckle(mask,w,h,tmpM);
+  var extra=THICK[thickness]!==undefined?THICK[thickness]:1;
+  for(i=0;i<extra;i++) dilate3(mask,w,h,tmpM);
+  return {mask:mask,minArea:Math.max(24,Math.round(P.minR*n))};
+}
+
+function segment(mask,rgba,w,h,minArea){
+  report(0.80,'Découpage des zones…');
+  var L=labelRegions(mask,w,h);
+  report(0.88,'Simplification…');
+  var count=mergeSmall(L.labels,w,h,L.count,minArea);
+  report(0.94,'Couleurs des zones…');
+  var st=regionStats(L.labels,rgba,w,h,count);
+  return {labels:L.labels,count:count,area:st.area,bbox:st.bbox,colors:st.colors,colorable:st.colorable};
+}
+
+/* op : image couleur -> dessin + zones */
+function buildLineArt(p){
+  var w=p.w,h=p.h;
+  var bm=buildMask(p.data,w,h,p.detail,p.thickness);
+  var seg=segment(bm.mask,p.data,w,h,bm.minArea);
+  report(1,'Terminé');
+  return {w:w,h:h,mask:bm.mask,labels:seg.labels,count:seg.count,area:seg.area,
+          bbox:seg.bbox,colors:seg.colors,colorable:seg.colorable};
+}
+
+/* op : masque deja connu (reouverture depuis la galerie) -> zones */
+function relabel(p){
+  var w=p.w,h=p.h;
+  var seg=segment(p.mask,p.data,w,h,Math.max(24,Math.round(0.0006*w*h)));
+  report(1,'Terminé');
+  return {w:w,h:h,mask:p.mask,labels:seg.labels,count:seg.count,area:seg.area,
+          bbox:seg.bbox,colors:seg.colors,colorable:seg.colorable};
+}
+
+return {buildLineArt:buildLineArt, relabel:relabel, setReporter:setReporter};
+}
+</script>
+
+<script>
+(function(){
+'use strict';
+
+/* ======================================================== petits helpers == */
+var $=function(s,r){return (r||document).querySelector(s);};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+var MAX_DIM=1280;              /* resolution de travail (cote le plus long) */
+var toastEl=$('#toast'), toastT=0;
+function toast(msg,ms){
+  toastEl.textContent=msg; toastEl.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(function(){toastEl.classList.remove('show');},ms||2000);
+}
+function ov(id,on){ $('#'+id).classList.toggle('show',!!on); }
+function screen(id){
+  $$('.screen').forEach(function(s){ s.classList.toggle('active', s.id===id); });
+  ST.screen=id;
+  if(id==='s-editor') requestAnimationFrame(function(){ ED.resize(); });
+}
+function confirmBox(o){
+  return new Promise(function(res){
+    $('#cf-emoji').textContent=o.emoji||'❓';
+    $('#cf-title').textContent=o.title||'Confirmer';
+    $('#cf-text').textContent=o.text||'';
+    $('#cf-ok').querySelector('span:last-child').textContent=o.ok||'Oui';
+    ov('ov-confirm',true);
+    function done(v){ ov('ov-confirm',false); $('#cf-ok').onclick=null; $('#cf-no').onclick=null; res(v); }
+    $('#cf-ok').onclick=function(){done(true);};
+    $('#cf-no').onclick=function(){done(false);};
+  });
+}
+function loading(on,txt,p){
+  ov('ov-loading',on);
+  if(txt) $('#load-txt').textContent=txt;
+  $('#load-bar').style.width=Math.round((p||0)*100)+'%';
+}
+function nowId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+var ST={ screen:'s-home', file:null, srcCanvas:null, srcData:null, thick:'normal', detail:'normal',
+         reveal:'flat', fx:true, result:null, editingId:null };
+try{
+  var pref=JSON.parse(localStorage.getItem('coloriage.prefs')||'{}');
+  if(pref.reveal) ST.reveal=pref.reveal;
+  if(pref.fx===false) ST.fx=false;
+}catch(e){}
+function savePrefs(){
+  try{ localStorage.setItem('coloriage.prefs',JSON.stringify({reveal:ST.reveal,fx:ST.fx})); }catch(e){}
+}
+
+/* ============================================================== le worker == */
+var WK=(function(){
+  var worker=null, seq=0, jobs={}, fallback=null;
+  function src(){
+    return ProcessorLib.toString()+'\n'+
+      'var LIB=ProcessorLib();\n'+
+      'LIB.setReporter(function(p,l){ self.postMessage({t:"p",p:p,l:l}); });\n'+
+      'self.onmessage=function(e){\n'+
+      '  var d=e.data;\n'+
+      '  try{\n'+
+      '    var r=LIB[d.op](d.payload);\n'+
+      '    var tr=[r.mask.buffer,r.labels.buffer,r.area.buffer,r.bbox.buffer,r.colors.buffer];\n'+
+      '    self.postMessage({t:"r",id:d.id,res:r},tr);\n'+
+      '  }catch(err){ self.postMessage({t:"e",id:d.id,msg:String(err&&err.message||err)}); }\n'+
+      '};';
+  }
+  function boot(){
+    if(worker||fallback) return;
+    try{
+      var url=URL.createObjectURL(new Blob([src()],{type:'text/javascript'}));
+      worker=new Worker(url);
+      worker.onmessage=function(e){
+        var d=e.data;
+        if(d.t==='p'){ if(jobs.cur&&jobs.cur.onp) jobs.cur.onp(d.p,d.l); return; }
+        var j=jobs[d.id]; if(!j) return; delete jobs[d.id]; jobs.cur=null;
+        if(d.t==='r') j.res(d.res); else j.rej(new Error(d.msg));
+      };
+      /* Worker refuse (ex. page ouverte en file://) : on rebascule les travaux
+         en cours sur le thread principal plutot que de les perdre. */
+      worker.onerror=function(){
+        var pending=[], k;
+        for(k in jobs){ if(k!=='cur'&&jobs[k]) pending.push([k,jobs[k]]); }
+        worker=null; jobs.cur=null;
+        pending.forEach(function(e){ delete jobs[e[0]]; local(e[1].op,e[1].payload,e[1].onp).then(e[1].res,e[1].rej); });
+      };
+    }catch(e){ worker=null; fallback=ProcessorLib(); }
+  }
+  /* repli synchrone (differe d'un tick pour laisser l'ecran se rafraichir) */
+  function local(op,payload,onp){
+    if(!fallback) fallback=ProcessorLib();
+    fallback.setReporter(onp||function(){});
+    return new Promise(function(res,rej){
+      setTimeout(function(){
+        try{ res(fallback[op](payload)); }catch(e){ rej(e); }
+      },40);
+    });
+  }
+  function run(op,payload,onp,transfer){
+    boot();
+    if(worker){
+      return new Promise(function(res,rej){
+        var id=++seq;
+        jobs[id]={res:res,rej:rej,onp:onp,op:op,payload:payload}; jobs.cur=jobs[id];
+        worker.postMessage({id:id,op:op,payload:payload},transfer||[]);
+      });
+    }
+    return local(op,payload,onp);
+  }
+  return {run:run};
+})();
+
+/* ====================================================== chargement image == */
+function fileToBitmap(file){
+  if(self.createImageBitmap){
+    return createImageBitmap(file,{imageOrientation:'from-image'})
+      .catch(function(){ return createImageBitmap(file); })
+      .catch(function(){ return viaImg(file); });
+  }
+  return viaImg(file);
+}
+function viaImg(file){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(file), im=new Image();
+    im.onload=function(){ res(im); };
+    im.onerror=function(){ URL.revokeObjectURL(url); rej(new Error('Image illisible')); };
+    im.src=url;
+  });
+}
+function makeCanvas(w,h){ var c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
+
+/* reduction progressive (par moities) : evite l'aliasing sur les grosses photos */
+function downscale(img,maxDim){
+  var iw=img.width||img.naturalWidth, ih=img.height||img.naturalHeight;
+  var sc=Math.min(1,maxDim/Math.max(iw,ih));
+  var tw=Math.max(1,Math.round(iw*sc)), th=Math.max(1,Math.round(ih*sc));
+  var cw=iw, ch=ih, cur=img;
+  while(cw>tw*2 && ch>th*2){
+    cw=Math.max(tw,Math.round(cw/2)); ch=Math.max(th,Math.round(ch/2));
+    var c=makeCanvas(cw,ch), x=c.getContext('2d');
+    x.imageSmoothingEnabled=true; x.imageSmoothingQuality='high';
+    x.drawImage(cur,0,0,cw,ch);
+    cur=c;
+  }
+  var out=makeCanvas(tw,th), o=out.getContext('2d',{willReadFrequently:true});
+  o.imageSmoothingEnabled=true; o.imageSmoothingQuality='high';
+  o.fillStyle='#fff'; o.fillRect(0,0,tw,th);
+  o.drawImage(cur,0,0,tw,th);
+  if(cur!==img && cur.width) cur.width=0;
+  if(img.close) try{img.close();}catch(e){}
+  return out;
+}
+
+/* ============================================================ importation = */
+var fileInput=$('#file-input'), camInput=$('#cam-input'), drop=$('#drop');
+$('#pick-file').onclick=function(){ fileInput.value=''; fileInput.click(); };
+$('#pick-camera').onclick=function(){ camInput.value=''; camInput.click(); };
+fileInput.onchange=function(){ if(fileInput.files[0]) handleFile(fileInput.files[0]); };
+camInput.onchange=function(){ if(camInput.files[0]) handleFile(camInput.files[0]); };
+
+['dragenter','dragover'].forEach(function(ev){
+  drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.add('hot'); });
+});
+['dragleave','drop'].forEach(function(ev){
+  drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.remove('hot'); });
+});
+drop.addEventListener('drop',function(e){
+  var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+  if(f) handleFile(f);
+});
+window.addEventListener('dragover',function(e){e.preventDefault();});
+window.addEventListener('drop',function(e){e.preventDefault();});
+document.addEventListener('paste',function(e){
+  if(ST.screen!=='s-import'&&ST.screen!=='s-home') return;
+  var it=e.clipboardData&&e.clipboardData.items;
+  if(!it) return;
+  for(var i=0;i<it.length;i++) if(it[i].type.indexOf('image/')===0){
+    var f=it[i].getAsFile(); if(f){ screen('s-import'); handleFile(f); }
+    break;
+  }
+});
+
+function handleFile(file){
+  if(!file.type || file.type.indexOf('image/')!==0){ toast('Ce fichier n’est pas une image 🙈',2600); return; }
+  screen('s-import');
+  loading(true,'📷 Ouverture de l’image…',0.2);
+  fileToBitmap(file).then(function(img){
+    ST.srcCanvas=downscale(img,MAX_DIM);
+    ST.srcData=ST.srcCanvas.getContext('2d',{willReadFrequently:true})
+                 .getImageData(0,0,ST.srcCanvas.width,ST.srcCanvas.height);
+    ST.file=file;
+    if(ST.previewURL) URL.revokeObjectURL(ST.previewURL);
+    ST.srcCanvas.toBlob(function(b){
+      var url=ST.previewURL=URL.createObjectURL(b);
+      $('#import-img').src=url;
+      $('#prep-orig').src=url;
+      $('#import-preview').classList.remove('hidden');
+      loading(false);
+      $('#import-preview').scrollIntoView({behavior:'smooth',block:'nearest'});
+    },'image/jpeg',0.9);
+  }).catch(function(err){
+    loading(false);
+    toast('Impossible de lire cette image 😕',3000);
+    console.error(err);
+  });
+}
+
+/* ============================================== generation du dessin N&B == */
+var prepTimer=0, prepBusy=false, prepAgain=false;
+function generate(){
+  if(!ST.srcData) return;
+  if(prepBusy){ prepAgain=true; return; }
+  prepBusy=true;
+  loading(true,'✨ Création de ton dessin…',0.05);
+  var d=ST.srcData;
+  WK.run('buildLineArt',{data:d.data,w:d.width,h:d.height,detail:ST.detail,thickness:ST.thick},
+    function(p,l){ loading(true,l?'✨ '+l:'✨ Création de ton dessin…',p); }
+  ).then(function(res){
+    ST.result=res;
+    drawMaskTo($('#prep-line'),res);
+    loading(false);
+    prepBusy=false;
+    if(prepAgain){ prepAgain=false; generate(); }
+  }).catch(function(err){
+    prepBusy=false; loading(false);
+    toast('Oups, la création a échoué 😕',3000);
+    console.error(err);
+  });
+}
+function drawMaskTo(cv,res){
+  cv.width=res.w; cv.height=res.h;
+  var ctx=cv.getContext('2d'), im=ctx.createImageData(res.w,res.h), d=im.data, m=res.mask;
+  for(var i=0,n=res.w*res.h;i<n;i++){
+    var j=i<<2, v=m[i]?0:255;
+    d[j]=d[j+1]=d[j+2]=v; d[j+3]=255;
+  }
+  ctx.putImageData(im,0,0);
+}
+function maskToLineCanvas(res){
+  var cv=makeCanvas(res.w,res.h), ctx=cv.getContext('2d');
+  var im=ctx.createImageData(res.w,res.h), d=im.data, m=res.mask;
+  for(var i=0,n=res.w*res.h;i<n;i++){
+    if(m[i]){ var j=i<<2; d[j]=d[j+1]=d[j+2]=26; d[j+3]=255; }
+  }
+  ctx.putImageData(im,0,0);
+  return cv;
+}
+
+$('#to-prepare').onclick=function(){ screen('s-prepare'); generate(); };
+function segWire(sel,key,cb){
+  $$(sel+' button').forEach(function(b){
+    b.onclick=function(){
+      $$(sel+' button').forEach(function(o){o.classList.remove('on');});
+      b.classList.add('on'); ST[key]=b.dataset.v; if(cb) cb();
+    };
+  });
+}
+segWire('#seg-thick','thick',function(){ clearTimeout(prepTimer); prepTimer=setTimeout(generate,120); });
+segWire('#seg-detail','detail',function(){ clearTimeout(prepTimer); prepTimer=setTimeout(generate,120); });
+segWire('#seg-reveal','reveal',savePrefs);
+segWire('#seg-fx','fx',function(){ ST.fx=(ST.fx==='on'||ST.fx===true); savePrefs(); });
+
+$$('#seg-reveal button').forEach(function(b){ b.classList.toggle('on',b.dataset.v===ST.reveal); });
+$$('#seg-fx button').forEach(function(b){ b.classList.toggle('on',(b.dataset.v==='on')===!!ST.fx); });
+
+$('#use-drawing').onclick=function(){
+  if(!ST.result){ toast('Le dessin n’est pas prêt…'); return; }
+  screen('s-editor');
+  ED.load({
+    res:ST.result,
+    origCanvas:ST.srcCanvas,
+    id:null,
+    title:'Coloriage du '+new Date().toLocaleDateString('fr-FR')
+  });
+};
+
+/* navigation simple */
+$$('[data-back]').forEach(function(b){ b.onclick=function(){ screen(b.dataset.back); }; });
+$$('[data-close-ov]').forEach(function(b){ b.onclick=function(){ $$('.overlay').forEach(function(o){o.classList.remove('show');}); }; });
+$('#go-import').onclick=function(){ screen('s-import'); };
+$('#go-gallery').onclick=function(){ screen('s-gallery'); GAL.refresh(); };
+$('#go-settings').onclick=function(){ ov('ov-settings',true); };
+$('#gal-new').onclick=function(){ screen('s-import'); };
+
+/* ========================================================================== */
+/*  EDITEUR DE COLORIAGE                                                      */
+/* ========================================================================== */
+var ED=(function(){
+  var stage=$('#stage'), board=$('#board'), ctx=board.getContext('2d');
+  var W=0,H=0,DPR=1;
+  var w=0,h=0,mask=null,labels=null,colors=null,area=null,bbox=null,count=0,colorable=1;
+  var lineCv=null,paintCv=null,pctx=null,pimg=null,pdata=null,origData=null,origCv=null;
+  var view={s:1,x:0,y:0}, fitS=1;
+  var tool='magic', color=[230,57,70], reveal=false, sizeIdx=1;
+  var painted=0, doneShown=false;
+  var history=[], hist=-1, snap=null, strokeBox=null, drawing=false;
+  var active=0, cand=0, candDist=0, last=null, magicLock=false;
+  var pendingRect=null, raf=0, fill=null;
+  var pointers=new Map(), pinch=null;
+  var id=null, title='';
+
+  /* ------------------------------------------------------------- rendu --- */
+  function invalidate(){ if(!raf) raf=requestAnimationFrame(render); }
+  function render(){
+    raf=0;
+    if(fill) stepFill();
+    if(pendingRect){
+      pctx.putImageData(pimg,0,0,pendingRect.x0,pendingRect.y0,
+                        pendingRect.x1-pendingRect.x0+1,pendingRect.y1-pendingRect.y0+1);
+      pendingRect=null;
+    }
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0,0,board.width,board.height);
+    if(!w) return;
+    ctx.save();
+    ctx.scale(DPR,DPR);
+    ctx.translate(view.x,view.y);
+    ctx.scale(view.s,view.s);
+    ctx.shadowColor='rgba(70,40,120,.22)';
+    ctx.shadowBlur=14/Math.max(view.s,.2);
+    ctx.shadowOffsetY=6/Math.max(view.s,.2);
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,w,h);
+    ctx.shadowColor='transparent'; ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+    ctx.imageSmoothingEnabled=true;
+    ctx.drawImage(paintCv,0,0);
+    ctx.drawImage(lineCv,0,0);
+    ctx.restore();
+    if(fill) invalidate();
+  }
+  function resize(){
+    W=stage.clientWidth||1; H=stage.clientHeight||1;
+    DPR=Math.min(window.devicePixelRatio||1,2.5);
+    board.width=Math.round(W*DPR); board.height=Math.round(H*DPR);
+    computeFit();
+    clampView();
+    invalidate();
+  }
+  function computeFit(){ fitS=w?Math.min(W/w,H/h)*0.94:1; }
+  function fitView(){ computeFit(); view.s=fitS; view.x=(W-w*fitS)/2; view.y=(H-h*fitS)/2; invalidate(); }
+  function clampView(){
+    if(!w) return;
+    var iw=w*view.s, ih=h*view.s;
+    if(iw<=W) view.x=(W-iw)/2; else view.x=Math.min(0,Math.max(W-iw,view.x));
+    if(ih<=H) view.y=(H-ih)/2; else view.y=Math.min(0,Math.max(H-ih,view.y));
+  }
+  function clampScale(s){ return Math.max(fitS*0.85,Math.min(fitS*12,s)); }
+  function zoomAt(f,sx,sy){
+    var ns=clampScale(view.s*f), k=ns/view.s;
+    view.x=sx-(sx-view.x)*k; view.y=sy-(sy-view.y)*k; view.s=ns;
+    clampView(); invalidate();
+  }
+
+  /* ------------------------------------------------------- chargement --- */
+  function load(o){
+    var res=o.res;
+    w=res.w; h=res.h; mask=res.mask; labels=res.labels; colors=res.colors;
+    area=res.area; bbox=res.bbox; count=res.count; colorable=res.colorable||1;
+    lineCv=maskToLineCanvas(res);
+    origCv=o.origCanvas;
+    origData=origCv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,w,h).data;
+    paintCv=makeCanvas(w,h);
+    pctx=paintCv.getContext('2d',{willReadFrequently:true});
+    if(o.paintImage) pctx.drawImage(o.paintImage,0,0,w,h);
+    pimg=pctx.getImageData(0,0,w,h); pdata=pimg.data;
+    snap=new Uint8ClampedArray(pdata.length);
+    history=[]; hist=-1; strokeBox=null; drawing=false; active=0; fill=null;
+    id=o.id||null; title=o.title||'Coloriage';
+    painted=0;
+    for(var i=0,n=w*h;i<n;i++) if(labels[i]&&pdata[(i<<2)+3]>=128) painted++;
+    doneShown=painted/colorable>=0.9;
+    ST.editingId=id;
+    resize(); fitView(); updateUI();
+  }
+
+  /* -------------------------------------------------------- peinture ---- */
+  function labelAt(x,y){
+    var xi=Math.round(x), yi=Math.round(y);
+    if(xi<0||yi<0||xi>=w||yi>=h) return 0;
+    return labels[yi*w+xi];
+  }
+  /* la zone dominante sous le pinceau (rattrape les doigts poses sur un trait) */
+  function dominant(x,y,r){
+    var counts={}, best=0, bestN=0, k, an, rr, l;
+    for(k=0;k<24;k++){
+      an=k*Math.PI/12; rr=r*((k&1)?0.5:0.85);
+      l=labelAt(x+Math.cos(an)*rr, y+Math.sin(an)*rr);
+      if(!l) continue;
+      counts[l]=(counts[l]||0)+1;
+      if(counts[l]>bestN){ bestN=counts[l]; best=l; }
+    }
+    return best;
+  }
+  /* vrai seulement si le doigt est franchement A L'INTERIEUR de la zone lb :
+     un simple depassement du trait ne suffit donc jamais a changer de zone. */
+  function deepIn(x,y,lb,r){
+    var rr=Math.max(3,r*0.55), ok=0;
+    for(var k=0;k<8;k++){
+      var an=k*Math.PI/4;
+      if(labelAt(x+Math.cos(an)*rr, y+Math.sin(an)*rr)===lb) ok++;
+    }
+    return ok>=7;
+  }
+  function radius(){
+    var base=Math.max(w,h), f=[0.020,0.036,0.058][sizeIdx];
+    return Math.max(7,Math.min(160,base*f));
+  }
+  function expand(x0,y0,x1,y1){
+    if(!pendingRect) pendingRect={x0:x0,y0:y0,x1:x1,y1:y1};
+    else{
+      if(x0<pendingRect.x0)pendingRect.x0=x0; if(y0<pendingRect.y0)pendingRect.y0=y0;
+      if(x1>pendingRect.x1)pendingRect.x1=x1; if(y1>pendingRect.y1)pendingRect.y1=y1;
+    }
+    if(!strokeBox) strokeBox={x0:x0,y0:y0,x1:x1,y1:y1};
+    else{
+      if(x0<strokeBox.x0)strokeBox.x0=x0; if(y0<strokeBox.y0)strokeBox.y0=y0;
+      if(x1>strokeBox.x1)strokeBox.x1=x1; if(y1>strokeBox.y1)strokeBox.y1=y1;
+    }
+    invalidate();
+  }
+  function compose(i,lb,a,erase){
+    var o=i<<2, da=pdata[o+3]/255, was=da>=0.5, na;
+    if(erase){
+      na=da*(1-a);
+      if(na<0.006){ pdata[o]=pdata[o+1]=pdata[o+2]=0; na=0; }
+      pdata[o+3]=na*255;
+      if(lb&&was&&na<0.5) painted--;
+      return;
+    }
+    var r,g,b;
+    if(reveal){
+      if(ST.reveal==='photo'){ r=origData[o]; g=origData[o+1]; b=origData[o+2]; }
+      else { var c3=lb*3; r=colors[c3]; g=colors[c3+1]; b=colors[c3+2]; }
+    } else { r=color[0]; g=color[1]; b=color[2]; }
+    na=a+da*(1-a);
+    if(na<=0) return;
+    var k2=a/na, k=da*(1-a)/na;
+    pdata[o]=r*k2+pdata[o]*k;
+    pdata[o+1]=g*k2+pdata[o+1]*k;
+    pdata[o+2]=b*k2+pdata[o+2]*k;
+    pdata[o+3]=na*255;
+    if(lb&&!was&&na>=0.5) painted++;
+  }
+  function stampAt(cx,cy,r,flow,erase){
+    var x0=Math.max(0,Math.floor(cx-r)), x1=Math.min(w-1,Math.ceil(cx+r));
+    var y0=Math.max(0,Math.floor(cy-r)), y1=Math.min(h-1,Math.ceil(cy+r));
+    if(x1<x0||y1<y0) return;
+    var r2=r*r, inner=r*0.5, den=Math.max(0.001,r-inner);
+    for(var y=y0;y<=y1;y++){
+      var dy=y-cy, row=y*w;
+      for(var x=x0;x<=x1;x++){
+        var dx=x-cx, d2=dx*dx+dy*dy;
+        if(d2>r2) continue;
+        var i=row+x, lb=labels[i];
+        if(!erase){
+          if(!lb) continue;                       /* jamais de couleur sur le trait */
+          if(magicLock && lb!==active) continue;  /* pinceau magique : zone verrouillee */
+        }
+        var t=(r-Math.sqrt(d2))/den;
+        if(t>1)t=1; else if(t<0) continue;
+        var a=flow*t*t*(3-2*t);
+        if(a<=0.003) continue;
+        compose(i,lb,a,erase);
+      }
+    }
+    expand(x0,y0,x1,y1);
+  }
+  function strokeSeg(a,b,r,flow,erase){
+    var dx=b.x-a.x, dy=b.y-a.y, len=Math.sqrt(dx*dx+dy*dy);
+    var step=Math.max(1,r*0.25), n=Math.max(1,Math.ceil(len/step));
+    if(n>240) n=240;
+    for(var i=1;i<=n;i++) stampAt(a.x+dx*i/n, a.y+dy*i/n, r, flow, erase);
+  }
+
+  /* --------------------------------------------------------- gestes ----- */
+  function begin(pt){
+    if(!w) return;
+    snap.set(pdata); strokeBox=null; cand=0; candDist=0; last=pt;
+    var r=radius();
+    var lb=labelAt(pt.x,pt.y);
+    if(!lb && (tool==='magic'||tool==='bucket')) lb=dominant(pt.x,pt.y,r*0.8);
+    if(tool==='bucket'){ if(lb) startFill(lb); else toast('Touche une zone blanche 🙂',1400); return; }
+    drawing=true;
+    magicLock=(tool==='magic');
+    active=magicLock?lb:0;
+    if(tool==='eraser') stampAt(pt.x,pt.y,r,0.85,true);
+    else stampAt(pt.x,pt.y,r,0.55,false);
+  }
+  function move(pt){
+    if(!drawing) return;
+    var r=radius();
+    if(magicLock){
+      var lb=labelAt(pt.x,pt.y);
+      if(!active){
+        /* le doigt s'est pose sur un trait : on accroche la premiere vraie zone */
+        if(lb&&deepIn(pt.x,pt.y,lb,r)){ active=lb; cand=0; candDist=0; }
+      } else if(lb&&lb!==active){
+        /* changement de zone volontaire uniquement : il faut etre bien a
+           l'interieur de la nouvelle zone pendant plusieurs mesures. */
+        if(lb===cand){
+          candDist++;
+          if(candDist>=3&&deepIn(pt.x,pt.y,lb,r)){ active=lb; cand=0; candDist=0; }
+        } else { cand=lb; candDist=1; }
+      } else { cand=0; candDist=0; }
+    }
+    strokeSeg(last,pt,r,(tool==='eraser')?0.85:0.55,tool==='eraser');
+    last=pt;
+  }
+  function end(){
+    if(!drawing) return;
+    drawing=false; active=0; magicLock=false;
+    if(strokeBox) pushHistory(strokeBox);
+    strokeBox=null;
+    checkDone();
+  }
+
+  /* --------------------------------------------------- pot de peinture -- */
+  function startFill(lb){
+    snap.set(pdata); strokeBox=null;
+    fill={lb:lb,step:0};
+    invalidate();
+  }
+  function stepFill(){
+    var lb=fill.lb, o=4*lb;
+    var x0=bbox[o], y0=bbox[o+1], x1=bbox[o+2], y1=bbox[o+3];
+    if(x1<x0){ fill=null; return; }
+    var lastStep=(fill.step>=4);
+    for(var y=y0;y<=y1;y++){
+      var row=y*w;
+      for(var x=x0;x<=x1;x++){
+        var i=row+x;
+        if(labels[i]!==lb) continue;
+        compose(i,lb,lastStep?1:0.42,false);
+      }
+    }
+    expand(x0,y0,x1,y1);
+    fill.step++;
+    if(lastStep){
+      fill=null;
+      if(strokeBox) pushHistory(strokeBox);
+      strokeBox=null;
+      checkDone();
+    }
+  }
+
+  /* ------------------------------------------------ annuler / retablir -- */
+  function boxSize(b){ return (b.x1-b.x0+1)*(b.y1-b.y0+1)*4; }
+  function extract(src,b){
+    var bw=b.x1-b.x0+1, bh=b.y1-b.y0+1, out=new Uint8ClampedArray(bw*bh*4), o=0;
+    for(var y=0;y<bh;y++){
+      var s=((b.y0+y)*w+b.x0)*4;
+      out.set(src.subarray(s,s+bw*4),o); o+=bw*4;
+    }
+    return out;
+  }
+  function applyPatch(b,buf){
+    var bw=b.x1-b.x0+1, bh=b.y1-b.y0+1, o=0;
+    for(var y=0;y<bh;y++){
+      var yy=b.y0+y, s=(yy*w+b.x0)*4;
+      for(var x=0;x<bw;x++){
+        var i=yy*w+b.x0+x, p=s+x*4, q=o+x*4;
+        var lb=labels[i];
+        if(lb){
+          var was=pdata[p+3]>=128, now=buf[q+3]>=128;
+          if(was&&!now) painted--; else if(!was&&now) painted++;
+        }
+        pdata[p]=buf[q]; pdata[p+1]=buf[q+1]; pdata[p+2]=buf[q+2]; pdata[p+3]=buf[q+3];
+      }
+      o+=bw*4;
+    }
+    expand(b.x0,b.y0,b.x1,b.y1);
+    strokeBox=null;
+  }
+  function pushHistory(b){
+    history.length=hist+1;
+    history.push({box:b,before:extract(snap,b),after:extract(pdata,b)});
+    var bytes=0,i;
+    for(i=0;i<history.length;i++) bytes+=boxSize(history[i].box)*2;
+    while(history.length>1&&(bytes>56e6||history.length>40)){
+      bytes-=boxSize(history[0].box)*2; history.shift();
+    }
+    hist=history.length-1;
+    updateUI();
+  }
+  function undo(){ if(hist<0) return; var e=history[hist]; applyPatch(e.box,e.before); hist--; updateUI(); }
+  function redo(){ if(hist>=history.length-1) return; hist++; var e=history[hist]; applyPatch(e.box,e.after); updateUI(); }
+  function resetAll(){
+    if(!w) return;
+    snap.set(pdata); strokeBox=null;
+    pdata.fill(0); painted=0;
+    expand(0,0,w-1,h-1);
+    if(strokeBox) pushHistory(strokeBox);
+    strokeBox=null; doneShown=false; updateUI();
+  }
+
+  /* ------------------------------------------------------------- etat --- */
+  function progress(){ return Math.min(1,painted/Math.max(1,colorable)); }
+  function updateUI(){
+    $('#ed-undo').disabled=hist<0;
+    $('#ed-redo').disabled=hist>=history.length-1;
+    $('#prog').style.width=Math.round(progress()*100)+'%';
+  }
+  function checkDone(){
+    updateUI();
+    var p=progress();
+    if(p<0.8) doneShown=false;
+    if(p>=0.9&&!doneShown){ doneShown=true; setTimeout(showDone,350); }
+  }
+
+  /* --------------------------------------------------------- pointeurs -- */
+  function toImg(e){
+    var r=stage.getBoundingClientRect();
+    return {x:(e.clientX-r.left-view.x)/view.s, y:(e.clientY-r.top-view.y)/view.s};
+  }
+  function pdist(a,b){ var dx=a.x-b.x, dy=a.y-b.y; return Math.sqrt(dx*dx+dy*dy)||1; }
+  function pmid(a,b){ return {x:(a.x+b.x)/2, y:(a.y+b.y)/2}; }
+  function startPinch(){
+    var p=[]; pointers.forEach(function(v){p.push(v);});
+    if(p.length<2) return;
+    pinch={d:pdist(p[0],p[1]), c:pmid(p[0],p[1]), s:view.s, x:view.x, y:view.y};
+  }
+  function doPinch(){
+    if(!pinch) return;
+    var p=[]; pointers.forEach(function(v){p.push(v);});
+    if(p.length<2) return;
+    var r=stage.getBoundingClientRect();
+    var d=pdist(p[0],p[1]), c=pmid(p[0],p[1]);
+    var ns=clampScale(pinch.s*(d/pinch.d)), k=ns/pinch.s;
+    var c0x=pinch.c.x-r.left, c0y=pinch.c.y-r.top;
+    view.s=ns;
+    view.x=(c.x-r.left)-(c0x-pinch.x)*k;
+    view.y=(c.y-r.top)-(c0y-pinch.y)*k;
+    clampView(); invalidate();
+  }
+  board.addEventListener('pointerdown',function(e){
+    e.preventDefault();
+    try{ board.setPointerCapture(e.pointerId); }catch(err){}
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pointers.size===1){ begin(toImg(e)); }
+    else if(pointers.size===2){ if(drawing) end(); startPinch(); }
+  });
+  board.addEventListener('pointermove',function(e){
+    if(!pointers.has(e.pointerId)) return;
+    e.preventDefault();
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pointers.size>=2){ doPinch(); return; }
+    if(!drawing) return;
+    var evs=(e.getCoalescedEvents?e.getCoalescedEvents():null);
+    if(evs&&evs.length){ for(var i=0;i<evs.length;i++) move(toImg(evs[i])); }
+    else move(toImg(e));
+  });
+  function up(e){
+    if(!pointers.has(e.pointerId)) return;
+    pointers.delete(e.pointerId);
+    if(pointers.size<2) pinch=null;
+    if(pointers.size===0) end();
+  }
+  board.addEventListener('pointerup',up);
+  board.addEventListener('pointercancel',up);
+  board.addEventListener('lostpointercapture',up);
+  board.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+  board.addEventListener('wheel',function(e){
+    e.preventDefault();
+    var r=stage.getBoundingClientRect();
+    zoomAt(e.deltaY<0?1.12:1/1.12, e.clientX-r.left, e.clientY-r.top);
+  },{passive:false});
+  stage.addEventListener('touchmove',function(e){ e.preventDefault(); },{passive:false});
+  window.addEventListener('resize',function(){ if(ST.screen==='s-editor') resize(); });
+  if(window.visualViewport) window.visualViewport.addEventListener('resize',function(){
+    if(ST.screen==='s-editor') resize();
+  });
+
+  /* ------------------------------------------------------ composition --- */
+  function composite(){
+    var c=makeCanvas(w,h), x=c.getContext('2d');
+    x.fillStyle='#ffffff'; x.fillRect(0,0,w,h);
+    x.drawImage(paintCv,0,0); x.drawImage(lineCv,0,0);
+    return c;
+  }
+  function thumbnail(size){
+    var sc=Math.min(1,size/Math.max(w,h)), tw=Math.max(1,Math.round(w*sc)), th=Math.max(1,Math.round(h*sc));
+    var c=makeCanvas(tw,th), x=c.getContext('2d');
+    x.fillStyle='#ffffff'; x.fillRect(0,0,tw,th);
+    x.imageSmoothingEnabled=true; x.imageSmoothingQuality='high';
+    x.drawImage(paintCv,0,0,tw,th); x.drawImage(lineCv,0,0,tw,th);
+    return c;
+  }
+  function toBlob(cv,type,q){
+    return new Promise(function(res){
+      if(cv.toBlob) cv.toBlob(function(b){ res(b); },type,q);
+      else{
+        var d=cv.toDataURL(type,q), bin=atob(d.split(',')[1]), u=new Uint8Array(bin.length);
+        for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+        res(new Blob([u],{type:type}));
+      }
+    });
+  }
+
+  return {
+    load:load, resize:resize, fitView:fitView, zoomAt:zoomAt, undo:undo, redo:redo,
+    resetAll:resetAll, composite:composite, thumbnail:thumbnail, toBlob:toBlob,
+    lineCanvas:function(){return lineCv;}, origCanvas:function(){return origCv;},
+    paintCanvas:function(){return paintCv;},
+    size:function(){return {w:w,h:h};},
+    ready:function(){return !!w;},
+    stats:function(){ return {w:w,h:h,zones:count,colorable:colorable,painted:painted,
+                              view:{s:view.s,x:view.x,y:view.y},undo:hist,redo:history.length-1-hist}; },
+    labelAt:labelAt,
+    getId:function(){return id;}, setId:function(v){id=v;ST.editingId=v;},
+    getTitle:function(){return title;}, setTitle:function(t){title=t;},
+    setTool:function(t){tool=t;},
+    setColor:function(rgb){ color=rgb; reveal=false; },
+    setReveal:function(v){ reveal=!!v; },
+    isReveal:function(){ return reveal; },
+    setSize:function(i){ sizeIdx=i; },
+    zoomIn:function(){ zoomAt(1.35,W/2,H/2); },
+    zoomOut:function(){ zoomAt(1/1.35,W/2,H/2); },
+    progress:progress
+  };
+})();
+
+/* ========================================================================== */
+/*  OUTILS, COULEURS                                                          */
+/* ========================================================================== */
+var COLORS=['#E63946','#FF7A1A','#FFCF33','#9BD62F','#2FB55A','#12B5A6','#45B6FF','#2D6CDF',
+            '#8B5CF6','#FF6FB5','#8B5A2B','#F2C9A0','#1A1A1A','#9AA3AD','#FFFFFF'];
+var recents=[];
+try{ recents=JSON.parse(localStorage.getItem('coloriage.recents')||'[]'); }catch(e){}
+
+function hex2rgb(hx){
+  hx=hx.replace('#','');
+  if(hx.length===3) hx=hx[0]+hx[0]+hx[1]+hx[1]+hx[2]+hx[2];
+  var v=parseInt(hx,16);
+  return [(v>>16)&255,(v>>8)&255,v&255];
+}
+function pickColor(hex,el){
+  ED.setColor(hex2rgb(hex));
+  recents=[hex].concat(recents.filter(function(c){return c.toLowerCase()!==hex.toLowerCase();})).slice(0,6);
+  try{ localStorage.setItem('coloriage.recents',JSON.stringify(recents)); }catch(e){}
+  buildPalette(hex);
+}
+function buildPalette(sel){
+  var p=$('#palette');
+  p.innerHTML='';
+  var rb=document.createElement('button');
+  rb.className='swatch rainbow'+(ED.isReveal()?' on':'');
+  rb.title='Couleurs originales'; rb.setAttribute('aria-label','Couleurs originales');
+  rb.textContent='🌈';
+  rb.onclick=function(){ ED.setReveal(!ED.isReveal()); buildPalette(sel);
+    toast(ED.isReveal()?'🌈 Couleurs originales !':'🎨 Coloriage libre',1400); };
+  p.appendChild(rb);
+
+  var pick=document.createElement('label');
+  pick.className='swatch pick'; pick.title='Choisir une couleur';
+  pick.innerHTML='🎨<input type="color" value="'+(sel&&sel[0]==='#'?sel:'#E63946')+'">';
+  pick.querySelector('input').oninput=function(){ pickColor(this.value); };
+  p.appendChild(pick);
+
+  if(recents.length){
+    var sep=document.createElement('i'); sep.className='recent-sep'; p.appendChild(sep);
+    recents.forEach(function(c){ p.appendChild(swatch(c,sel)); });
+  }
+  var sep2=document.createElement('i'); sep2.className='recent-sep'; p.appendChild(sep2);
+  COLORS.forEach(function(c){ p.appendChild(swatch(c,sel)); });
+}
+function swatch(c,sel){
+  var b=document.createElement('button');
+  b.className='swatch'+((!ED.isReveal()&&sel&&sel.toLowerCase()===c.toLowerCase())?' on':'');
+  b.style.background=c; b.setAttribute('aria-label','Couleur '+c);
+  b.onclick=function(){ pickColor(c); };
+  return b;
+}
+$$('#tools .tool').forEach(function(b){
+  b.onclick=function(){
+    $$('#tools .tool').forEach(function(o){o.classList.remove('on');});
+    b.classList.add('on'); ED.setTool(b.dataset.tool);
+  };
+});
+$$('#sizes button').forEach(function(b){
+  b.onclick=function(){
+    $$('#sizes button').forEach(function(o){o.classList.remove('on');});
+    b.classList.add('on'); ED.setSize(parseInt(b.dataset.size,10));
+  };
+});
+$('#z-in').onclick=function(){ ED.zoomIn(); };
+$('#z-out').onclick=function(){ ED.zoomOut(); };
+$('#z-fit').onclick=function(){ ED.fitView(); };
+$('#ed-undo').onclick=function(){ ED.undo(); };
+$('#ed-redo').onclick=function(){ ED.redo(); };
+$('#ed-reset').onclick=function(){
+  confirmBox({emoji:'🔄',title:'Tout effacer ?',text:'Le coloriage repart à zéro (le dessin reste).',ok:'Effacer'})
+    .then(function(v){ if(v){ ED.resetAll(); toast('Page blanche ! ✨'); } });
+};
+$('#ed-home').onclick=function(){
+  /* on sauvegarde discretement pour ne rien perdre, puis retour a l'accueil */
+  if(ED.ready()&&ED.progress()>0.002) saveCurrent(false).then(function(){ screen('s-home'); });
+  else screen('s-home');
+};
+$('#ed-save').onclick=function(){ saveCurrent(true); };
+$('#ed-dl').onclick=function(){ downloadCurrent(); };
+document.addEventListener('keydown',function(e){
+  if(ST.screen!=='s-editor') return;
+  var k=e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&k==='z'){ e.preventDefault(); e.shiftKey?ED.redo():ED.undo(); }
+  else if((e.ctrlKey||e.metaKey)&&k==='y'){ e.preventDefault(); ED.redo(); }
+  else if((e.ctrlKey||e.metaKey)&&k==='s'){ e.preventDefault(); saveCurrent(true); }
+});
+
+/* ========================================================================== */
+/*  ENREGISTREMENT / EXPORT                                                   */
+/* ========================================================================== */
+var DB=(function(){
+  var dbp=null;
+  function open(){
+    if(dbp) return dbp;
+    dbp=new Promise(function(res,rej){
+      if(!self.indexedDB) return rej(new Error('IndexedDB indisponible'));
+      var rq=indexedDB.open('coloriage-magique',1);
+      rq.onupgradeneeded=function(){
+        var db=rq.result;
+        if(!db.objectStoreNames.contains('drawings')) db.createObjectStore('drawings',{keyPath:'id'});
+      };
+      rq.onsuccess=function(){ res(rq.result); };
+      rq.onerror=function(){ rej(rq.error); };
+    });
+    return dbp;
+  }
+  function run(mode,fn){
+    return open().then(function(db){
+      return new Promise(function(res,rej){
+        var t=db.transaction('drawings',mode), s=t.objectStore('drawings'), r=fn(s);
+        t.oncomplete=function(){ res(r?r.result:undefined); };
+        t.onerror=function(){ rej(t.error); };
+        t.onabort=function(){ rej(t.error); };
+      });
+    });
+  }
+  return {
+    all:function(){ return run('readonly',function(s){ return s.getAll(); }); },
+    get:function(id){ return run('readonly',function(s){ return s.get(id); }); },
+    put:function(rec){ return run('readwrite',function(s){ return s.put(rec); }); },
+    del:function(id){ return run('readwrite',function(s){ return s.delete(id); }); },
+    clear:function(){ return run('readwrite',function(s){ return s.clear(); }); }
+  };
+})();
+
+function saveCurrent(notify){
+  if(!ED.ready()){ toast('Rien à enregistrer 🙂'); return Promise.resolve(); }
+  var sz=ED.size();
+  return Promise.all([
+    ED.toBlob(ED.thumbnail(340),'image/png'),
+    ED.toBlob(ED.lineCanvas(),'image/png'),
+    ED.toBlob(ED.origCanvas(),'image/jpeg',0.85),
+    ED.toBlob(ED.paintCanvas(),'image/png')
+  ]).then(function(b){
+    var rec={ id:ED.getId()||nowId(), title:ED.getTitle(), w:sz.w, h:sz.h,
+              createdAt:Date.now(), updatedAt:Date.now(),
+              thumb:b[0], line:b[1], orig:b[2], paint:b[3] };
+    return DB.get(rec.id).then(function(old){
+      if(old&&old.createdAt) rec.createdAt=old.createdAt;
+      return DB.put(rec);
+    }).then(function(){
+      ED.setId(rec.id);
+      if(notify) toast('💾 Coloriage enregistré !');
+    });
+  }).catch(function(e){
+    console.error(e);
+    toast('Enregistrement impossible 😕',3000);
+  });
+}
+function saveBlob(blob,name){
+  var file=null;
+  try{ file=new File([blob],name,{type:blob.type}); }catch(e){}
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){
+    navigator.share({files:[file],title:name}).catch(function(){ anchorSave(blob,name); });
+    return;
+  }
+  anchorSave(blob,name);
+}
+function anchorSave(blob,name){
+  var url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=name; a.rel='noopener';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); },4000);
+}
+function downloadCurrent(){
+  if(!ED.ready()) return;
+  ED.toBlob(ED.composite(),'image/png').then(function(b){
+    saveBlob(b,'coloriage-'+new Date().toISOString().slice(0,10)+'.png');
+    toast('📥 Image prête !');
+  });
+}
+
+/* ========================================================================== */
+/*  GALERIE                                                                   */
+/* ========================================================================== */
+function blobToBitmap(b){
+  if(self.createImageBitmap) return createImageBitmap(b).catch(function(){ return viaImg(b); });
+  return viaImg(b);
+}
+var GAL=(function(){
+  function refresh(){
+    var g=$('#gal-grid');
+    DB.all().then(function(list){
+      list=(list||[]).sort(function(a,b){ return b.updatedAt-a.updatedAt; });
+      if(!list.length){
+        g.innerHTML='<div class="empty">🖼️<br>Aucun coloriage pour l’instant.<br>Importe une image pour commencer&nbsp;!</div>';
+        return;
+      }
+      g.innerHTML='';
+      list.forEach(function(rec){
+        var c=document.createElement('div'); c.className='card';
+        var im=document.createElement('img'); im.className='thumb'; im.alt=rec.title||'Coloriage';
+        im.src=URL.createObjectURL(rec.thumb);
+        im.onload=function(){ URL.revokeObjectURL(im.src); };
+        c.appendChild(im);
+        var m=document.createElement('div'); m.className='meta';
+        m.textContent=new Date(rec.updatedAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+        c.appendChild(m);
+        var acts=document.createElement('div'); acts.className='acts';
+        acts.appendChild(btn('✏️','Ouvrir et modifier',function(){ openRec(rec.id); }));
+        acts.appendChild(btn('📥','Télécharger',function(){ exportRecord(rec); }));
+        acts.appendChild(btn('🗑️','Supprimer',function(){
+          confirmBox({emoji:'🗑️',title:'Supprimer ?',text:'Ce coloriage sera effacé définitivement.',ok:'Supprimer'})
+            .then(function(v){ if(v) DB.del(rec.id).then(function(){ refresh(); toast('Supprimé'); }); });
+        }));
+        c.appendChild(acts);
+        g.appendChild(c);
+      });
+    }).catch(function(e){
+      console.error(e);
+      g.innerHTML='<div class="empty">Stockage local indisponible 😕<br>(navigation privée&nbsp;?)</div>';
+    });
+  }
+  function btn(txt,label,fn){
+    var b=document.createElement('button'); b.textContent=txt;
+    b.setAttribute('aria-label',label); b.onclick=fn; return b;
+  }
+  function exportRecord(rec){
+    Promise.all([blobToBitmap(rec.paint),blobToBitmap(rec.line)]).then(function(a){
+      var c=makeCanvas(rec.w,rec.h), x=c.getContext('2d');
+      x.fillStyle='#fff'; x.fillRect(0,0,rec.w,rec.h);
+      x.drawImage(a[0],0,0,rec.w,rec.h); x.drawImage(a[1],0,0,rec.w,rec.h);
+      return ED.toBlob(c,'image/png');
+    }).then(function(b){
+      saveBlob(b,'coloriage-'+new Date(rec.updatedAt).toISOString().slice(0,10)+'.png');
+    }).catch(function(e){ console.error(e); toast('Export impossible 😕'); });
+  }
+  function openRec(recId){
+    loading(true,'📂 Ouverture du coloriage…',0.1);
+    DB.get(recId).then(function(rec){
+      if(!rec) throw new Error('introuvable');
+      return Promise.all([blobToBitmap(rec.line),blobToBitmap(rec.orig),blobToBitmap(rec.paint)])
+        .then(function(a){
+          var lineBmp=a[0], origBmp=a[1], paintBmp=a[2];
+          var oc=makeCanvas(rec.w,rec.h), ox=oc.getContext('2d',{willReadFrequently:true});
+          ox.drawImage(origBmp,0,0,rec.w,rec.h);
+          var lc=makeCanvas(rec.w,rec.h), lx=lc.getContext('2d',{willReadFrequently:true});
+          lx.drawImage(lineBmp,0,0,rec.w,rec.h);
+          var ld=lx.getImageData(0,0,rec.w,rec.h).data, n=rec.w*rec.h, mk=new Uint8Array(n);
+          for(var i=0;i<n;i++) mk[i]=ld[(i<<2)+3]>128?1:0;
+          var od=ox.getImageData(0,0,rec.w,rec.h);
+          return WK.run('relabel',{mask:mk,data:od.data,w:rec.w,h:rec.h},
+                        function(p,l){ loading(true,'📂 '+(l||'Ouverture…'),p); })
+            .then(function(res){
+              screen('s-editor');
+              ED.load({res:res,origCanvas:oc,paintImage:paintBmp,id:rec.id,title:rec.title});
+              loading(false);
+            });
+        });
+    }).catch(function(e){
+      loading(false); console.error(e); toast('Impossible d’ouvrir ce coloriage 😕',3000);
+    });
+  }
+  return {refresh:refresh, open:openRec};
+})();
+
+/* ========================================================================== */
+/*  FIN DE COLORIAGE + CONFETTIS                                              */
+/* ========================================================================== */
+function showDone(){
+  ov('ov-done',true);
+  if(ST.fx) confetti(2200);
+}
+$('#done-save').onclick=function(){ saveCurrent(true).then(function(){ ov('ov-done',false); }); };
+$('#done-dl').onclick=function(){ downloadCurrent(); };
+$('#done-continue').onclick=function(){ ov('ov-done',false); };
+$('#done-home').onclick=function(){ ov('ov-done',false); saveCurrent(false).then(function(){ screen('s-home'); }); };
+
+function confetti(ms){
+  var cv=$('#confetti'), x=cv.getContext('2d');
+  cv.classList.remove('hidden');
+  var W=cv.width=window.innerWidth, H=cv.height=window.innerHeight;
+  var parts=[], cols=['#E63946','#FF7A1A','#FFCF33','#2FB55A','#45B6FF','#8B5CF6','#FF6FB5'];
+  for(var i=0;i<110;i++) parts.push({
+    x:Math.random()*W, y:-20-Math.random()*H*0.5,
+    vx:(Math.random()-0.5)*1.6, vy:2+Math.random()*3.4,
+    s:6+Math.random()*8, r:Math.random()*Math.PI, vr:(Math.random()-0.5)*0.25,
+    c:cols[(Math.random()*cols.length)|0]
+  });
+  var t0=performance.now();
+  (function loop(t){
+    x.clearRect(0,0,W,H);
+    for(var i=0;i<parts.length;i++){
+      var p=parts[i]; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr;
+      x.save(); x.translate(p.x,p.y); x.rotate(p.r);
+      x.fillStyle=p.c; x.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6); x.restore();
+    }
+    if(t-t0<ms) requestAnimationFrame(loop);
+    else { x.clearRect(0,0,W,H); cv.classList.add('hidden'); }
+  })(t0);
+}
+
+/* ========================================================================== */
+/*  PARAMETRES / DONNEES                                                      */
+/* ========================================================================== */
+$('#wipe').onclick=function(){
+  confirmBox({emoji:'🗑️',title:'Tout supprimer ?',
+    text:'Tous tes coloriages enregistrés et tes réglages seront effacés de cet appareil.',ok:'Tout supprimer'})
+  .then(function(v){
+    if(!v) return;
+    var jobs=[DB.clear().catch(function(){})];
+    if(self.caches&&caches.keys) jobs.push(caches.keys().then(function(k){
+      return Promise.all(k.map(function(n){ return caches.delete(n); }));
+    }).catch(function(){}));
+    Promise.all(jobs).then(function(){
+      try{ localStorage.removeItem('coloriage.recents'); localStorage.removeItem('coloriage.prefs'); }catch(e){}
+      recents=[]; buildPalette('#E63946');
+      GAL.refresh(); ov('ov-settings',false);
+      toast('Toutes tes données ont été supprimées ✅',2600);
+    });
+  });
+};
+
+/* ========================================================================== */
+/*  PWA                                                                       */
+/* ========================================================================== */
+(function pwa(){
+  if(location.protocol==='http:'||location.protocol==='https:'){
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',function(){
+        navigator.serviceWorker.register('sw.js').catch(function(){ /* mono-fichier : normal */ });
+      });
+    }
+  }
+  /* si manifest.webmanifest n'est pas depose a cote du HTML, on en fabrique un */
+  var link=document.querySelector('link[rel="manifest"]');
+  if(!link) return;
+  fetch(link.href,{method:'GET'}).then(function(r){
+    if(r.ok) return null;
+    throw new Error('no manifest');
+  }).catch(function(){
+    try{
+      var icon=iconDataURL(512);
+      var mf={ name:'Mon Coloriage Magique', short_name:'Coloriage', start_url:location.href.split('#')[0],
+        scope:'./', display:'standalone', orientation:'any', background_color:'#FDF7FF', theme_color:'#7C5CFF',
+        description:'Transforme tes photos en dessins à colorier.',
+        icons:[{src:icon,sizes:'512x512',type:'image/png',purpose:'any'},
+               {src:icon,sizes:'512x512',type:'image/png',purpose:'maskable'}] };
+      link.href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/manifest+json'}));
+    }catch(e){}
+  });
+})();
+function iconDataURL(s){
+  var c=makeCanvas(s,s), x=c.getContext('2d');
+  var g=x.createLinearGradient(0,0,s,s); g.addColorStop(0,'#7C5CFF'); g.addColorStop(1,'#FF5FA2');
+  x.fillStyle=g; x.fillRect(0,0,s,s);
+  x.fillStyle='#fffdfa'; x.beginPath(); x.arc(s*0.5,s*0.53,s*0.30,0,6.2832); x.fill();
+  var dots=[[-0.42,-0.36,'#E63946'],[0.06,-0.52,'#FFB02E'],[0.50,-0.20,'#2FB55A'],
+            [-0.48,0.22,'#45B6FF'],[-0.02,0.30,'#8B5CF6']];
+  dots.forEach(function(d){
+    x.fillStyle=d[2]; x.beginPath();
+    x.arc(s*0.5+d[0]*s*0.30, s*0.53+d[1]*s*0.30, s*0.062,0,6.2832); x.fill();
+  });
+  return c.toDataURL('image/png');
+}
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault(); deferredPrompt=e;
+  var b=document.createElement('button');
+  b.className='big-btn ghost';
+  b.innerHTML='<span class="ico">📲</span><span>Installer l’application</span>';
+  b.onclick=function(){
+    b.remove();
+    deferredPrompt.prompt();
+    deferredPrompt=null;
+  };
+  $('#go-settings').insertAdjacentElement('afterend',b);
+});
+
+/* ========================================================================== */
+/*  DEMARRAGE                                                                 */
+/* ========================================================================== */
+buildPalette('#E63946');
+ED.setColor(hex2rgb('#E63946'));
+window.addEventListener('orientationchange',function(){
+  setTimeout(function(){ if(ST.screen==='s-editor') ED.resize(); },250);
+});
+document.addEventListener('gesturestart',function(e){ e.preventDefault(); },{passive:false});
+document.addEventListener('gesturechange',function(e){ e.preventDefault(); },{passive:false});
+document.addEventListener('touchmove',function(e){ if(e.touches.length>1) e.preventDefault(); },{passive:false});
+document.addEventListener('dblclick',function(e){ e.preventDefault(); },{passive:false});
+window.CM={ED:ED,ST:ST,DB:DB,GAL:GAL,WK:WK,screen:screen};  /* utile pour le debug */
+})();
+</script>
+</body>
+</html>
