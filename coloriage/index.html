@@ -1778,7 +1778,12 @@ $('#wipe').onclick=function(){
   if(location.protocol==='http:'||location.protocol==='https:'){
     if('serviceWorker' in navigator){
       window.addEventListener('load',function(){
-        navigator.serviceWorker.register('sw.js').catch(function(){ /* mono-fichier : normal */ });
+        /* sw.js peut ne pas avoir ete depose (usage mono-fichier) : on verifie
+           avant d'enregistrer, pour ne pas polluer la console d'une erreur. */
+        fetch('sw.js',{method:'GET'}).then(function(r){
+          var t=r.headers.get('content-type')||'';
+          if(r.ok&&t.indexOf('javascript')>=0) return navigator.serviceWorker.register('sw.js');
+        }).catch(function(){});
       });
     }
   }
