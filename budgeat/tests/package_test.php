@@ -25,7 +25,7 @@ echo "\n== Construction de l'archive ==\n";
 exec(sprintf('php %s 2>&1', escapeshellarg("$root/scripts/build_release.php")), $output, $code);
 check('le script de build s\'exécute', $code === 0, implode("\n", array_slice($output, -4)));
 
-$zips = glob(dirname($root) . '/budgeat-*.zip');
+$zips = glob("$root/dist/budgeat-*.zip");
 usort($zips, fn($a, $b) => filemtime($b) <=> filemtime($a));
 $zipPath = $zips[0] ?? null;
 check('une archive est produite', $zipPath !== null);

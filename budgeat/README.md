@@ -71,7 +71,7 @@ Prérequis : PHP 8.1+ avec `pdo_sqlite` et `curl`. Aucun Composer, aucun build.
 ### Par FTP (hébergement mutualisé)
 
 ```bash
-php scripts/build_release.php      # produit ../budgeat-AAAA-MM-JJ.zip
+php scripts/build_release.php      # produit dist/budgeat-AAAA-MM-JJ.zip
 ```
 
 Décompressez, envoyez le contenu dans le dossier public, ouvrez

@@ -1,2 +1,8 @@
 config.php
 storage/
+dist/
+
+# Fichiers de travail produits par les scripts de prix
+data/releves.csv
+data/carnet.txt
+data/a_mapper.txt

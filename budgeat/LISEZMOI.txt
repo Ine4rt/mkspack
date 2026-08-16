@@ -147,4 +147,7 @@ Les prix ne se collectent pas
 
 
 ================================================================================
+L'archive se régénère à tout moment avec :  php scripts/build_release.php
+Elle est écrite dans dist/, et n'est pas versionnée.
+
 Le détail technique complet est dans README.md.

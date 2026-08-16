@@ -14,10 +14,14 @@ declare(strict_types=1);
 $root = realpath(__DIR__ . '/..');
 $name = 'budgeat';
 $version = date('Y-m-d');
-$zipPath = dirname($root) . "/$name-$version.zip";
+$distDir = "$root/dist";
+if (!is_dir($distDir)) {
+    mkdir($distDir, 0775, true);
+}
+$zipPath = "$distDir/$name-$version.zip";
 
 // Ce qui ne part jamais : secrets, données locales, outillage de développement.
-$excludeDirs = ['storage', 'tests', '.git', 'node_modules'];
+$excludeDirs = ['storage', 'tests', '.git', 'node_modules', 'dist'];
 $excludeFiles = ['config.php', '.DS_Store', 'releves.csv', 'carnet.txt', 'a_mapper.txt'];
 $excludeExt = ['sqlite', 'sqlite-wal', 'sqlite-shm', 'log', 'zip'];
 
