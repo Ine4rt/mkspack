@@ -47,6 +47,9 @@ final class App
             mkdir($dir, 0775, true);
         }
 
+        $this->protectStorage($dir);
+        $path = $this->resolveDatabasePath($path, $dir);
+
         $fresh = !file_exists($path);
         $this->db = new PDO('sqlite:' . $path, null, null, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -58,6 +61,52 @@ final class App
         if ($fresh || !$this->tableExists('users')) {
             $this->db->exec(file_get_contents(__DIR__ . '/../schema.sql'));
         }
+    }
+
+    /**
+     * Le dossier de stockage se retrouve souvent à l'intérieur du répertoire
+     * public après un envoi par FTP. Le .htaccess ne couvre qu'Apache : sur
+     * nginx, une base nommée de façon prévisible se télécharge en une requête.
+     * On sème donc les protections qu'on peut, et on rend le nom du fichier
+     * non devinable — install.php vérifie ensuite l'accès pour de bon.
+     */
+    private function protectStorage(string $dir): void
+    {
+        if (!is_writable($dir)) {
+            return;
+        }
+        if (!file_exists("$dir/.htaccess")) {
+            @file_put_contents("$dir/.htaccess", "Require all denied\nDeny from all\n");
+        }
+        if (!file_exists("$dir/index.html")) {
+            @file_put_contents("$dir/index.html", '');
+        }
+    }
+
+    /**
+     * Donne à la base un nom imprévisible, mémorisé pour les lancements
+     * suivants. Une installation existante garde son fichier.
+     */
+    private function resolveDatabasePath(string $path, string $dir): string
+    {
+        if (basename($path) !== 'budgeat.sqlite' || file_exists($path)) {
+            return $path;                        // chemin choisi par l'utilisateur, ou base déjà en place
+        }
+
+        $marker = "$dir/db.name";
+        if (file_exists($marker)) {
+            $name = trim((string) file_get_contents($marker));
+            if ($name !== '') {
+                return "$dir/$name";
+            }
+        }
+        if (!is_writable($dir)) {
+            return $path;
+        }
+
+        $name = 'budgeat-' . bin2hex(random_bytes(6)) . '.sqlite';
+        @file_put_contents($marker, $name);
+        return "$dir/$name";
     }
 
     private function tableExists(string $name): bool

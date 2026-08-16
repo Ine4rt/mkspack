@@ -1,0 +1,46 @@
+# Budgeat — configuration Apache (hébergement mutualisé).
+# Si votre hébergeur utilise nginx, ces règles sont ignorées : demandez-lui
+# d'interdire l'accès direct aux dossiers storage/ et scripts/.
+
+# Pas de listing de répertoire.
+Options -Indexes
+
+# Fichiers sensibles : configuration, base de données, relevés de prix.
+<FilesMatch "\.(sqlite|sqlite-wal|sqlite-shm|sql|log|csv|md)$">
+    Require all denied
+</FilesMatch>
+
+<Files "config.php">
+    Require all denied
+</Files>
+
+<Files "config.example.php">
+    Require all denied
+</Files>
+
+# Page d'accueil
+DirectoryIndex index.php index.html
+
+# Compression et cache des fichiers statiques.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
+
+# Quelques en-têtes de sécurité sans effet de bord.
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Pour forcer le HTTPS, décommentez ces trois lignes une fois votre certificat
+# actif (sinon vous risquez une boucle de redirection) :
+# RewriteEngine On
+# RewriteCond %{HTTPS} !=on
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]

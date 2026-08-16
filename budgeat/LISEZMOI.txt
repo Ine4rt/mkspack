@@ -1,0 +1,150 @@
+BUDGEAT — INSTALLATION PAR FTP
+================================================================================
+
+Ce dossier est prêt à être envoyé tel quel sur votre hébergement.
+Comptez dix minutes.
+
+
+1. CE QU'IL FAUT VÉRIFIER CHEZ VOTRE HÉBERGEUR
+--------------------------------------------------------------------------------
+
+  · PHP 8.1 ou plus récent
+  · les extensions pdo_sqlite, curl, mbstring (présentes par défaut presque partout)
+
+Pas de base MySQL à créer, pas de Composer, pas de ligne de commande :
+les données sont stockées dans un fichier, dans le dossier storage/.
+
+
+2. ENVOYER LES FICHIERS
+--------------------------------------------------------------------------------
+
+Avec FileZilla (ou le gestionnaire de fichiers de votre hébergeur) :
+
+  a. Connectez-vous à votre serveur.
+  b. Ouvrez le dossier public : selon l'hébergeur il s'appelle www, public_html,
+     htdocs ou httpdocs.
+  c. Envoyez TOUT le contenu de ce dossier dedans.
+
+     · Pour un site à la racine (https://mondomaine.be) : déposez les fichiers
+       directement dans le dossier public.
+     · Pour un sous-dossier (https://mondomaine.be/menus) : créez le dossier
+       « menus » et déposez les fichiers à l'intérieur. Rien d'autre à changer,
+       les adresses s'adaptent toutes seules.
+
+  d. Une fois l'envoi terminé, clic droit sur le dossier storage/ →
+     « Permissions du fichier » → saisissez 755.
+     Si l'étape 3 signale que l'écriture est impossible, remettez 775.
+
+
+3. LANCER L'INSTALLATION
+--------------------------------------------------------------------------------
+
+Ouvrez dans votre navigateur :
+
+     https://votre-domaine/install.php
+
+La page vérifie l'hébergement, crée la base de données et vous propose de créer
+votre compte. Ce premier compte reçoit l'accès complet.
+
+  >>> SUPPRIMEZ ENSUITE install.php DE VOTRE SERVEUR. <<<
+      Tant qu'il est en ligne, il expose des informations sur votre hébergement.
+
+
+4. RENSEIGNER VOTRE CONFIGURATION
+--------------------------------------------------------------------------------
+
+Renommez config.example.php en config.php, puis ouvrez-le et complétez :
+
+     'app_name'  => le nom de votre service
+     'base_url'  => https://votre-domaine    (sans barre oblique finale)
+     'mail_from' => votre adresse de contact
+     'plans'     => vos prix, en centimes (499 = 4,99 €)
+
+Le site fonctionne même sans ce fichier, mais autant le faire tout de suite.
+
+
+5. ENCAISSER LES PAIEMENTS
+--------------------------------------------------------------------------------
+
+Tant qu'aucune clé n'est renseignée, le site tourne en MODE DÉMONSTRATION :
+le parcours d'abonnement fonctionne d'un bout à l'autre, mais rien n'est débité.
+C'est fait exprès, pour que vous puissiez tout tester avant d'ouvrir un compte
+Stripe.
+
+Pour encaisser réellement :
+
+  a. Créez un compte sur stripe.com
+  b. Copiez vos clés (sk_live_… et pk_live_…) dans config.php
+  c. Dans le tableau de bord Stripe, section Développeurs → Webhooks, ajoutez :
+
+         https://votre-domaine/api/webhook.php
+
+     avec les événements : checkout.session.completed, invoice.paid,
+     customer.subscription.deleted
+
+  d. Copiez la clé de signature (whsec_…) dans config.php
+
+  e. AVANT LA PREMIÈRE VENTE : complétez legal/mentions.php avec votre identité
+     d'entreprise. C'est une obligation légale, et c'est le premier endroit que
+     regardent les visiteurs qui hésitent à payer.
+
+
+6. PRIX RÉELS
+--------------------------------------------------------------------------------
+
+IMPORTANT : les prix livrés avec le catalogue sont des ordres de grandeur
+crédibles, PAS des relevés réels. Le site fonctionne parfaitement avec, mais la
+promesse « pile dans votre budget » ne sera exacte qu'une fois les prix recalés
+sur votre marché.
+
+Ces outils s'utilisent en ligne de commande (SSH ou Terminal, sur votre
+ordinateur), pas par FTP :
+
+  php scripts/mapper_produits.php 30 colruyt,delhaize,lidl,aldi
+      Prépare la liste des pages produits à renseigner (data/a_mapper.txt).
+      Vous collez les adresses des fiches produits dans data/collectors.json.
+      C'est le seul travail manuel, et il n'est à faire qu'une fois.
+
+  php scripts/collect_stores.php colruyt --limite=3
+      Essai sur trois produits, pour vérifier que l'extraction fonctionne.
+
+  php scripts/collect_stores.php colruyt,delhaize,lidl,aldi
+      La collecte complète.
+
+  php scripts/import_prices.php --dry-run
+  php scripts/import_prices.php
+      Recalcule les prix du catalogue et les indices d'enseigne.
+
+Une fois les prix à jour, renvoyez par FTP les deux fichiers modifiés :
+data/ingredients.json et data/stores.json.
+
+Autres méthodes disponibles, décrites dans README.md :
+  · scripts/fetch_openprices.php — collecte sur une base de prix ouverte
+  · scripts/carnet_releves.php   — liste à imprimer pour relever en magasin
+
+
+7. EN CAS DE PROBLÈME
+--------------------------------------------------------------------------------
+
+Page blanche
+    Votre hébergeur masque les erreurs. Cherchez « error_log » dans votre espace
+    client, ou activez l'affichage des erreurs. Neuf fois sur dix, il s'agit du
+    dossier storage/ non inscriptible ou d'une version de PHP trop ancienne.
+
+« Impossible de créer la base »
+    Permissions de storage/ : passez-le à 775.
+
+Le site s'affiche sans mise en forme
+    Le dossier assets/ n'a pas été envoyé en entier.
+
+Les liens pointent vers la mauvaise adresse
+    Renseignez 'base_url' dans config.php.
+
+Les prix ne se collectent pas
+    Lancez le diagnostic sur une fiche produit :
+        php scripts/diagnose_page.php "https://…"
+    Il indique si la page expose ses prix et quels sélecteurs utiliser.
+
+
+================================================================================
+Le détail technique complet est dans README.md.

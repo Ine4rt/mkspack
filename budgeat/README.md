@@ -68,6 +68,26 @@ Pistes complémentaires, non implémentées, par ordre d'effort croissant :
 
 Prérequis : PHP 8.1+ avec `pdo_sqlite` et `curl`. Aucun Composer, aucun build.
 
+### Par FTP (hébergement mutualisé)
+
+```bash
+php scripts/build_release.php      # produit ../budgeat-AAAA-MM-JJ.zip
+```
+
+Décompressez, envoyez le contenu dans le dossier public, ouvrez
+`https://votre-domaine/install.php` : la page contrôle l'hébergement, crée la base,
+crée votre compte, puis vous demande de la supprimer. La marche à suivre détaillée
+est dans `LISEZMOI.txt`, écrite pour être lue sans connaissance technique.
+
+**Un point mérite votre attention.** Le `.htaccess` livré protège `storage/`, mais il
+n'est lu que par Apache : sur un hébergement nginx, la base de données serait
+téléchargeable. `install.php` teste réellement cet accès et vous alerte. Le fichier
+porte aussi un nom aléatoire, ce qui le met hors de portée d'un scan automatique.
+La seule protection complète reste de placer `storage/` **hors du dossier public** et
+d'indiquer son chemin dans `config.php`.
+
+### Manuellement
+
 ```bash
 cp config.example.php config.php     # puis renseignez base_url, pays, prix, Stripe
 mkdir -p storage && chmod 775 storage
@@ -90,7 +110,9 @@ déduite de la requête : le site fonctionne dès la copie des fichiers.
 
 ```bash
 php tests/engine_test.php     # 50 assertions — moteur, budgets, filtres, liste
-php tests/prices_test.php     # 14 assertions — collecte et recalage des prix
+php tests/prices_test.php     # 14 assertions — collecte ouverte et recalage
+php tests/scraper_test.php    # 23 assertions — extraction sur les sites d'enseignes
+php tests/package_test.php    # 13 assertions — contenu de l'archive de déploiement
 ```
 
 Le premier couvre la cohérence du catalogue, le respect du budget sur 8 scénarios,
@@ -127,10 +149,17 @@ budgeat/
 │   ├── App.php         config, SQLite, sessions, comptes, quotas
 │   └── Billing.php     Stripe sans SDK, parrainage, résiliation
 ├── data/               stores.json · ingredients.json · recipes.json
+├── install.php         diagnostic d'hébergement et création du premier compte
+├── LISEZMOI.txt        notice d'installation par FTP, sans jargon
 ├── scripts/
+│   ├── collect_stores.php  collecte sur les sites d'enseignes (robots.txt, cache)
+│   ├── mapper_produits.php prépare les pages produits à renseigner
+│   ├── diagnose_page.php   que contient une page, quels sélecteurs utiliser
+│   ├── fetch_openprices.php collecte sur la base ouverte Open Prices
 │   ├── carnet_releves.php  quels produits relever en magasin, par ordre d'impact
 │   ├── import_prices.php   recalage du catalogue sur des relevés réels
-│   └── build_demo.php      assemblage de la démo autonome
+│   ├── build_demo.php      assemblage de la démo autonome
+│   └── build_release.php   archive prête pour le FTP
 ├── demo/               moteur porté en JS + page de démonstration
 ├── legal/              mentions, CGV, confidentialité
 └── tests/engine_test.php
@@ -154,7 +183,49 @@ faire tourner et démontrer le produit ; ils ne suffisent pas à tenir la promes
 Deux chemins, complémentaires : la collecte automatique couvre vite les produits
 courants, le relevé terrain comble les trous et sert de référence.
 
-### Option A — collecte automatique (Open Prices)
+### Option A — collecte sur les sites des enseignes
+
+```bash
+php scripts/mapper_produits.php 30 colruyt,delhaize,lidl,aldi   # une seule fois
+# … vous collez les adresses des fiches produits dans data/collectors.json …
+php scripts/collect_stores.php colruyt --limite=3               # essai
+php scripts/collect_stores.php colruyt,delhaize,lidl,aldi       # collecte
+php scripts/import_prices.php
+```
+
+C'est la source la plus juste : le prix vient du magasin où vos utilisateurs font
+leurs courses. C'est aussi celle qui demande le plus de précautions.
+
+**Ce que vous devez savoir avant de lancer.** Les prix sont des faits, mais les sites
+qui les publient sont couverts par leurs conditions d'utilisation et, en Europe, par
+un droit propre aux bases de données. Extraire des prix d'un site marchand est donc un
+risque contractuel qui vous appartient. Le collecteur est écrit pour le réduire : il
+lit `robots.txt` et renonce à ce qui est interdit, attend deux secondes entre deux
+pages, s'annonce avec votre adresse de contact, met en cache, et **s'arrête net sur un
+refus du site sans jamais chercher à le contourner**. Un passage par trimestre suffit à
+garder un catalogue juste ; un robot qui tourne en continu se fait bloquer et donne
+raison à l'enseigne.
+
+**Ce qui demande votre travail.** L'extraction lit d'abord les données structurées
+schema.org que publient la plupart des sites marchands — quand elles sont là, rien à
+configurer. Il faut en revanche indiquer, une fois, quelle page correspond à quel
+produit : c'est ce que prépare `mapper_produits.php`. Comptez deux à trois heures pour
+les 30 produits qui pèsent le plus, puis la collecte se rejoue en une commande.
+
+Si une enseigne ne rend rien, le diagnostic montre ce que contient la page et propose
+les sélecteurs à corriger dans `data/collectors.json` :
+
+```bash
+php scripts/diagnose_page.php "https://…/une-fiche-produit"
+```
+
+Deux réserves franches : **je n'ai pas pu tester ces collecteurs sur les vrais sites**
+(l'environnement de développement n'avait pas d'accès réseau), donc les sélecteurs de
+repli sont des hypothèses — le diagnostic est là pour ça. Et **Lidl comme Aldi
+publient peu de prix permanents en ligne** : sur ces deux enseignes, attendez-vous à
+compléter en magasin.
+
+### Option B — collecte automatique (Open Prices)
 
 ```bash
 php scripts/fetch_openprices.php colruyt,aldi,delhaize,lidl
@@ -187,7 +258,7 @@ Deux réserves à connaître :
 La logique du script est couverte par `tests/prices_test.php`, sur une réponse d'API
 figée. L'appel réseau lui-même, non : c'est la première chose à vérifier chez vous.
 
-### Option B — relevé terrain
+### Option C — relevé terrain
 
 C'est la méthode lente mais incontestable, et le complément naturel de la collecte
 automatique sur les produits qu'elle ne couvre pas.

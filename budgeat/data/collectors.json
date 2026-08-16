@@ -1,0 +1,66 @@
+{
+  "_comment": "Configuration de la collecte sur les sites d'enseignes. Les chemins produits sont VIDES au départ : il faut les renseigner une fois (voir scripts/mapper_produits.php), après quoi la collecte est automatique et rejouable. Les règles d'extraction ne servent que si la page n'expose pas de données structurées schema.org, ce qui est rare sur un site marchand.",
+
+  "contact": "votre-adresse@example.com",
+  "_contact_doc": "Obligatoire : part dans le User-Agent. Le script refuse de démarrer tant que cette adresse n'est pas la vôtre.",
+
+  "_products_doc": "ingredient_id -> chemin de la page produit, relatif à base (ou URL complète). L'URL doit pointer vers le format décrit par packLabel dans ingredients.json : si notre fiche dit « barquette 900 g », prenez la page de la barquette de 900 g, sinon les prix ne seront pas comparables.",
+
+  "collectors": {
+    "colruyt": {
+      "base": "https://www.colruyt.be",
+      "robots_path": "/fr/",
+      "rules": {
+        "xpath": [
+          "//*[contains(@class,'product-price')]",
+          "//*[contains(@class,'price__amount')]",
+          "//*[@data-price]"
+        ],
+        "regex": []
+      },
+      "products": {}
+    },
+
+    "delhaize": {
+      "base": "https://www.delhaize.be",
+      "robots_path": "/fr-be/",
+      "rules": {
+        "xpath": [
+          "//*[contains(@class,'product-price')]",
+          "//*[contains(@class,'price-amount')]",
+          "//*[@data-testid='product-price']"
+        ],
+        "regex": []
+      },
+      "products": {}
+    },
+
+    "lidl": {
+      "base": "https://www.lidl.be",
+      "robots_path": "/fr/",
+      "rules": {
+        "xpath": [
+          "//*[contains(@class,'m-price__price')]",
+          "//*[contains(@class,'pricebox__price')]"
+        ],
+        "regex": []
+      },
+      "products": {},
+      "_note": "Lidl publie surtout son catalogue promotionnel en ligne, peu de prix permanents. Attendez-vous à une couverture faible : le relevé en magasin restera nécessaire."
+    },
+
+    "aldi": {
+      "base": "https://www.aldi.be",
+      "robots_path": "/fr/",
+      "rules": {
+        "xpath": [
+          "//*[contains(@class,'price')]//*[contains(@class,'amount')]",
+          "//*[contains(@class,'product-price')]"
+        ],
+        "regex": []
+      },
+      "products": {},
+      "_note": "Même remarque que Lidl : l'assortiment permanent est peu détaillé en ligne."
+    }
+  }
+}
