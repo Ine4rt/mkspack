@@ -1,0 +1,65 @@
+CARNET DE RELEVÉS — 16/08/2026
+========================================================================
+
+Notez le prix affiché pour le conditionnement indiqué. Si le magasin ne
+vend que d'autres formats, notez le prix au kilo (colonne de droite) et
+précisez-le dans la colonne source.
+Évitez les produits en promotion : on cherche le prix habituel.
+
+
+FRUITS & LéGUMES
+------------------------------------------------------------------------
+  Citrons                        filet de 4                 ............ €   [2.9 % des paniers]
+  Brocoli                        à la pièce (~500 g)      ............ €   [2.1 % des paniers]
+  Tomates                        barquette 500 g            ............ €   [2.1 % des paniers]
+  Oignons                        filet 1 kg                 ............ €   [2.0 % des paniers]
+  Échalotes                     filet 500 g                ............ €   [1.9 % des paniers]
+  Salade verte                   à la pièce               ............ €   [1.6 % des paniers]
+  Pommes de terre                sac 2,5 kg                 ............ €   [1.5 % des paniers]
+  Ail                            filet 150 g                ............ €   [1.5 % des paniers]
+  Citrons verts                  filet de 4                 ............ €   [1.2 % des paniers]
+  Carottes                       sachet 1 kg                ............ €   [1.2 % des paniers]
+
+BOUCHERIE
+------------------------------------------------------------------------
+  Haché de bœuf                barquette 500 g            ............ €   [3.8 % des paniers]
+  Filets de poulet               barquette 900 g            ............ €   [2.5 % des paniers]
+  Bœuf à mijoter               barquette 600 g            ............ €   [2.3 % des paniers]
+  Cuisses de poulet              barquette 1 kg             ............ €   [1.4 % des paniers]
+
+POISSONNERIE
+------------------------------------------------------------------------
+  Moules fraîches               sac 1 kg                   ............ €   [8.0 % des paniers]
+  Pavés de saumon               barquette 250 g            ............ €   [5.7 % des paniers]
+
+CRèMERIE & FRAIS
+------------------------------------------------------------------------
+  Parmesan râpé                sachet 100 g               ............ €   [2.9 % des paniers]
+  Beurre                         plaquette 250 g            ............ €   [2.6 % des paniers]
+  Œufs                          boîte de 12               ............ €   [2.6 % des paniers]
+  Feta                           bloc 200 g                 ............ €   [1.5 % des paniers]
+  Emmental râpé                sachet 200 g               ............ €   [1.5 % des paniers]
+  Tofu ferme nature              bloc 250 g                 ............ €   [1.5 % des paniers]
+
+BOULANGERIE
+------------------------------------------------------------------------
+  Pain                           baguette                   ............ €   [2.2 % des paniers]
+
+SURGELéS
+------------------------------------------------------------------------
+  Crevettes décortiquées       sachet 250 g               ............ €   [5.7 % des paniers]
+  Mélange de légumes wok surgelés sachet 750 g               ............ €   [2.9 % des paniers]
+  Frites au four surgelées      sachet 1 kg                ............ €   [2.7 % des paniers]
+  Filets de colin surgelés      sachet 400 g               ............ €   [2.2 % des paniers]
+
+ÉPICERIE SALéE
+------------------------------------------------------------------------
+  Riz basmati                    paquet 1 kg                ............ €   [2.4 % des paniers]
+  Riz long grain                 paquet 1 kg                ............ €   [2.3 % des paniers]
+  Olives noires                  bocal 200 g                ............ €   [1.2 % des paniers]
+
+========================================================================
+Enseignes à couvrir : Colruyt, Lidl, Aldi, Delhaize, Carrefour Hyper
+
+Une fois les prix notés, remplissez data/releves.csv puis lancez :
+    php scripts/import_prices.php

@@ -20,6 +20,10 @@
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* Thème sombre. Deux déclarations sont nécessaires : la première suit le
+   réglage du système (cas par défaut, où rien n'est marqué sur <html>), la
+   seconde répond à un choix explicite de l'utilisateur ou du lecteur, qui doit
+   l'emporter sur le réglage système dans les deux sens. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ink: #eef3ee;
@@ -33,9 +37,27 @@
     --brand-soft: #1c2c23;
     --accent: #f5b463;
     --accent-soft: #2c2419;
+    --danger: #e57368;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .3);
     --shadow-lg: 0 2px 4px rgba(0, 0, 0, .3), 0 18px 48px rgba(0, 0, 0, .45);
   }
+}
+
+:root[data-theme="dark"] {
+  --ink: #eef3ee;
+  --ink-soft: #b3c3b8;
+  --ink-mute: #8b9d92;
+  --paper: #121714;
+  --card: #1a221d;
+  --line: #2b352e;
+  --brand: #4ec489;
+  --brand-dark: #3aa771;
+  --brand-soft: #1c2c23;
+  --accent: #f5b463;
+  --accent-soft: #2c2419;
+  --danger: #e57368;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .3);
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, .3), 0 18px 48px rgba(0, 0, 0, .45);
 }
 
 * { box-sizing: border-box; }

@@ -13,8 +13,8 @@ copie d'un site tiers mais d'une implémentation propre du même service.
 
 ## Ce que ça fait
 
-1. L'utilisateur choisit son magasin (20 enseignes belges et françaises), son budget
-   hebdomadaire, le nombre de convives et de dîners.
+1. L'utilisateur choisit son magasin (21 enseignes belges), son budget hebdomadaire,
+   le nombre de convives et de dîners.
 2. Il précise son régime (6 profils), ses allergènes (13 filtres) et les ingrédients
    qu'il ne veut pas voir.
 3. Le moteur compose la semaine, chaque dîner étant chiffré, et produit la liste de
@@ -60,7 +60,7 @@ Pistes complémentaires, non implémentées, par ordre d'effort croissant :
   des prix.
 - **Version « pro »** pour diététiciens et coachs : plusieurs profils clients, export
   des menus à leur nom. Panier moyen bien supérieur à celui du particulier.
-- **Comparateur d'enseignes** : le même menu chiffré dans les 20 magasins, en réservant
+- **Comparateur d'enseignes** : le même menu chiffré dans les 21 enseignes, en réservant
   la fonction aux abonnés. Le moteur sait déjà le faire, il ne manque que l'écran.
 - **Menus saisonniers** vendus à l'unité (fêtes, rentrée, batch cooking).
 
@@ -95,6 +95,19 @@ php tests/engine_test.php
 47 assertions : cohérence du catalogue, respect du budget sur 8 scénarios, filtres
 régime/allergènes/temps/exclusions, remplacement, liste de courses, performance.
 
+## Démo publique
+
+`demo/budgeat-demo.html` est une page autonome (aucun serveur, aucune requête réseau) :
+le moteur y est porté en JavaScript et les données sont inlinées. Régénérez-la après
+toute modification du catalogue ou du style :
+
+```bash
+php scripts/build_demo.php
+```
+
+Le port JS suit le PHP pas à pas ; le PHP reste la référence, c'est lui qui est couvert
+par les tests.
+
 ## Structure
 
 ```
@@ -110,6 +123,11 @@ budgeat/
 │   ├── App.php         config, SQLite, sessions, comptes, quotas
 │   └── Billing.php     Stripe sans SDK, parrainage, résiliation
 ├── data/               stores.json · ingredients.json · recipes.json
+├── scripts/
+│   ├── carnet_releves.php  quels produits relever en magasin, par ordre d'impact
+│   ├── import_prices.php   recalage du catalogue sur des relevés réels
+│   └── build_demo.php      assemblage de la démo autonome
+├── demo/               moteur porté en JS + page de démonstration
 ├── legal/              mentions, CGV, confidentialité
 └── tests/engine_test.php
 ```
@@ -122,15 +140,56 @@ budgeat/
   végétarienne qui contient des lardons.
 - **Ajouter un ingrédient** : `data/ingredients.json`, avec son conditionnement réel
   (`pack`) et sa durée de conservation (`shelf`), qui sert au calcul du gaspillage.
-- **Mettre à jour les prix** : les prix de référence sont dans `ingredients.json`,
-  les indices par enseigne dans `stores.json`. Un relevé trimestriel sur une vingtaine
-  de produits repères suffit à garder l'ensemble crédible.
+## Calibrer les prix — à faire avant toute mise en ligne
+
+**Les prix livrés sont des ordres de grandeur posés à la main, pas des relevés.**
+`data/stores.json` porte d'ailleurs un drapeau `"calibrated": false`. Ils suffisent à
+faire tourner et démontrer le produit ; ils ne suffisent pas à tenir la promesse
+« pile dans votre budget » devant un client payant. Deux outils font le travail.
+
+### 1. Savoir quoi relever
+
+```bash
+php scripts/carnet_releves.php 30 colruyt,lidl,aldi,delhaize,carrefour
+```
+
+Le script simule 175 semaines et classe les produits par poids réel dans les paniers.
+Les 30 premiers pèsent environ **76 % de la valeur des courses** : relever ceux-là
+suffit, le reste peut rester estimé sans fausser le budget. Il écrit
+`data/carnet.txt` (à imprimer et emporter en magasin) et `data/releves.csv`
+(à compléter).
+
+Comptez environ deux heures par enseigne pour 30 produits. Les prix des drives en
+ligne font gagner du temps, mais vérifiez leurs conditions d'utilisation avant tout
+relevé automatisé : un scraper qui tourne en continu se fait bloquer, et le sujet
+n'est pas neutre juridiquement. Un relevé manuel trimestriel est plus lent mais
+incontestable.
+
+### 2. Recaler le catalogue
+
+```bash
+php scripts/import_prices.php            # ajoute --dry-run pour voir sans écrire
+```
+
+Le prix d'un produit chez Delhaize est élevé pour deux raisons mêlées : le produit
+lui-même et l'enseigne. Le script sépare les deux par quelques passes d'ajustement
+alterné, sur des médianes (une promo isolée ne déforme donc pas le résultat). Il
+recalcule les prix de référence, l'indice de chaque enseigne et ses écarts par rayon,
+puis passe `calibrated` à `true`. Une enseigne avec moins de 5 relevés garde sa valeur
+d'origine plutôt que d'être calibrée sur du vide.
+
+Relancez ensuite `php tests/engine_test.php` : si les prix changent beaucoup, les
+scénarios de budget vous diront tout de suite si les menus tiennent toujours.
 
 ## Limites connues
 
-- Les prix sont des **estimations par enseigne**, pas des relevés magasin par magasin
-  en temps réel. C'est écrit sur la page d'accueil, dans la FAQ et dans les CGV : mieux
-  vaut annoncer une estimation honnête qu'un prix exact qui ne l'est pas.
+- Les prix sont des **estimations par enseigne** tant que le calibrage n'a pas été
+  fait, et ensuite des moyennes — jamais des relevés magasin par magasin en temps
+  réel. C'est écrit sur la page d'accueil, dans la FAQ et dans les CGV : mieux vaut
+  annoncer une estimation honnête qu'un prix exact qui ne l'est pas.
+- Les 58 recettes sont écrites pour ce projet. Elles couvrent le quotidien belge et
+  français ; c'est peu pour un abonné qui reste un an, il faut prévoir d'en ajouter
+  régulièrement (c'est aussi ce qui justifie l'abonnement).
 - Le service ne couvre que les dîners.
 - Les quantités par personne visent un adulte ; un foyer avec de jeunes enfants
   consommera moins.

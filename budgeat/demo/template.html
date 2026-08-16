@@ -1,0 +1,145 @@
+<title>Budgeat</title>
+<style>
+{{CSS}}
+.demo-banner {
+  background: var(--accent-soft); border-bottom: 1px solid var(--accent);
+  padding: .7rem 0; font-size: .88rem;
+}
+.demo-banner .wrap { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+.demo-hero { padding: 2.5rem 0 1rem; }
+.demo-hero h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); margin-bottom: .5rem; }
+.demo-hero p { color: var(--ink-soft); max-width: 54ch; }
+</style>
+
+<div class="demo-banner">
+  <div class="wrap">
+    <strong>Démo</strong>
+    <span class="muted">Tout tourne dans votre navigateur. Les prix sont des estimations
+    non encore calibrées sur des relevés réels — voir la note en bas de page.</span>
+  </div>
+</div>
+
+<header class="site-head">
+  <div class="wrap">
+    <span class="logo"><span class="logo-mark">🥕</span>Budgeat</span>
+    <nav class="site-nav">
+      <span class="small muted hide-sm">Belgique · {{STORE_COUNT}} enseignes · {{RECIPE_COUNT}} recettes</span>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap app-main">
+  <div class="demo-hero">
+    <h1>Vos dîners de la semaine, pile dans votre budget.</h1>
+    <p>Choisissez votre magasin et le montant que vous ne voulez pas dépasser.
+    Vous obtenez sept dîners chiffrés, leurs recettes, et la liste de courses triée
+    par rayon avec le total à prévoir en caisse.</p>
+  </div>
+
+  <form id="config" class="config">
+    <fieldset class="block">
+      <legend>Votre magasin</legend>
+      <div class="chips" id="stores"></div>
+    </fieldset>
+
+    <fieldset class="block">
+      <legend>Votre budget pour la semaine</legend>
+      <div class="budget-row">
+        <input type="range" id="budgetRange" min="20" max="200" step="5" value="70">
+        <div class="budget-value">
+          <input type="number" id="budget" min="10" max="500" step="1" value="70">
+          <span>€</span>
+        </div>
+      </div>
+      <p class="hint" id="budgetHint"></p>
+    </fieldset>
+
+    <div class="block-row">
+      <fieldset class="block">
+        <legend>Convives</legend>
+        <div class="stepper">
+          <button type="button" data-step="people" data-delta="-1" aria-label="Moins">−</button>
+          <input type="number" id="people" min="1" max="12" value="2" readonly>
+          <button type="button" data-step="people" data-delta="1" aria-label="Plus">+</button>
+        </div>
+      </fieldset>
+      <fieldset class="block">
+        <legend>Dîners à prévoir</legend>
+        <div class="stepper">
+          <button type="button" data-step="days" data-delta="-1" aria-label="Moins">−</button>
+          <input type="number" id="days" min="1" max="7" value="7" readonly>
+          <button type="button" data-step="days" data-delta="1" aria-label="Plus">+</button>
+        </div>
+      </fieldset>
+      <fieldset class="block">
+        <legend>Temps max en cuisine</legend>
+        <select id="maxTime">
+          <option value="0">Peu importe</option>
+          <option value="25">25 minutes</option>
+          <option value="35">35 minutes</option>
+          <option value="45">45 minutes</option>
+        </select>
+      </fieldset>
+    </div>
+
+    <fieldset class="block">
+      <legend>Régime</legend>
+      <div class="chips" id="diets"></div>
+    </fieldset>
+
+    <details class="block advanced">
+      <summary>Allergies et aliments à éviter</summary>
+      <p class="hint">Aucun menu ne contiendra ces allergènes, y compris après un remplacement.</p>
+      <div class="chips" id="allergens"></div>
+
+      <label class="field" style="margin-top:1.4rem">
+        <span>Ingrédients que vous ne voulez pas voir</span>
+        <select id="exclude" multiple size="6"></select>
+        <span class="hint">Maintenez Ctrl (ou ⌘) pour en sélectionner plusieurs.</span>
+      </label>
+
+      <label class="field">
+        <span><input type="checkbox" id="emptyPantry"> Je pars de zéro</span>
+        <span class="hint">Par défaut, on considère que vous avez déjà sel, poivre, huile et
+        épices de base. Cochez pour les inclure dans le budget et la liste.</span>
+      </label>
+    </details>
+
+    <button type="submit" class="btn btn-primary btn-lg btn-block">Composer ma semaine</button>
+    <p class="hint center" style="margin-top:.8rem">Calcul instantané, dans votre navigateur.</p>
+  </form>
+
+  <div id="result" hidden></div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <h3 style="font-size:1rem">Sur les prix</h3>
+    <p class="small">
+      Cette démo utilise un indice de prix par enseigne et par rayon, appliqué à un
+      catalogue de {{INGREDIENT_COUNT}} produits avec leurs conditionnements réels. Ces valeurs sont
+      des <strong>ordres de grandeur</strong>, pas des relevés magasin. La mécanique de calcul,
+      elle, est celle du produit final : on chiffre le panier réel (paquets entiers, restes
+      réutilisés d'un dîner à l'autre) et non une somme d'ingrédients au prorata.
+    </p>
+    <p class="small">
+      Le projet est livré avec deux outils pour passer à de vrais prix :
+      <code>scripts/carnet_releves.php</code> qui indique les 30 produits à relever
+      (ils représentent environ trois quarts de la valeur des paniers), et
+      <code>scripts/import_prices.php</code> qui recalcule le catalogue et les indices
+      d'enseigne à partir de ces relevés.
+    </p>
+    <p class="small muted" style="margin-top:1.4rem">
+      Budgeat n'est affilié à aucune enseigne. Les marques citées appartiennent à leurs
+      propriétaires et ne servent qu'à choisir où vous faites vos courses.
+    </p>
+  </div>
+</footer>
+
+<script>window.BUDGEAT_DATA = {{DATA}};</script>
+<script>
+{{ENGINE}}
+</script>
+<script>
+{{UI}}
+</script>

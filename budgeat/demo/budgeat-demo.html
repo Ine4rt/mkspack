@@ -1,0 +1,1588 @@
+<title>Budgeat</title>
+<style>
+/* Budgeat — feuille de style unique, sans framework. */
+
+:root {
+  --ink: #14261c;
+  --ink-soft: #4c6156;
+  --ink-mute: #7c8f85;
+  --paper: #fbfaf5;
+  --card: #ffffff;
+  --line: #e6e3d8;
+  --brand: #1f7a4d;
+  --brand-dark: #16603c;
+  --brand-soft: #e7f4ec;
+  --accent: #f2a341;
+  --accent-soft: #fdf1de;
+  --danger: #c0392b;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(20, 38, 28, .06), 0 8px 24px rgba(20, 38, 28, .06);
+  --shadow-lg: 0 2px 4px rgba(20, 38, 28, .06), 0 18px 48px rgba(20, 38, 28, .12);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Thème sombre. Deux déclarations sont nécessaires : la première suit le
+   réglage du système (cas par défaut, où rien n'est marqué sur <html>), la
+   seconde répond à un choix explicite de l'utilisateur ou du lecteur, qui doit
+   l'emporter sur le réglage système dans les deux sens. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #eef3ee;
+    --ink-soft: #b3c3b8;
+    --ink-mute: #8b9d92;
+    --paper: #121714;
+    --card: #1a221d;
+    --line: #2b352e;
+    --brand: #4ec489;
+    --brand-dark: #3aa771;
+    --brand-soft: #1c2c23;
+    --accent: #f5b463;
+    --accent-soft: #2c2419;
+    --danger: #e57368;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .3);
+    --shadow-lg: 0 2px 4px rgba(0, 0, 0, .3), 0 18px 48px rgba(0, 0, 0, .45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #eef3ee;
+  --ink-soft: #b3c3b8;
+  --ink-mute: #8b9d92;
+  --paper: #121714;
+  --card: #1a221d;
+  --line: #2b352e;
+  --brand: #4ec489;
+  --brand-dark: #3aa771;
+  --brand-soft: #1c2c23;
+  --accent: #f5b463;
+  --accent-soft: #2c2419;
+  --danger: #e57368;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .3);
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, .3), 0 18px 48px rgba(0, 0, 0, .45);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { line-height: 1.15; letter-spacing: -.02em; margin: 0 0 .5em; }
+h1 { font-size: clamp(2rem, 5.5vw, 3.4rem); font-weight: 800; }
+h2 { font-size: clamp(1.5rem, 3.6vw, 2.2rem); font-weight: 750; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0 0 1em; }
+a { color: var(--brand); }
+
+.wrap { width: min(1120px, 100% - 2.5rem); margin-inline: auto; }
+.narrow { width: min(680px, 100% - 2.5rem); margin-inline: auto; }
+
+/* ------------------------------------------------------------------ header */
+
+.site-head {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.site-head .wrap { display: flex; align-items: center; gap: 1.5rem; height: 64px; }
+.logo {
+  display: flex; align-items: center; gap: .5rem;
+  font-weight: 800; font-size: 1.15rem; color: var(--ink); text-decoration: none;
+  letter-spacing: -.03em;
+}
+.logo-mark {
+  width: 30px; height: 30px; border-radius: 9px;
+  background: var(--brand); color: #fff;
+  display: grid; place-items: center; font-size: 1rem;
+}
+.site-nav { margin-left: auto; display: flex; align-items: center; gap: 1.4rem; }
+.site-nav a { color: var(--ink-soft); text-decoration: none; font-size: .94rem; font-weight: 550; }
+.site-nav a:hover { color: var(--ink); }
+@media (max-width: 720px) { .site-nav .hide-sm { display: none; } }
+
+/* ------------------------------------------------------------------ boutons */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  padding: .8rem 1.4rem; border-radius: 999px; border: 1px solid transparent;
+  font: inherit; font-weight: 650; font-size: .97rem;
+  cursor: pointer; text-decoration: none; transition: transform .12s, background .15s, box-shadow .15s;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--brand); color: #fff; box-shadow: 0 6px 18px color-mix(in srgb, var(--brand) 30%, transparent); }
+.btn-primary:hover { background: var(--brand-dark); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { background: var(--card); }
+.btn-soft { background: var(--brand-soft); color: var(--brand-dark); }
+.btn-lg { padding: 1rem 1.9rem; font-size: 1.05rem; }
+.btn-sm { padding: .5rem .9rem; font-size: .85rem; }
+.btn-block { width: 100%; }
+.btn[disabled] { opacity: .5; pointer-events: none; }
+
+/* -------------------------------------------------------------------- hero */
+
+.hero { padding: clamp(3rem, 8vw, 5.5rem) 0 3rem; }
+.hero-grid { display: grid; gap: 3rem; grid-template-columns: 1.05fr .95fr; align-items: center; }
+@media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; gap: 2rem; } }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: var(--brand-soft); color: var(--brand-dark);
+  padding: .35rem .85rem; border-radius: 999px;
+  font-size: .82rem; font-weight: 650; margin-bottom: 1.2rem;
+}
+.lede { font-size: clamp(1.05rem, 2vw, 1.22rem); color: var(--ink-soft); max-width: 46ch; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1.8rem; align-items: center; }
+.hero-note { font-size: .87rem; color: var(--ink-mute); margin-top: 1rem; }
+
+/* ------------------------------------------------------------------- cartes */
+
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.card-pad { padding: 1.4rem; }
+
+.grid { display: grid; gap: 1.2rem; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+section { padding: clamp(2.5rem, 6vw, 4.5rem) 0; }
+.section-head { max-width: 60ch; margin-bottom: 2.2rem; }
+.section-head p { color: var(--ink-soft); font-size: 1.05rem; }
+
+/* Aperçu de la semaine en héros */
+.preview { position: relative; }
+.preview-card { padding: 1.2rem; border-radius: var(--radius); }
+.preview-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .9rem; }
+.preview-total { font-size: 1.6rem; font-weight: 800; letter-spacing: -.03em; }
+.preview-total small { font-size: .85rem; font-weight: 550; color: var(--ink-mute); }
+.preview-row {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .6rem 0; border-top: 1px solid var(--line); font-size: .93rem;
+}
+.preview-row .emoji { font-size: 1.3rem; }
+.preview-row .day { color: var(--ink-mute); width: 4.5rem; flex-shrink: 0; font-size: .82rem; }
+.preview-row .price { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+.bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; margin: .3rem 0 .9rem; }
+.bar span { display: block; height: 100%; background: var(--brand); border-radius: 999px; }
+
+/* -------------------------------------------------------------- étapes 1-2-3 */
+
+.steps { counter-reset: step; }
+.step-num {
+  width: 34px; height: 34px; border-radius: 50%; background: var(--brand); color: #fff;
+  display: grid; place-items: center; font-weight: 700; margin-bottom: .9rem;
+}
+
+/* --------------------------------------------------------------- enseignes */
+
+.stores { display: flex; flex-wrap: wrap; gap: .55rem; }
+.store-chip {
+  border: 1px solid var(--line); background: var(--card);
+  border-radius: 999px; padding: .45rem 1rem; font-size: .87rem; font-weight: 600;
+  display: inline-flex; align-items: center; gap: .45rem;
+}
+.store-dot { width: 9px; height: 9px; border-radius: 50%; }
+
+/* -------------------------------------------------------------------- FAQ */
+
+details.faq {
+  border-bottom: 1px solid var(--line); padding: 1.1rem 0;
+}
+details.faq summary {
+  cursor: pointer; font-weight: 650; font-size: 1.03rem; list-style: none;
+  display: flex; justify-content: space-between; gap: 1rem; align-items: center;
+}
+details.faq summary::-webkit-details-marker { display: none; }
+details.faq summary::after { content: "+"; font-size: 1.4rem; color: var(--ink-mute); font-weight: 400; }
+details.faq[open] summary::after { content: "−"; }
+details.faq p { margin: .8rem 0 0; color: var(--ink-soft); }
+
+/* ------------------------------------------------------------------ tarifs */
+
+.price-card { display: flex; flex-direction: column; padding: 1.6rem; position: relative; }
+.price-card.featured { border-color: var(--brand); box-shadow: var(--shadow-lg); }
+.price-tag { font-size: 2.4rem; font-weight: 800; letter-spacing: -.03em; margin: .3rem 0; }
+.price-tag small { font-size: .95rem; font-weight: 550; color: var(--ink-mute); letter-spacing: 0; }
+.price-badge {
+  position: absolute; top: -12px; right: 1.4rem;
+  background: var(--accent); color: #3a2508; font-size: .74rem; font-weight: 700;
+  padding: .25rem .7rem; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em;
+}
+.check-list { list-style: none; padding: 0; margin: 1.1rem 0 1.6rem; display: grid; gap: .6rem; font-size: .95rem; }
+.check-list li { display: flex; gap: .6rem; align-items: flex-start; color: var(--ink-soft); }
+.check-list li::before { content: "✓"; color: var(--brand); font-weight: 700; flex-shrink: 0; }
+.check-list li.off { color: var(--ink-mute); }
+.check-list li.off::before { content: "—"; color: var(--ink-mute); }
+
+/* ------------------------------------------------------------------ footer */
+
+.site-foot { border-top: 1px solid var(--line); padding: 2.5rem 0; color: var(--ink-mute); font-size: .9rem; }
+.site-foot a { color: var(--ink-soft); text-decoration: none; }
+.site-foot a:hover { text-decoration: underline; }
+.foot-grid { display: flex; flex-wrap: wrap; gap: 2.5rem; justify-content: space-between; }
+.foot-links { display: flex; flex-wrap: wrap; gap: 1.2rem; }
+
+/* ------------------------------------------------------------ formulaires */
+
+label.field { display: block; margin-bottom: 1.1rem; }
+label.field > span { display: block; font-weight: 600; font-size: .92rem; margin-bottom: .4rem; }
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], select {
+  width: 100%; padding: .78rem .9rem; font: inherit;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--card); color: var(--ink);
+}
+input:focus, select:focus, button:focus-visible {
+  outline: 2px solid var(--brand); outline-offset: 1px;
+}
+.hint { font-size: .84rem; color: var(--ink-mute); }
+.flash {
+  background: var(--accent-soft); border: 1px solid var(--accent);
+  padding: .8rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1.2rem; font-size: .92rem;
+}
+.flash.err { background: color-mix(in srgb, var(--danger) 12%, var(--card)); border-color: var(--danger); }
+.flash.ok { background: var(--brand-soft); border-color: var(--brand); }
+
+/* ------------------------------------------------------------------ divers */
+
+.muted { color: var(--ink-mute); }
+.small { font-size: .87rem; }
+.center { text-align: center; }
+.stat { font-size: 1.9rem; font-weight: 800; letter-spacing: -.03em; }
+.tag {
+  display: inline-block; background: var(--brand-soft); color: var(--brand-dark);
+  padding: .18rem .6rem; border-radius: 999px; font-size: .76rem; font-weight: 600;
+}
+.tag.warn { background: var(--accent-soft); color: #8a5a12; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tag.warn { color: var(--accent); } }
+
+/* ================================================================= app.php */
+
+.app-main { padding: 2.5rem 0 4rem; }
+.config { max-width: 780px; margin-inline: auto; }
+.config-title { font-size: clamp(1.7rem, 4vw, 2.4rem); margin-bottom: 1.4rem; }
+
+.block {
+  border: 1px solid var(--line); background: var(--card);
+  border-radius: var(--radius); padding: 1.2rem 1.3rem; margin: 0 0 1.1rem;
+  box-shadow: var(--shadow);
+}
+.block legend, .block > summary {
+  font-weight: 700; font-size: .95rem; padding: 0 .35rem; margin-left: -.35rem;
+}
+.block > summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.block > summary::-webkit-details-marker { display: none; }
+.block > summary::after { content: "＋"; color: var(--ink-mute); font-weight: 400; }
+details.block[open] > summary::after { content: "－"; }
+details.block[open] > summary { margin-bottom: 1rem; }
+.block-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+@media (max-width: 720px) { .block-row { grid-template-columns: 1fr; } }
+
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+.chip { position: relative; cursor: pointer; }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip > span {
+  display: inline-flex; align-items: center; gap: .45rem;
+  border: 1px solid var(--line); background: var(--paper);
+  border-radius: 999px; padding: .5rem 1rem; font-size: .9rem; font-weight: 550;
+  transition: all .12s;
+}
+.chip input:checked + span {
+  border-color: var(--brand); background: var(--brand-soft); color: var(--brand-dark); font-weight: 650;
+}
+.chip input:focus-visible + span { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.budget-row { display: flex; align-items: center; gap: 1.2rem; margin-top: .9rem; }
+.budget-row input[type=range] { flex: 1; accent-color: var(--brand); }
+.budget-value { display: flex; align-items: baseline; gap: .3rem; font-weight: 700; font-size: 1.3rem; }
+.budget-value input { width: 5.2rem; text-align: right; font-weight: 700; font-size: 1.2rem; padding: .5rem .6rem; }
+
+.stepper { display: flex; align-items: center; gap: .5rem; margin-top: .7rem; }
+.stepper button {
+  width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--paper); font-size: 1.2rem; cursor: pointer; color: var(--ink);
+}
+.stepper button:hover { border-color: var(--brand); color: var(--brand); }
+.stepper input { width: 4rem; text-align: center; font-weight: 700; font-size: 1.05rem; }
+.block select { margin-top: .7rem; }
+
+/* ------------------------------------------------------------- récapitulatif */
+
+.summary { padding: 1.4rem; margin-bottom: 1.4rem; }
+.summary-head { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: flex-start; }
+.summary-total { font-size: 2rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; }
+.summary-total small { font-size: .9rem; font-weight: 550; color: var(--ink-mute); letter-spacing: 0; }
+.summary-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.summary .bar { margin: 1rem 0 1.2rem; }
+.summary-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: .8rem; }
+@media (max-width: 860px) { .summary-stats { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 520px) { .summary-stats { grid-template-columns: repeat(2, 1fr); } }
+.summary-stat { display: flex; flex-direction: column; gap: .1rem; }
+.summary-stat strong { font-size: 1.15rem; font-weight: 750; letter-spacing: -.02em; }
+.summary-stat span { font-size: .78rem; color: var(--ink-mute); line-height: 1.3; }
+.summary .carry { margin: 1rem 0 0; }
+
+/* -------------------------------------------------------------------- onglets */
+
+.tabs { display: flex; gap: .4rem; margin-bottom: 1.2rem; }
+.tab {
+  border: 1px solid var(--line); background: var(--card); color: var(--ink-soft);
+  padding: .6rem 1.1rem; border-radius: 999px; font: inherit; font-size: .92rem;
+  font-weight: 600; cursor: pointer;
+}
+.tab.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+/* --------------------------------------------------------------- les dîners */
+
+.days-pane { display: grid; gap: .9rem; }
+.day-card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 1.1rem 1.2rem; box-shadow: var(--shadow);
+}
+.day-head { display: flex; gap: .9rem; align-items: flex-start; }
+.day-emoji { font-size: 2rem; line-height: 1; }
+.day-meta { flex: 1; min-width: 0; }
+.day-name { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-mute); font-weight: 700; }
+.day-title { font-size: 1.1rem; margin: .1rem 0 .4rem; }
+.day-tags { display: flex; flex-wrap: wrap; gap: .35rem; }
+.day-price { text-align: right; flex-shrink: 0; }
+.day-price strong { display: block; font-size: 1.1rem; font-weight: 750; }
+.day-price span { font-size: .74rem; color: var(--ink-mute); }
+.day-actions { display: flex; gap: .5rem; margin-top: .9rem; flex-wrap: wrap; }
+.day-body { margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.day-cols { display: grid; grid-template-columns: .8fr 1.2fr; gap: 1.8rem; }
+@media (max-width: 700px) { .day-cols { grid-template-columns: 1fr; gap: 1.2rem; } }
+.day-body h4 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-mute); margin: 0 0 .6rem; }
+.ing-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .35rem; font-size: .92rem; }
+.ing-list li { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px dashed var(--line); padding-bottom: .3rem; }
+.ing-list .qty { color: var(--ink-mute); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.step-list { margin: 0; padding-left: 1.2rem; display: grid; gap: .5rem; font-size: .94rem; color: var(--ink-soft); }
+
+/* ------------------------------------------------------------------- courses */
+
+.list-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.list-total strong { font-size: 1.4rem; font-weight: 800; }
+.aisle { margin-bottom: 1rem; overflow: hidden; }
+.aisle-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .85rem 1.2rem; background: var(--brand-soft); border-bottom: 1px solid var(--line);
+}
+.aisle-head h3 { margin: 0; font-size: .95rem; }
+.list-row {
+  display: flex; align-items: center; gap: .85rem;
+  padding: .75rem 1.2rem; border-bottom: 1px solid var(--line); cursor: pointer;
+}
+.list-row:last-child { border-bottom: 0; }
+.list-row input { width: 20px; height: 20px; accent-color: var(--brand); flex-shrink: 0; }
+.list-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.list-name { font-weight: 600; font-size: .96rem; }
+.list-detail { font-size: .82rem; color: var(--ink-mute); }
+.list-warn { font-size: .78rem; color: var(--accent); }
+.list-price { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; }
+.list-price strong { font-variant-numeric: tabular-nums; }
+.list-row.done { opacity: .45; }
+.list-row.done .list-name { text-decoration: line-through; }
+.pantry .aisle-head { background: var(--paper); }
+.pantry-list { padding: .9rem 1.2rem 0; }
+.pantry .hint { padding: 0 1.2rem 1rem; }
+.share { display: flex; justify-content: center; }
+
+/* -------------------------------------------------------------------- modal */
+
+.modal {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(10, 22, 16, .55); backdrop-filter: blur(3px);
+  display: grid; place-items: center; padding: 1.5rem;
+}
+.modal[hidden] { display: none; }
+.modal-card {
+  background: var(--card); border-radius: var(--radius); padding: 2rem;
+  max-width: 430px; width: 100%; box-shadow: var(--shadow-lg); position: relative;
+}
+.modal-close {
+  position: absolute; top: .8rem; right: .9rem; border: 0; background: none;
+  font-size: 1.6rem; line-height: 1; color: var(--ink-mute); cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- impression */
+
+@media print {
+  .site-head, .site-foot, .summary-actions, .tabs, .day-actions, .share, .modal { display: none !important; }
+  body { background: #fff; }
+  .pane[hidden] { display: block !important; }
+  .card, .day-card, .aisle { box-shadow: none; border-color: #ccc; break-inside: avoid; }
+  .day-body { display: block !important; }
+}
+
+/* Le header est collant : on réserve sa hauteur lors des sauts d'ancre. */
+#result, #config { scroll-margin-top: 84px; }
+.marginal-note { margin-top: .4rem; }
+
+/* ------------------------------------------------------------ pages légales */
+.legal h2 { font-size: 1.15rem; margin-top: 2rem; }
+.legal ul { padding-left: 1.2rem; color: var(--ink-soft); }
+.legal li { margin-bottom: .4rem; }
+.legal p { color: var(--ink-soft); }
+
+/* Le sélecteur .site-nav a l'emporte sur .btn-* : on rétablit les couleurs. */
+.site-nav a.btn-primary { color: #fff; }
+.site-nav a.btn-primary:hover { color: #fff; }
+
+.demo-banner {
+  background: var(--accent-soft); border-bottom: 1px solid var(--accent);
+  padding: .7rem 0; font-size: .88rem;
+}
+.demo-banner .wrap { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+.demo-hero { padding: 2.5rem 0 1rem; }
+.demo-hero h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); margin-bottom: .5rem; }
+.demo-hero p { color: var(--ink-soft); max-width: 54ch; }
+</style>
+
+<div class="demo-banner">
+  <div class="wrap">
+    <strong>Démo</strong>
+    <span class="muted">Tout tourne dans votre navigateur. Les prix sont des estimations
+    non encore calibrées sur des relevés réels — voir la note en bas de page.</span>
+  </div>
+</div>
+
+<header class="site-head">
+  <div class="wrap">
+    <span class="logo"><span class="logo-mark">🥕</span>Budgeat</span>
+    <nav class="site-nav">
+      <span class="small muted hide-sm">Belgique · 21 enseignes · 58 recettes</span>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap app-main">
+  <div class="demo-hero">
+    <h1>Vos dîners de la semaine, pile dans votre budget.</h1>
+    <p>Choisissez votre magasin et le montant que vous ne voulez pas dépasser.
+    Vous obtenez sept dîners chiffrés, leurs recettes, et la liste de courses triée
+    par rayon avec le total à prévoir en caisse.</p>
+  </div>
+
+  <form id="config" class="config">
+    <fieldset class="block">
+      <legend>Votre magasin</legend>
+      <div class="chips" id="stores"></div>
+    </fieldset>
+
+    <fieldset class="block">
+      <legend>Votre budget pour la semaine</legend>
+      <div class="budget-row">
+        <input type="range" id="budgetRange" min="20" max="200" step="5" value="70">
+        <div class="budget-value">
+          <input type="number" id="budget" min="10" max="500" step="1" value="70">
+          <span>€</span>
+        </div>
+      </div>
+      <p class="hint" id="budgetHint"></p>
+    </fieldset>
+
+    <div class="block-row">
+      <fieldset class="block">
+        <legend>Convives</legend>
+        <div class="stepper">
+          <button type="button" data-step="people" data-delta="-1" aria-label="Moins">−</button>
+          <input type="number" id="people" min="1" max="12" value="2" readonly>
+          <button type="button" data-step="people" data-delta="1" aria-label="Plus">+</button>
+        </div>
+      </fieldset>
+      <fieldset class="block">
+        <legend>Dîners à prévoir</legend>
+        <div class="stepper">
+          <button type="button" data-step="days" data-delta="-1" aria-label="Moins">−</button>
+          <input type="number" id="days" min="1" max="7" value="7" readonly>
+          <button type="button" data-step="days" data-delta="1" aria-label="Plus">+</button>
+        </div>
+      </fieldset>
+      <fieldset class="block">
+        <legend>Temps max en cuisine</legend>
+        <select id="maxTime">
+          <option value="0">Peu importe</option>
+          <option value="25">25 minutes</option>
+          <option value="35">35 minutes</option>
+          <option value="45">45 minutes</option>
+        </select>
+      </fieldset>
+    </div>
+
+    <fieldset class="block">
+      <legend>Régime</legend>
+      <div class="chips" id="diets"></div>
+    </fieldset>
+
+    <details class="block advanced">
+      <summary>Allergies et aliments à éviter</summary>
+      <p class="hint">Aucun menu ne contiendra ces allergènes, y compris après un remplacement.</p>
+      <div class="chips" id="allergens"></div>
+
+      <label class="field" style="margin-top:1.4rem">
+        <span>Ingrédients que vous ne voulez pas voir</span>
+        <select id="exclude" multiple size="6"></select>
+        <span class="hint">Maintenez Ctrl (ou ⌘) pour en sélectionner plusieurs.</span>
+      </label>
+
+      <label class="field">
+        <span><input type="checkbox" id="emptyPantry"> Je pars de zéro</span>
+        <span class="hint">Par défaut, on considère que vous avez déjà sel, poivre, huile et
+        épices de base. Cochez pour les inclure dans le budget et la liste.</span>
+      </label>
+    </details>
+
+    <button type="submit" class="btn btn-primary btn-lg btn-block">Composer ma semaine</button>
+    <p class="hint center" style="margin-top:.8rem">Calcul instantané, dans votre navigateur.</p>
+  </form>
+
+  <div id="result" hidden></div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <h3 style="font-size:1rem">Sur les prix</h3>
+    <p class="small">
+      Cette démo utilise un indice de prix par enseigne et par rayon, appliqué à un
+      catalogue de 113 produits avec leurs conditionnements réels. Ces valeurs sont
+      des <strong>ordres de grandeur</strong>, pas des relevés magasin. La mécanique de calcul,
+      elle, est celle du produit final : on chiffre le panier réel (paquets entiers, restes
+      réutilisés d'un dîner à l'autre) et non une somme d'ingrédients au prorata.
+    </p>
+    <p class="small">
+      Le projet est livré avec deux outils pour passer à de vrais prix :
+      <code>scripts/carnet_releves.php</code> qui indique les 30 produits à relever
+      (ils représentent environ trois quarts de la valeur des paniers), et
+      <code>scripts/import_prices.php</code> qui recalcule le catalogue et les indices
+      d'enseigne à partir de ces relevés.
+    </p>
+    <p class="small muted" style="margin-top:1.4rem">
+      Budgeat n'est affilié à aucune enseigne. Les marques citées appartiennent à leurs
+      propriétaires et ne servent qu'à choisir où vous faites vos courses.
+    </p>
+  </div>
+</footer>
+
+<script>window.BUDGEAT_DATA = {"ingredients":{"_comment":"Catalogue d'ingredients. price = prix pour 'ref' unites (g -\u003E prix/kg, ml -\u003E prix/L, piece -\u003E prix/piece) au niveau d'indice 1.00. pack = conditionnement reellement vendu en rayon, utilise pour calculer le PANIER REEL (on paie des paquets entiers, pas des grammes). type sert aux filtres de regime, allergens aux filtres allergenes.","updated":"2026-08-01","ingredients":[{"id":"oignon","name":"Oignons","aisle":"fruits-legumes","unit":"g","ref":1000,"price":1.6,"pack":1000,"packLabel":"filet 1 kg","type":"veg","allergens":[],"kcal":40,"prot":1.1,"staple":true,"shelf":30},{"id":"echalote","name":"Échalotes","aisle":"fruits-legumes","unit":"g","ref":1000,"price":4.2,"pack":500,"packLabel":"filet 500 g","type":"veg","allergens":[],"kcal":72,"prot":2.5,"staple":true,"shelf":30},{"id":"ail","name":"Ail","aisle":"fruits-legumes","unit":"g","ref":1000,"price":8,"pack":150,"packLabel":"filet 150 g","type":"veg","allergens":[],"kcal":149,"prot":6.4,"staple":true,"shelf":60},{"id":"carotte","name":"Carottes","aisle":"fruits-legumes","unit":"g","ref":1000,"price":1.5,"pack":1000,"packLabel":"sachet 1 kg","type":"veg","allergens":[],"kcal":41,"prot":0.9,"staple":true,"shelf":21},{"id":"pdt","name":"Pommes de terre","aisle":"fruits-legumes","unit":"g","ref":1000,"price":1.35,"pack":2500,"packLabel":"sac 2,5 kg","type":"veg","allergens":[],"kcal":77,"prot":2,"staple":true,"shelf":40},{"id":"patate-douce","name":"Patates douces","aisle":"fruits-legumes","unit":"g","ref":1000,"price":2.6,"pack":1000,"packLabel":"sachet 1 kg","type":"veg","allergens":[],"kcal":86,"prot":1.6,"staple":false,"shelf":21},{"id":"courgette","name":"Courgettes","aisle":"fruits-legumes","unit":"g","ref":1000,"price":2.6,"pack":400,"packLabel":"à la pièce (~400 g)","type":"veg","allergens":[],"kcal":17,"prot":1.2,"staple":false,"shelf":8},{"id":"aubergine","name":"Aubergines","aisle":"fruits-legumes","unit":"g","ref":1000,"price":3.2,"pack":350,"packLabel":"à la pièce (~350 g)","type":"veg","allergens":[],"kcal":25,"prot":1,"staple":false,"shelf":8},{"id":"poivron","name":"Poivrons","aisle":"fruits-legumes","unit":"g","ref":1000,"price":4.5,"pack":200,"packLabel":"à la pièce (~200 g)","type":"veg","allergens":[],"kcal":26,"prot":1,"staple":false,"shelf":10},{"id":"tomate","name":"Tomates","aisle":"fruits-legumes","unit":"g","ref":1000,"price":2.9,"pack":500,"packLabel":"barquette 500 g","type":"veg","allergens":[],"kcal":18,"prot":0.9,"staple":false,"shelf":7},{"id":"tomate-cerise","name":"Tomates cerises","aisle":"fruits-legumes","unit":"g","ref":1000,"price":5.8,"pack":250,"packLabel":"barquette 250 g","type":"veg","allergens":[],"kcal":18,"prot":0.9,"staple":false,"shelf":7},{"id":"champignon","name":"Champignons de Paris","aisle":"fruits-legumes","unit":"g","ref":1000,"price":4.4,"pack":250,"packLabel":"barquette 250 g","type":"veg","allergens":[],"kcal":22,"prot":3.1,"staple":false,"shelf":6},{"id":"brocoli","name":"Brocoli","aisle":"fruits-legumes","unit":"g","ref":1000,"price":3.2,"pack":500,"packLabel":"à la pièce (~500 g)","type":"veg","allergens":[],"kcal":34,"prot":2.8,"staple":false,"shelf":8},{"id":"chou-fleur","name":"Chou-fleur","aisle":"fruits-legumes","unit":"g","ref":1000,"price":2.8,"pack":800,"packLabel":"à la pièce (~800 g)","type":"veg","allergens":[],"kcal":25,"prot":1.9,"staple":false,"shelf":10},{"id":"chou-blanc","name":"Chou blanc","aisle":"fruits-legumes","unit":"g","ref":1000,"price":1.6,"pack":1000,"packLabel":"à la pièce (~1 kg)","type":"veg","allergens":[],"kcal":25,"prot":1.3,"staple":false,"shelf":20},{"id":"poireau","name":"Poireaux","aisle":"fruits-legumes","unit":"g","ref":1000,"price":2.6,"pack":500,"packLabel":"botte (~500 g)","type":"veg","allergens":[],"kcal":31,"prot":1.5,"staple":false,"shelf":12},{"id":"celeri-branche","name":"Céleri branche","aisle":"fruits-legumes","unit":"g","ref":1000,"price":2.4,"pack":400,"packLabel":"botte (~400 g)","type":"veg","allergens":["celeri"],"kcal":16,"prot":0.7,"staple":false,"shelf":10},{"id":"butternut","name":"Courge butternut","aisle":"fruits-legumes","unit":"g","ref":1000,"price":2.2,"pack":1000,"packLabel":"à la pièce (~1 kg)","type":"veg","allergens":[],"kcal":45,"prot":1,"staple":false,"shelf":25},{"id":"salade","name":"Salade verte","aisle":"fruits-legumes","unit":"piece","ref":1,"price":1.3,"pack":1,"packLabel":"à la pièce","type":"veg","allergens":[],"kcal":15,"prot":1.4,"staple":false,"shelf":5},{"id":"concombre","name":"Concombre","aisle":"fruits-legumes","unit":"piece","ref":1,"price":1.2,"pack":1,"packLabel":"à la pièce","type":"veg","allergens":[],"kcal":15,"prot":0.7,"staple":false,"shelf":8},{"id":"citron","name":"Citrons","aisle":"fruits-legumes","unit":"piece","ref":1,"price":0.55,"pack":4,"packLabel":"filet de 4","type":"veg","allergens":[],"kcal":29,"prot":1.1,"staple":true,"shelf":20},{"id":"citron-vert","name":"Citrons verts","aisle":"fruits-legumes","unit":"piece","ref":1,"price":0.45,"pack":4,"packLabel":"filet de 4","type":"veg","allergens":[],"kcal":30,"prot":0.7,"staple":true,"shelf":20},{"id":"gingembre","name":"Gingembre frais","aisle":"fruits-legumes","unit":"g","ref":1000,"price":9.9,"pack":100,"packLabel":"morceau ~100 g","type":"veg","allergens":[],"kcal":80,"prot":1.8,"staple":true,"shelf":20},{"id":"persil","name":"Persil frais","aisle":"fruits-legumes","unit":"g","ref":1000,"price":20,"pack":50,"packLabel":"botte 50 g","type":"veg","allergens":[],"kcal":36,"prot":3,"staple":false,"shelf":6},{"id":"coriandre","name":"Coriandre fraîche","aisle":"fruits-legumes","unit":"g","ref":1000,"price":22,"pack":50,"packLabel":"botte 50 g","type":"veg","allergens":[],"kcal":23,"prot":2.1,"staple":false,"shelf":5},{"id":"basilic","name":"Basilic frais","aisle":"fruits-legumes","unit":"g","ref":1000,"price":40,"pack":30,"packLabel":"pot 30 g","type":"veg","allergens":[],"kcal":23,"prot":3.2,"staple":false,"shelf":7},{"id":"pomme","name":"Pommes","aisle":"fruits-legumes","unit":"g","ref":1000,"price":2.3,"pack":1000,"packLabel":"filet 1 kg","type":"veg","allergens":[],"kcal":52,"prot":0.3,"staple":false,"shelf":20},{"id":"banane","name":"Bananes","aisle":"fruits-legumes","unit":"g","ref":1000,"price":1.7,"pack":1000,"packLabel":"régime ~1 kg","type":"veg","allergens":[],"kcal":89,"prot":1.1,"staple":false,"shelf":7},{"id":"poulet-filet","name":"Filets de poulet","aisle":"boucherie","unit":"g","ref":1000,"price":8.9,"pack":900,"packLabel":"barquette 900 g","type":"meat","allergens":[],"kcal":110,"prot":23,"staple":false,"shelf":4,"cheaper":"poulet-cuisse"},{"id":"poulet-cuisse","name":"Cuisses de poulet","aisle":"boucherie","unit":"g","ref":1000,"price":4.3,"pack":1000,"packLabel":"barquette 1 kg","type":"meat","allergens":[],"kcal":140,"prot":18,"staple":false,"shelf":4},{"id":"dinde-escalope","name":"Escalopes de dinde","aisle":"boucherie","unit":"g","ref":1000,"price":9.5,"pack":500,"packLabel":"barquette 500 g","type":"meat","allergens":[],"kcal":105,"prot":24,"staple":false,"shelf":4,"cheaper":"poulet-cuisse"},{"id":"hache-mixte","name":"Haché porc et bœuf","aisle":"boucherie","unit":"g","ref":1000,"price":7.4,"pack":500,"packLabel":"barquette 500 g","type":"pork","allergens":[],"kcal":220,"prot":18,"staple":false,"shelf":3},{"id":"hache-boeuf","name":"Haché de bœuf","aisle":"boucherie","unit":"g","ref":1000,"price":9.9,"pack":500,"packLabel":"barquette 500 g","type":"meat","allergens":[],"kcal":200,"prot":20,"staple":false,"shelf":3,"cheaper":"hache-mixte"},{"id":"lardons","name":"Lardons fumés","aisle":"boucherie","unit":"g","ref":1000,"price":9.5,"pack":200,"packLabel":"barquette 200 g","type":"pork","allergens":[],"kcal":290,"prot":15,"staple":false,"shelf":8},{"id":"saucisse","name":"Saucisses de porc","aisle":"boucherie","unit":"g","ref":1000,"price":8.2,"pack":400,"packLabel":"barquette 400 g","type":"pork","allergens":["sulfites"],"kcal":300,"prot":14,"staple":false,"shelf":5},{"id":"merguez","name":"Merguez","aisle":"boucherie","unit":"g","ref":1000,"price":9.6,"pack":400,"packLabel":"barquette 400 g","type":"meat","allergens":["sulfites"],"kcal":290,"prot":15,"staple":false,"shelf":5},{"id":"jambon","name":"Jambon blanc","aisle":"boucherie","unit":"g","ref":1000,"price":12,"pack":150,"packLabel":"paquet 150 g","type":"pork","allergens":[],"kcal":110,"prot":20,"staple":false,"shelf":7},{"id":"chorizo","name":"Chorizo","aisle":"boucherie","unit":"g","ref":1000,"price":14,"pack":150,"packLabel":"paquet 150 g","type":"pork","allergens":[],"kcal":340,"prot":22,"staple":false,"shelf":20},{"id":"boeuf-bourgui","name":"Bœuf à mijoter","aisle":"boucherie","unit":"g","ref":1000,"price":12.5,"pack":600,"packLabel":"barquette 600 g","type":"meat","allergens":[],"kcal":180,"prot":21,"staple":false,"shelf":4},{"id":"cabillaud","name":"Dos de cabillaud surgelé","aisle":"surgeles","unit":"g","ref":1000,"price":13.5,"pack":400,"packLabel":"sachet 400 g","type":"fish","allergens":["poissons"],"kcal":82,"prot":18,"staple":false,"shelf":180,"cheaper":"colin"},{"id":"colin","name":"Filets de colin surgelés","aisle":"surgeles","unit":"g","ref":1000,"price":8.9,"pack":400,"packLabel":"sachet 400 g","type":"fish","allergens":["poissons"],"kcal":78,"prot":17,"staple":false,"shelf":180},{"id":"saumon","name":"Pavés de saumon","aisle":"poissonnerie","unit":"g","ref":1000,"price":21,"pack":250,"packLabel":"barquette 250 g","type":"fish","allergens":["poissons"],"kcal":200,"prot":20,"staple":false,"shelf":3,"cheaper":"colin"},{"id":"thon-boite","name":"Thon au naturel","aisle":"epicerie-salee","unit":"g","ref":1000,"price":11.5,"pack":112,"packLabel":"boîte 112 g","type":"fish","allergens":["poissons"],"kcal":108,"prot":25,"staple":true,"shelf":700},{"id":"sardine-boite","name":"Sardines à l'huile","aisle":"epicerie-salee","unit":"g","ref":1000,"price":10,"pack":120,"packLabel":"boîte 120 g","type":"fish","allergens":["poissons"],"kcal":210,"prot":24,"staple":true,"shelf":900},{"id":"crevette","name":"Crevettes décortiquées","aisle":"surgeles","unit":"g","ref":1000,"price":16.5,"pack":250,"packLabel":"sachet 250 g","type":"seafood","allergens":["crustaces"],"kcal":99,"prot":21,"staple":false,"shelf":180},{"id":"moules","name":"Moules fraîches","aisle":"poissonnerie","unit":"g","ref":1000,"price":4.6,"pack":1000,"packLabel":"sac 1 kg","type":"seafood","allergens":["mollusques"],"kcal":86,"prot":12,"staple":false,"shelf":2},{"id":"oeuf","name":"Œufs","aisle":"cremerie","unit":"piece","ref":1,"price":0.33,"pack":12,"packLabel":"boîte de 12","type":"egg","allergens":["oeufs"],"kcal":78,"prot":6.3,"staple":true,"shelf":25},{"id":"lait","name":"Lait demi-écrémé","aisle":"cremerie","unit":"ml","ref":1000,"price":1.05,"pack":1000,"packLabel":"brique 1 L","type":"dairy","allergens":["lait"],"kcal":46,"prot":3.3,"staple":true,"shelf":60},{"id":"creme","name":"Crème fraîche épaisse","aisle":"cremerie","unit":"ml","ref":1000,"price":4.6,"pack":200,"packLabel":"pot 200 ml","type":"dairy","allergens":["lait"],"kcal":200,"prot":2.4,"staple":false,"shelf":20},{"id":"creme-liquide","name":"Crème liquide","aisle":"cremerie","unit":"ml","ref":1000,"price":3.6,"pack":200,"packLabel":"brique 200 ml","type":"dairy","allergens":["lait"],"kcal":190,"prot":2.3,"staple":true,"shelf":90},{"id":"beurre","name":"Beurre","aisle":"cremerie","unit":"g","ref":1000,"price":9.8,"pack":250,"packLabel":"plaquette 250 g","type":"dairy","allergens":["lait"],"kcal":740,"prot":0.7,"staple":true,"shelf":45},{"id":"fromage-rape","name":"Emmental râpé","aisle":"cremerie","unit":"g","ref":1000,"price":9.4,"pack":200,"packLabel":"sachet 200 g","type":"dairy","allergens":["lait"],"kcal":370,"prot":27,"staple":false,"shelf":20},{"id":"mozzarella","name":"Mozzarella","aisle":"cremerie","unit":"g","ref":1000,"price":7.6,"pack":125,"packLabel":"boule 125 g","type":"dairy","allergens":["lait"],"kcal":280,"prot":18,"staple":false,"shelf":20},{"id":"feta","name":"Feta","aisle":"cremerie","unit":"g","ref":1000,"price":11,"pack":200,"packLabel":"bloc 200 g","type":"dairy","allergens":["lait"],"kcal":260,"prot":14,"staple":false,"shelf":30},{"id":"parmesan","name":"Parmesan râpé","aisle":"cremerie","unit":"g","ref":1000,"price":21,"pack":100,"packLabel":"sachet 100 g","type":"dairy","allergens":["lait"],"kcal":390,"prot":33,"staple":false,"shelf":40},{"id":"yaourt-nature","name":"Yaourt nature","aisle":"cremerie","unit":"g","ref":1000,"price":2.2,"pack":500,"packLabel":"pack 4 x 125 g","type":"dairy","allergens":["lait"],"kcal":60,"prot":4,"staple":false,"shelf":20},{"id":"fromage-frais","name":"Fromage frais nature","aisle":"cremerie","unit":"g","ref":1000,"price":6.2,"pack":300,"packLabel":"pot 300 g","type":"dairy","allergens":["lait"],"kcal":150,"prot":6,"staple":false,"shelf":20},{"id":"tofu","name":"Tofu ferme nature","aisle":"cremerie","unit":"g","ref":1000,"price":9,"pack":250,"packLabel":"bloc 250 g","type":"veg","allergens":["soja"],"kcal":145,"prot":15,"staple":false,"shelf":25},{"id":"pates","name":"Pâtes (penne, fusilli)","aisle":"epicerie-salee","unit":"g","ref":1000,"price":1.45,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":["gluten"],"kcal":350,"prot":12,"staple":true,"shelf":700},{"id":"spaghetti","name":"Spaghetti","aisle":"epicerie-salee","unit":"g","ref":1000,"price":1.45,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":["gluten"],"kcal":350,"prot":12,"staple":true,"shelf":700},{"id":"riz","name":"Riz long grain","aisle":"epicerie-salee","unit":"g","ref":1000,"price":2.1,"pack":1000,"packLabel":"paquet 1 kg","type":"veg","allergens":[],"kcal":350,"prot":7,"staple":true,"shelf":700},{"id":"riz-basmati","name":"Riz basmati","aisle":"epicerie-salee","unit":"g","ref":1000,"price":3.2,"pack":1000,"packLabel":"paquet 1 kg","type":"veg","allergens":[],"kcal":350,"prot":7.5,"staple":true,"shelf":700,"cheaper":"riz"},{"id":"semoule","name":"Semoule de couscous","aisle":"epicerie-salee","unit":"g","ref":1000,"price":2.2,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":["gluten"],"kcal":350,"prot":12,"staple":true,"shelf":700},{"id":"boulgour","name":"Boulgour","aisle":"epicerie-salee","unit":"g","ref":1000,"price":3.2,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":["gluten"],"kcal":340,"prot":12,"staple":true,"shelf":700},{"id":"quinoa","name":"Quinoa","aisle":"epicerie-salee","unit":"g","ref":1000,"price":6.5,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":[],"kcal":360,"prot":14,"staple":true,"shelf":700,"cheaper":"boulgour"},{"id":"lentilles","name":"Lentilles vertes","aisle":"epicerie-salee","unit":"g","ref":1000,"price":2.9,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":[],"kcal":330,"prot":24,"staple":true,"shelf":700},{"id":"lentilles-corail","name":"Lentilles corail","aisle":"epicerie-salee","unit":"g","ref":1000,"price":4,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":[],"kcal":340,"prot":24,"staple":true,"shelf":700},{"id":"pois-chiche","name":"Pois chiches","aisle":"epicerie-salee","unit":"g","ref":1000,"price":2.6,"pack":265,"packLabel":"boîte 400 g (265 g égouttés)","type":"veg","allergens":[],"kcal":130,"prot":7,"staple":true,"shelf":700},{"id":"haricot-rouge","name":"Haricots rouges","aisle":"epicerie-salee","unit":"g","ref":1000,"price":2.7,"pack":265,"packLabel":"boîte 400 g (265 g égouttés)","type":"veg","allergens":[],"kcal":120,"prot":8,"staple":true,"shelf":700},{"id":"haricot-blanc","name":"Haricots blancs","aisle":"epicerie-salee","unit":"g","ref":1000,"price":2.5,"pack":265,"packLabel":"boîte 400 g (265 g égouttés)","type":"veg","allergens":[],"kcal":120,"prot":7,"staple":true,"shelf":700},{"id":"mais","name":"Maïs doux","aisle":"epicerie-salee","unit":"g","ref":1000,"price":3.1,"pack":285,"packLabel":"boîte 285 g","type":"veg","allergens":[],"kcal":90,"prot":3,"staple":true,"shelf":700},{"id":"tomate-concassee","name":"Tomates concassées","aisle":"epicerie-salee","unit":"g","ref":1000,"price":1.6,"pack":400,"packLabel":"boîte 400 g","type":"veg","allergens":[],"kcal":32,"prot":1.2,"staple":true,"shelf":700},{"id":"passata","name":"Coulis de tomates","aisle":"epicerie-salee","unit":"ml","ref":1000,"price":1.8,"pack":700,"packLabel":"bouteille 700 ml","type":"veg","allergens":[],"kcal":35,"prot":1.3,"staple":true,"shelf":700},{"id":"concentre-tomate","name":"Concentré de tomates","aisle":"epicerie-salee","unit":"g","ref":1000,"price":4,"pack":140,"packLabel":"boîte 140 g","type":"veg","allergens":[],"kcal":80,"prot":4,"staple":true,"shelf":700},{"id":"lait-coco","name":"Lait de coco","aisle":"monde","unit":"ml","ref":1000,"price":3.2,"pack":400,"packLabel":"boîte 400 ml","type":"veg","allergens":[],"kcal":190,"prot":2,"staple":true,"shelf":700},{"id":"sauce-soja","name":"Sauce soja","aisle":"monde","unit":"ml","ref":1000,"price":5.6,"pack":250,"packLabel":"flacon 250 ml","type":"veg","allergens":["soja","gluten"],"kcal":60,"prot":8,"staple":true,"shelf":700},{"id":"curry-pate","name":"Pâte de curry rouge","aisle":"monde","unit":"g","ref":1000,"price":12,"pack":100,"packLabel":"pot 100 g","type":"veg","allergens":["poissons"],"kcal":90,"prot":2,"staple":true,"shelf":400},{"id":"tortilla","name":"Tortillas de blé","aisle":"monde","unit":"g","ref":1000,"price":6,"pack":320,"packLabel":"paquet de 8","type":"veg","allergens":["gluten"],"kcal":300,"prot":8,"staple":false,"shelf":90},{"id":"huile-olive","name":"Huile d'olive","aisle":"epicerie-salee","unit":"ml","ref":1000,"price":8.9,"pack":750,"packLabel":"bouteille 750 ml","type":"veg","allergens":[],"kcal":900,"prot":0,"staple":true,"shelf":700},{"id":"huile-tournesol","name":"Huile de tournesol","aisle":"epicerie-salee","unit":"ml","ref":1000,"price":2.3,"pack":1000,"packLabel":"bouteille 1 L","type":"veg","allergens":[],"kcal":900,"prot":0,"staple":true,"shelf":700},{"id":"vinaigre","name":"Vinaigre balsamique","aisle":"epicerie-salee","unit":"ml","ref":1000,"price":4.5,"pack":500,"packLabel":"bouteille 500 ml","type":"veg","allergens":["sulfites"],"kcal":90,"prot":0,"staple":true,"shelf":700},{"id":"moutarde","name":"Moutarde","aisle":"epicerie-salee","unit":"g","ref":1000,"price":4.2,"pack":200,"packLabel":"pot 200 g","type":"veg","allergens":["moutarde"],"kcal":66,"prot":4,"staple":true,"shelf":400},{"id":"bouillon","name":"Bouillon (cubes)","aisle":"epicerie-salee","unit":"piece","ref":1,"price":0.2,"pack":12,"packLabel":"boîte de 12","type":"veg","allergens":["celeri"],"kcal":10,"prot":0.5,"staple":true,"shelf":700},{"id":"farine","name":"Farine de blé","aisle":"epicerie-sucree","unit":"g","ref":1000,"price":1.1,"pack":1000,"packLabel":"paquet 1 kg","type":"veg","allergens":["gluten"],"kcal":350,"prot":10,"staple":true,"shelf":400},{"id":"chapelure","name":"Chapelure","aisle":"epicerie-salee","unit":"g","ref":1000,"price":2.8,"pack":250,"packLabel":"paquet 250 g","type":"veg","allergens":["gluten"],"kcal":360,"prot":11,"staple":true,"shelf":300},{"id":"sucre","name":"Sucre","aisle":"epicerie-sucree","unit":"g","ref":1000,"price":1.3,"pack":1000,"packLabel":"paquet 1 kg","type":"veg","allergens":[],"kcal":400,"prot":0,"staple":true,"shelf":900},{"id":"miel","name":"Miel","aisle":"epicerie-sucree","unit":"g","ref":1000,"price":9,"pack":250,"packLabel":"pot 250 g","type":"honey","allergens":[],"kcal":320,"prot":0.3,"staple":true,"shelf":900},{"id":"olive","name":"Olives noires","aisle":"epicerie-salee","unit":"g","ref":1000,"price":8,"pack":200,"packLabel":"bocal 200 g","type":"veg","allergens":[],"kcal":150,"prot":1,"staple":true,"shelf":400},{"id":"cornichon","name":"Cornichons","aisle":"epicerie-salee","unit":"g","ref":1000,"price":6,"pack":200,"packLabel":"bocal 200 g","type":"veg","allergens":["moutarde","sulfites"],"kcal":20,"prot":0.5,"staple":true,"shelf":400},{"id":"cajou","name":"Noix de cajou","aisle":"epicerie-sucree","unit":"g","ref":1000,"price":16,"pack":200,"packLabel":"sachet 200 g","type":"veg","allergens":["fruits-a-coque"],"kcal":580,"prot":18,"staple":true,"shelf":300},{"id":"cacahuete-beurre","name":"Beurre de cacahuète","aisle":"epicerie-sucree","unit":"g","ref":1000,"price":7.5,"pack":350,"packLabel":"pot 350 g","type":"veg","allergens":["arachides"],"kcal":590,"prot":25,"staple":true,"shelf":300},{"id":"sesame","name":"Graines de sésame","aisle":"monde","unit":"g","ref":1000,"price":9,"pack":150,"packLabel":"sachet 150 g","type":"veg","allergens":["sesame"],"kcal":570,"prot":18,"staple":true,"shelf":300},{"id":"amande-effilee","name":"Amandes effilées","aisle":"epicerie-sucree","unit":"g","ref":1000,"price":18,"pack":125,"packLabel":"sachet 125 g","type":"veg","allergens":["fruits-a-coque"],"kcal":600,"prot":20,"staple":true,"shelf":300},{"id":"raisin-sec","name":"Raisins secs","aisle":"epicerie-sucree","unit":"g","ref":1000,"price":6,"pack":250,"packLabel":"sachet 250 g","type":"veg","allergens":[],"kcal":300,"prot":3,"staple":true,"shelf":300},{"id":"curry-poudre","name":"Curry en poudre","aisle":"epicerie-salee","unit":"g","ref":1000,"price":22,"pack":40,"packLabel":"pot 40 g","type":"veg","allergens":[],"kcal":320,"prot":12,"staple":true,"shelf":700},{"id":"paprika","name":"Paprika","aisle":"epicerie-salee","unit":"g","ref":1000,"price":20,"pack":45,"packLabel":"pot 45 g","type":"veg","allergens":[],"kcal":280,"prot":14,"staple":true,"shelf":700},{"id":"cumin","name":"Cumin moulu","aisle":"epicerie-salee","unit":"g","ref":1000,"price":24,"pack":40,"packLabel":"pot 40 g","type":"veg","allergens":[],"kcal":375,"prot":18,"staple":true,"shelf":700},{"id":"curcuma","name":"Curcuma","aisle":"epicerie-salee","unit":"g","ref":1000,"price":22,"pack":40,"packLabel":"pot 40 g","type":"veg","allergens":[],"kcal":310,"prot":9,"staple":true,"shelf":700},{"id":"herbes","name":"Herbes de Provence","aisle":"epicerie-salee","unit":"g","ref":1000,"price":18,"pack":30,"packLabel":"pot 30 g","type":"veg","allergens":[],"kcal":270,"prot":9,"staple":true,"shelf":700},{"id":"piment","name":"Piment en poudre","aisle":"epicerie-salee","unit":"g","ref":1000,"price":26,"pack":35,"packLabel":"pot 35 g","type":"veg","allergens":[],"kcal":280,"prot":12,"staple":true,"shelf":700},{"id":"sel-poivre","name":"Sel et poivre","aisle":"epicerie-salee","unit":"g","ref":1000,"price":3,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":[],"kcal":0,"prot":0,"staple":true,"shelf":900},{"id":"epinard-surgele","name":"Épinards surgelés","aisle":"surgeles","unit":"g","ref":1000,"price":2.3,"pack":450,"packLabel":"sachet 450 g","type":"veg","allergens":[],"kcal":25,"prot":3,"staple":true,"shelf":300},{"id":"haricot-vert","name":"Haricots verts surgelés","aisle":"surgeles","unit":"g","ref":1000,"price":2.4,"pack":1000,"packLabel":"sachet 1 kg","type":"veg","allergens":[],"kcal":31,"prot":1.8,"staple":true,"shelf":300},{"id":"petit-pois","name":"Petits pois surgelés","aisle":"surgeles","unit":"g","ref":1000,"price":1.95,"pack":1000,"packLabel":"sachet 1 kg","type":"veg","allergens":[],"kcal":80,"prot":5,"staple":true,"shelf":300},{"id":"legume-wok","name":"Mélange de légumes wok surgelés","aisle":"surgeles","unit":"g","ref":1000,"price":2.8,"pack":750,"packLabel":"sachet 750 g","type":"veg","allergens":[],"kcal":40,"prot":2,"staple":true,"shelf":300},{"id":"frites-surgele","name":"Frites au four surgelées","aisle":"surgeles","unit":"g","ref":1000,"price":2.1,"pack":1000,"packLabel":"sachet 1 kg","type":"veg","allergens":[],"kcal":150,"prot":2.5,"staple":true,"shelf":300},{"id":"pain","name":"Pain","aisle":"boulangerie","unit":"piece","ref":1,"price":1.2,"pack":1,"packLabel":"baguette","type":"veg","allergens":["gluten"],"kcal":250,"prot":8,"staple":false,"shelf":2},{"id":"pate-brisee","name":"Pâte brisée","aisle":"cremerie","unit":"g","ref":1000,"price":5.2,"pack":230,"packLabel":"rouleau 230 g","type":"veg","allergens":["gluten"],"kcal":380,"prot":6,"staple":false,"shelf":30},{"id":"pate-feuilletee","name":"Pâte feuilletée","aisle":"cremerie","unit":"g","ref":1000,"price":5.4,"pack":230,"packLabel":"rouleau 230 g","type":"veg","allergens":["gluten"],"kcal":400,"prot":6,"staple":false,"shelf":30},{"id":"pate-pizza","name":"Pâte à pizza","aisle":"cremerie","unit":"g","ref":1000,"price":5,"pack":260,"packLabel":"rouleau 260 g","type":"veg","allergens":["gluten"],"kcal":280,"prot":8,"staple":false,"shelf":30},{"id":"gnocchi","name":"Gnocchi","aisle":"epicerie-salee","unit":"g","ref":1000,"price":3.2,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":["gluten"],"kcal":160,"prot":4,"staple":false,"shelf":90},{"id":"polenta","name":"Polenta","aisle":"epicerie-salee","unit":"g","ref":1000,"price":2.6,"pack":500,"packLabel":"paquet 500 g","type":"veg","allergens":[],"kcal":350,"prot":8,"staple":true,"shelf":400},{"id":"nouilles","name":"Nouilles chinoises","aisle":"monde","unit":"g","ref":1000,"price":4,"pack":250,"packLabel":"paquet 250 g","type":"veg","allergens":["gluten"],"kcal":350,"prot":11,"staple":true,"shelf":400}]},"recipes":{"_comment":"Recettes. q = quantite PAR PERSONNE dans l'unite de l'ingredient (g, ml ou piece). Les regimes et allergenes ne sont PAS declares ici : ils sont deduits automatiquement des ingredients par lib/Catalog.php, ce qui evite les incoherences.","updated":"2026-08-01","recipes":[{"id":"pates-bolo","name":"Spaghetti bolognaise maison","emoji":"🍝","time":35,"cuisine":"Italie","tags":["familial","batch"],"items":[{"i":"spaghetti","q":100},{"i":"hache-mixte","q":110},{"i":"tomate-concassee","q":150},{"i":"oignon","q":50},{"i":"carotte","q":50},{"i":"ail","q":4},{"i":"huile-olive","q":8},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],"steps":["Émincez l'oignon, la carotte et l'ail, faites-les revenir 5 min à l'huile d'olive.","Ajoutez la viande hachée, laissez colorer 5 min en écrasant à la cuillère.","Versez les tomates concassées et les herbes, salez, poivrez. Laissez mijoter 20 min à feu doux.","Cuisez les spaghetti al dente et mélangez-les à la sauce hors du feu."]},{"id":"poulet-curry-coco","name":"Poulet au curry et lait de coco","emoji":"🍛","time":30,"cuisine":"Inde","tags":["rapide"],"items":[{"i":"poulet-filet","q":130},{"i":"lait-coco","q":100},{"i":"curry-poudre","q":4},{"i":"oignon","q":60},{"i":"poivron","q":80},{"i":"riz","q":90},{"i":"huile-tournesol","q":8},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],"steps":["Coupez le poulet en cubes, l'oignon et le poivron en lamelles.","Saisissez le poulet 5 min, réservez. Faites suer oignon, poivron et ail 5 min.","Remettez le poulet, saupoudrez de curry, versez le lait de coco et laissez réduire 12 min.","Servez avec le riz cuit à l'eau salée."]},{"id":"chili-sin-carne","name":"Chili sin carne","emoji":"🌶️","time":30,"cuisine":"Mexique","tags":["batch","eco"],"items":[{"i":"haricot-rouge","q":110},{"i":"mais","q":60},{"i":"tomate-concassee","q":150},{"i":"poivron","q":70},{"i":"oignon","q":60},{"i":"riz","q":80},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"ail","q":4},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],"steps":["Faites revenir oignon, ail et poivron 6 min.","Ajoutez cumin et paprika, mélangez 1 min pour libérer les arômes.","Versez tomates, haricots rincés et maïs. Mijotez 15 min.","Servez sur un lit de riz."]},{"id":"gratin-pdt-jambon","name":"Gratin de pommes de terre au jambon","emoji":"🥔","time":55,"cuisine":"France","tags":["familial","four"],"items":[{"i":"pdt","q":300},{"i":"jambon","q":60},{"i":"creme-liquide","q":60},{"i":"lait","q":60},{"i":"fromage-rape","q":35},{"i":"ail","q":3},{"i":"beurre","q":8},{"i":"sel-poivre","q":2}],"steps":["Préchauffez le four à 180 °C. Épluchez et coupez les pommes de terre en fines rondelles.","Frottez le plat à l'ail, beurrez-le, disposez les pommes de terre et le jambon en couches.","Versez le mélange lait-crème, salez, poivrez, couvrez de fromage râpé.","Enfournez 45 min jusqu'à ce que la lame d'un couteau traverse sans résistance."]},{"id":"omelette-pdt","name":"Omelette paysanne aux pommes de terre","emoji":"🍳","time":25,"cuisine":"France","tags":["rapide","eco"],"items":[{"i":"oeuf","q":3},{"i":"pdt","q":200},{"i":"oignon","q":50},{"i":"persil","q":5},{"i":"huile-tournesol","q":10},{"i":"salade","q":0.25},{"i":"sel-poivre","q":2}],"steps":["Coupez les pommes de terre en dés, faites-les dorer 15 min à la poêle avec l'oignon.","Battez les œufs avec le persil, salez, poivrez.","Versez sur les pommes de terre, couvrez et laissez prendre 5 min à feu doux.","Servez avec la salade assaisonnée."]},{"id":"dahl-corail","name":"Dahl de lentilles corail","emoji":"🥘","time":30,"cuisine":"Inde","tags":["eco","batch"],"items":[{"i":"lentilles-corail","q":90},{"i":"lait-coco","q":80},{"i":"tomate-concassee","q":100},{"i":"oignon","q":60},{"i":"curcuma","q":2},{"i":"cumin","q":2},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"riz","q":60},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],"steps":["Faites revenir oignon, ail et gingembre 5 min avec les épices.","Ajoutez les lentilles rincées, les tomates et 2 volumes d'eau.","Laissez cuire 20 min à couvert en remuant, puis versez le lait de coco.","Servez avec un peu de riz."]},{"id":"saumon-riz-brocoli","name":"Pavé de saumon, riz et brocoli","emoji":"🐟","time":25,"cuisine":"France","tags":["rapide","sain"],"items":[{"i":"saumon","q":125},{"i":"riz","q":90},{"i":"brocoli","q":180},{"i":"citron","q":0.4},{"i":"beurre","q":10},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],"steps":["Lancez le riz. Détaillez le brocoli en fleurettes, cuisez-le 8 min à la vapeur.","Saisissez le saumon côté peau 4 min, retournez 3 min.","Déglacez avec le jus de citron et le beurre, arrosez le poisson.","Dressez saumon, riz et brocoli, terminez à l'ail écrasé."]},{"id":"colin-pane-frites","name":"Colin pané maison et frites au four","emoji":"🍟","time":35,"cuisine":"France","tags":["familial"],"items":[{"i":"colin","q":130},{"i":"chapelure","q":40},{"i":"oeuf","q":0.5},{"i":"farine","q":20},{"i":"frites-surgele","q":200},{"i":"citron","q":0.3},{"i":"huile-tournesol","q":12},{"i":"sel-poivre","q":2}],"steps":["Enfournez les frites à 200 °C pour 25 min.","Passez les filets de colin dans la farine, l'œuf battu puis la chapelure.","Faites dorer 4 min de chaque côté à la poêle.","Servez avec un quartier de citron."]},{"id":"wok-poulet-nouilles","name":"Wok de poulet et nouilles sautées","emoji":"🥢","time":25,"cuisine":"Asie","tags":["rapide"],"items":[{"i":"poulet-filet","q":120},{"i":"nouilles","q":80},{"i":"legume-wok","q":180},{"i":"sauce-soja","q":20},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"huile-tournesol","q":10},{"i":"sesame","q":5}],"steps":["Cuisez les nouilles 3 min, égouttez.","Saisissez le poulet en lamelles à feu vif 5 min avec ail et gingembre.","Ajoutez les légumes, sautez 6 min, puis les nouilles et la sauce soja.","Parsemez de graines de sésame."]},{"id":"quiche-lorraine","name":"Quiche lorraine","emoji":"🥧","time":45,"cuisine":"France","tags":["familial","four"],"items":[{"i":"pate-brisee","q":60},{"i":"lardons","q":50},{"i":"oeuf","q":1},{"i":"creme-liquide","q":50},{"i":"lait","q":40},{"i":"fromage-rape","q":25},{"i":"salade","q":0.25},{"i":"sel-poivre","q":2}],"steps":["Préchauffez à 190 °C, étalez la pâte dans le moule et piquez-la.","Faites rissoler les lardons 5 min sans matière grasse, égouttez.","Battez œufs, crème et lait, salez peu, poivrez. Ajoutez lardons et fromage.","Versez sur la pâte et enfournez 30 min. Servez avec la salade."]},{"id":"tarte-courgette-feta","name":"Tarte courgette et feta","emoji":"🥧","time":45,"cuisine":"Méditerranée","tags":["four"],"items":[{"i":"pate-feuilletee","q":60},{"i":"courgette","q":150},{"i":"feta","q":40},{"i":"oeuf","q":1},{"i":"creme-liquide","q":40},{"i":"herbes","q":1},{"i":"huile-olive","q":6},{"i":"sel-poivre","q":2}],"steps":["Coupez les courgettes en rondelles, faites-les revenir 8 min à l'huile d'olive.","Étalez la pâte, répartissez les courgettes et la feta émiettée.","Versez l'appareil œuf-crème assaisonné aux herbes.","Enfournez 30 min à 190 °C."]},{"id":"boulettes-tomate","name":"Boulettes de bœuf sauce tomate","emoji":"🍖","time":40,"cuisine":"Méditerranée","tags":["familial"],"items":[{"i":"hache-boeuf","q":120},{"i":"chapelure","q":20},{"i":"oeuf","q":0.3},{"i":"passata","q":150},{"i":"oignon","q":50},{"i":"ail","q":4},{"i":"pates","q":90},{"i":"herbes","q":1},{"i":"huile-olive","q":8},{"i":"sel-poivre","q":2}],"steps":["Mélangez viande, chapelure, œuf, oignon râpé, sel et poivre. Formez des boulettes.","Dorez-les 6 min à la poêle, réservez.","Faites revenir l'ail, versez le coulis et les herbes, remettez les boulettes 20 min.","Servez avec les pâtes."]},{"id":"couscous-poulet","name":"Couscous poulet et légumes","emoji":"🍲","time":45,"cuisine":"Maghreb","tags":["familial","batch"],"items":[{"i":"poulet-cuisse","q":180},{"i":"semoule","q":90},{"i":"carotte","q":80},{"i":"courgette","q":80},{"i":"pois-chiche","q":60},{"i":"oignon","q":60},{"i":"concentre-tomate","q":15},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"bouillon","q":0.5},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],"steps":["Dorez les cuisses de poulet 8 min dans une cocotte, réservez.","Faites suer l'oignon, ajoutez les épices et le concentré de tomate.","Versez le bouillon, les légumes en gros morceaux et le poulet. Mijotez 30 min.","Ajoutez les pois chiches 5 min avant la fin. Servez sur la semoule gonflée."]},{"id":"risotto-champignons","name":"Risotto aux champignons","emoji":"🍚","time":35,"cuisine":"Italie","tags":["confort"],"items":[{"i":"riz","q":90},{"i":"champignon","q":150},{"i":"oignon","q":50},{"i":"parmesan","q":20},{"i":"beurre","q":12},{"i":"bouillon","q":0.5},{"i":"ail","q":3},{"i":"persil","q":5},{"i":"sel-poivre","q":2}],"steps":["Faites sauter les champignons émincés 8 min à feu vif, réservez.","Nacrez le riz avec l'oignon dans le beurre 2 min.","Ajoutez le bouillon chaud louche par louche en remuant 18 min.","Incorporez champignons, parmesan et persil hors du feu."]},{"id":"hachis-parmentier","name":"Hachis parmentier","emoji":"🥧","time":55,"cuisine":"France","tags":["familial","four","batch"],"items":[{"i":"pdt","q":280},{"i":"hache-boeuf","q":110},{"i":"oignon","q":60},{"i":"lait","q":60},{"i":"beurre","q":15},{"i":"fromage-rape","q":25},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],"steps":["Cuisez les pommes de terre 20 min à l'eau, écrasez-les avec lait et beurre.","Faites revenir oignon et ail, ajoutez la viande 8 min, assaisonnez.","Montez le plat : viande puis purée, couvrez de fromage.","Gratinez 20 min à 200 °C."]},{"id":"moules-frites","name":"Moules marinière et frites","emoji":"🦪","time":30,"cuisine":"Belgique","tags":["rapide","convivial"],"items":[{"i":"moules","q":500},{"i":"frites-surgele","q":200},{"i":"echalote","q":40},{"i":"celeri-branche","q":40},{"i":"creme-liquide","q":25},{"i":"beurre","q":10},{"i":"persil","q":5},{"i":"sel-poivre","q":2}],"steps":["Enfournez les frites à 200 °C pour 25 min.","Grattez et rincez les moules, jetez celles qui restent ouvertes.","Faites suer échalote et céleri au beurre, ajoutez les moules à feu vif, couvrez 6 min.","Ajoutez crème et persil, secouez la casserole et servez aussitôt."]},{"id":"tacos-boeuf","name":"Tacos de bœuf haricots rouges","emoji":"🌮","time":25,"cuisine":"Mexique","tags":["rapide","convivial"],"items":[{"i":"tortilla","q":80},{"i":"hache-boeuf","q":100},{"i":"haricot-rouge","q":60},{"i":"mais","q":40},{"i":"fromage-rape","q":25},{"i":"salade","q":0.25},{"i":"tomate","q":60},{"i":"paprika","q":2},{"i":"cumin","q":2},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],"steps":["Faites revenir la viande 6 min avec les épices.","Ajoutez haricots rincés et maïs, réchauffez 3 min.","Tiédissez les tortillas 30 s à la poêle sèche.","Garnissez de viande, salade, tomate et fromage râpé."]},{"id":"carbonara","name":"Pâtes à la carbonara (la vraie)","emoji":"🍝","time":20,"cuisine":"Italie","tags":["rapide","eco"],"items":[{"i":"spaghetti","q":110},{"i":"lardons","q":60},{"i":"oeuf","q":1},{"i":"parmesan","q":25},{"i":"ail","q":2},{"i":"sel-poivre","q":3}],"steps":["Cuisez les spaghetti al dente, gardez une louche d'eau de cuisson.","Faites rissoler les lardons à sec avec l'ail écrasé.","Battez œufs et parmesan, poivrez généreusement.","Hors du feu, mélangez pâtes, lardons et appareil en détendant à l'eau de cuisson."]},{"id":"pates-pesto-tomate","name":"Pâtes pesto maison et tomates cerises","emoji":"🌿","time":20,"cuisine":"Italie","tags":["rapide","été"],"items":[{"i":"pates","q":110},{"i":"basilic","q":15},{"i":"parmesan","q":20},{"i":"cajou","q":15},{"i":"huile-olive","q":20},{"i":"tomate-cerise","q":100},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],"steps":["Mixez basilic, cajou, ail, parmesan et huile d'olive en pesto.","Cuisez les pâtes al dente.","Coupez les tomates cerises en deux, poêlez-les 3 min.","Mélangez le tout hors du feu avec un peu d'eau de cuisson."]},{"id":"tortilla-espagnole","name":"Tortilla espagnole","emoji":"🥘","time":35,"cuisine":"Espagne","tags":["eco"],"items":[{"i":"oeuf","q":3},{"i":"pdt","q":220},{"i":"oignon","q":70},{"i":"huile-olive","q":20},{"i":"salade","q":0.25},{"i":"sel-poivre","q":2}],"steps":["Coupez les pommes de terre en fines rondelles, confisez-les 15 min à l'huile avec l'oignon.","Égouttez et mélangez aux œufs battus salés.","Cuisez 6 min à feu doux, retournez à l'aide d'une assiette, 5 min de plus.","Laissez tiédir avant de couper en parts."]},{"id":"poulet-roti-legumes","name":"Cuisses de poulet rôties aux légumes","emoji":"🍗","time":55,"cuisine":"France","tags":["four","familial","eco"],"items":[{"i":"poulet-cuisse","q":200},{"i":"pdt","q":220},{"i":"carotte","q":100},{"i":"oignon","q":60},{"i":"herbes","q":2},{"i":"ail","q":5},{"i":"huile-olive","q":12},{"i":"sel-poivre","q":2}],"steps":["Préchauffez à 200 °C. Coupez les légumes en gros morceaux.","Disposez tout dans un plat, arrosez d'huile, salez, herbes et ail en chemise.","Enfournez 45 min en retournant à mi-cuisson.","Servez directement dans le plat."]},{"id":"gratin-chou-fleur","name":"Gratin de chou-fleur béchamel","emoji":"🧀","time":45,"cuisine":"France","tags":["four","eco"],"items":[{"i":"chou-fleur","q":300},{"i":"lait","q":150},{"i":"farine","q":20},{"i":"beurre","q":20},{"i":"fromage-rape","q":35},{"i":"sel-poivre","q":2}],"steps":["Cuisez le chou-fleur 12 min à l'eau bouillante salée, égouttez bien.","Réalisez une béchamel : beurre fondu, farine, puis lait en fouettant 5 min.","Versez sur le chou-fleur dans un plat, couvrez de fromage.","Gratinez 20 min à 200 °C."]},{"id":"gratin-pates-thon","name":"Gratin de pâtes au thon","emoji":"🐟","time":40,"cuisine":"France","tags":["eco","four","placard"],"items":[{"i":"pates","q":100},{"i":"thon-boite","q":55},{"i":"passata","q":120},{"i":"fromage-rape","q":30},{"i":"oignon","q":50},{"i":"creme-liquide","q":30},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],"steps":["Cuisez les pâtes 2 min de moins que le temps indiqué.","Mélangez thon égoutté, coulis, crème, oignon revenu et herbes.","Réunissez avec les pâtes dans un plat, couvrez de fromage.","Enfournez 20 min à 190 °C."]},{"id":"buddha-bowl-quinoa","name":"Buddha bowl quinoa et pois chiches rôtis","emoji":"🥗","time":35,"cuisine":"Monde","tags":["sain","four"],"items":[{"i":"quinoa","q":80},{"i":"pois-chiche","q":100},{"i":"patate-douce","q":150},{"i":"concombre","q":0.3},{"i":"citron","q":0.3},{"i":"huile-olive","q":15},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"sel-poivre","q":2}],"steps":["Coupez la patate douce en dés, mélangez-la aux pois chiches, huile et épices.","Enfournez 25 min à 200 °C en remuant à mi-cuisson.","Cuisez le quinoa 12 min à l'eau salée.","Dressez en bol avec le concombre et un filet de citron."]},{"id":"soupe-butternut","name":"Velouté de butternut et tartines grillées","emoji":"🎃","time":35,"cuisine":"France","tags":["hiver","eco","batch"],"items":[{"i":"butternut","q":350},{"i":"oignon","q":60},{"i":"creme-liquide","q":30},{"i":"bouillon","q":0.5},{"i":"pain","q":0.4},{"i":"fromage-rape","q":25},{"i":"huile-olive","q":8},{"i":"sel-poivre","q":2}],"steps":["Faites revenir l'oignon, ajoutez la courge en cubes et le bouillon à hauteur.","Cuisez 20 min à couvert puis mixez finement.","Ajoutez la crème, rectifiez l'assaisonnement.","Servez avec des tartines gratinées au fromage."]},{"id":"shakshuka","name":"Shakshuka (œufs pochés aux poivrons)","emoji":"🍳","time":30,"cuisine":"Maghreb","tags":["rapide","eco"],"items":[{"i":"oeuf","q":2},{"i":"tomate-concassee","q":180},{"i":"poivron","q":100},{"i":"oignon","q":60},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"ail","q":4},{"i":"pain","q":0.4},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],"steps":["Faites fondre oignon et poivron 10 min à l'huile d'olive.","Ajoutez ail, épices et tomates, laissez épaissir 10 min.","Creusez des puits, cassez-y les œufs, couvrez 6 min.","Servez à la poêle avec du pain."]},{"id":"gnocchi-tomate-mozza","name":"Poêlée de gnocchi tomates mozzarella","emoji":"🥔","time":20,"cuisine":"Italie","tags":["rapide"],"items":[{"i":"gnocchi","q":220},{"i":"tomate-cerise","q":120},{"i":"mozzarella","q":50},{"i":"basilic","q":8},{"i":"ail","q":4},{"i":"huile-olive","q":12},{"i":"sel-poivre","q":2}],"steps":["Poêlez les gnocchi 8 min à l'huile d'olive jusqu'à ce qu'ils dorent.","Ajoutez tomates cerises et ail, poursuivez 5 min.","Hors du feu, ajoutez la mozzarella en morceaux et le basilic.","Couvrez 2 min pour la faire fondre."]},{"id":"crevettes-ail-riz","name":"Crevettes à l'ail et riz citronné","emoji":"🍤","time":20,"cuisine":"Méditerranée","tags":["rapide"],"items":[{"i":"crevette","q":120},{"i":"riz","q":90},{"i":"ail","q":6},{"i":"persil","q":6},{"i":"citron","q":0.4},{"i":"huile-olive","q":15},{"i":"piment","q":1},{"i":"sel-poivre","q":2}],"steps":["Cuisez le riz, arrosez-le de jus de citron.","Faites chauffer l'huile avec l'ail émincé et le piment 1 min.","Ajoutez les crevettes, saisissez 4 min à feu vif.","Parsemez de persil et servez sur le riz."]},{"id":"salade-pdt-sardines","name":"Salade de pommes de terre aux sardines","emoji":"🥗","time":25,"cuisine":"France","tags":["eco","placard","été"],"items":[{"i":"pdt","q":280},{"i":"sardine-boite","q":60},{"i":"oeuf","q":1},{"i":"echalote","q":30},{"i":"cornichon","q":25},{"i":"moutarde","q":8},{"i":"huile-olive","q":15},{"i":"vinaigre","q":8},{"i":"persil","q":5},{"i":"sel-poivre","q":2}],"steps":["Cuisez les pommes de terre en robe des champs 20 min, laissez tiédir.","Faites cuire les œufs durs 9 min.","Fouettez moutarde, vinaigre et huile en vinaigrette.","Mélangez pommes de terre coupées, sardines, échalote, cornichons et œufs."]},{"id":"salade-pates-thon","name":"Salade de pâtes thon et maïs","emoji":"🥗","time":20,"cuisine":"France","tags":["rapide","été","placard"],"items":[{"i":"pates","q":100},{"i":"thon-boite","q":55},{"i":"mais","q":60},{"i":"tomate","q":80},{"i":"olive","q":25},{"i":"huile-olive","q":15},{"i":"vinaigre","q":8},{"i":"moutarde","q":6},{"i":"sel-poivre","q":2}],"steps":["Cuisez les pâtes, rincez-les à l'eau froide et égouttez.","Préparez la vinaigrette moutarde-vinaigre-huile.","Mélangez pâtes, thon, maïs, tomates et olives.","Réservez 30 min au frais avant de servir."]},{"id":"boeuf-carottes","name":"Bœuf carottes mijoté","emoji":"🥕","time":105,"cuisine":"France","tags":["batch","hiver","mijote"],"items":[{"i":"boeuf-bourgui","q":150},{"i":"carotte","q":200},{"i":"oignon","q":70},{"i":"concentre-tomate","q":15},{"i":"bouillon","q":0.5},{"i":"farine","q":10},{"i":"herbes","q":2},{"i":"ail","q":4},{"i":"huile-tournesol","q":10},{"i":"pdt","q":150},{"i":"sel-poivre","q":2}],"steps":["Saisissez la viande sur toutes ses faces, réservez.","Faites revenir oignon et ail, singez à la farine, ajoutez le concentré.","Remettez la viande, mouillez au bouillon, ajoutez carottes et herbes.","Laissez mijoter 1h30 à couvert, ajoutez les pommes de terre 30 min avant la fin."]},{"id":"poulet-basquaise","name":"Poulet basquaise","emoji":"🌶️","time":50,"cuisine":"France","tags":["mijote","batch"],"items":[{"i":"poulet-cuisse","q":180},{"i":"poivron","q":120},{"i":"tomate-concassee","q":150},{"i":"chorizo","q":25},{"i":"oignon","q":60},{"i":"riz","q":80},{"i":"ail","q":4},{"i":"paprika","q":2},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],"steps":["Dorez les cuisses 8 min, réservez.","Faites revenir oignon, poivrons et chorizo 8 min.","Ajoutez tomates, ail, paprika et le poulet. Mijotez 30 min à couvert.","Servez avec du riz."]},{"id":"tofu-teriyaki","name":"Tofu teriyaki et légumes sautés","emoji":"🥢","time":25,"cuisine":"Asie","tags":["rapide","sain"],"items":[{"i":"tofu","q":120},{"i":"riz-basmati","q":85},{"i":"legume-wok","q":180},{"i":"sauce-soja","q":25},{"i":"sucre","q":10},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"huile-tournesol","q":10},{"i":"sesame","q":5}],"steps":["Pressez le tofu 10 min, coupez-le en cubes et faites-le dorer 8 min.","Mélangez sauce soja, sucre, ail et gingembre, versez sur le tofu et laissez caraméliser 3 min.","Sautez les légumes 6 min à feu vif.","Servez sur le riz, parsemé de sésame."]},{"id":"curry-legumes-patate-douce","name":"Curry de légumes et patate douce","emoji":"🍛","time":35,"cuisine":"Inde","tags":["batch","sain"],"items":[{"i":"patate-douce","q":200},{"i":"pois-chiche","q":90},{"i":"lait-coco","q":100},{"i":"epinard-surgele","q":80},{"i":"oignon","q":60},{"i":"curry-poudre","q":4},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"riz","q":70},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],"steps":["Faites revenir oignon, ail et gingembre 5 min avec le curry.","Ajoutez la patate douce en cubes et le lait de coco, mijotez 20 min.","Incorporez pois chiches et épinards, poursuivez 5 min.","Servez avec le riz."]},{"id":"croque-monsieur","name":"Croque-monsieur et salade","emoji":"🥪","time":20,"cuisine":"France","tags":["rapide","eco"],"items":[{"i":"pain","q":0.6},{"i":"jambon","q":60},{"i":"fromage-rape","q":45},{"i":"lait","q":50},{"i":"farine","q":10},{"i":"beurre","q":12},{"i":"salade","q":0.3},{"i":"vinaigre","q":6},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],"steps":["Préparez une béchamel express : beurre, farine, lait, 4 min en fouettant.","Tartinez le pain, garnissez de jambon et de fromage.","Passez 10 min au four à 200 °C jusqu'à gratiner.","Servez avec la salade vinaigrette."]},{"id":"pizza-maison","name":"Pizza maison jambon-champignons","emoji":"🍕","time":30,"cuisine":"Italie","tags":["convivial","four"],"items":[{"i":"pate-pizza","q":80},{"i":"passata","q":70},{"i":"mozzarella","q":45},{"i":"jambon","q":40},{"i":"champignon","q":60},{"i":"herbes","q":1},{"i":"huile-olive","q":6},{"i":"sel-poivre","q":2}],"steps":["Préchauffez à 240 °C avec la plaque à l'intérieur.","Étalez la pâte, nappez de coulis, ajoutez herbes et garniture.","Terminez par la mozzarella déchirée et un filet d'huile.","Enfournez 12 min sur la plaque brûlante."]},{"id":"papillote-cabillaud","name":"Papillote de cabillaud aux légumes","emoji":"🐟","time":30,"cuisine":"France","tags":["sain","four"],"items":[{"i":"cabillaud","q":130},{"i":"courgette","q":120},{"i":"carotte","q":80},{"i":"citron","q":0.3},{"i":"riz","q":85},{"i":"huile-olive","q":10},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],"steps":["Taillez les légumes en fines lamelles (économe).","Déposez poisson et légumes sur un papier cuisson, arrosez d'huile et de citron.","Fermez hermétiquement et enfournez 20 min à 190 °C.","Servez avec le riz."]},{"id":"riz-cantonais","name":"Riz cantonais maison","emoji":"🍚","time":25,"cuisine":"Asie","tags":["rapide","eco","restes"],"items":[{"i":"riz","q":100},{"i":"oeuf","q":1},{"i":"jambon","q":50},{"i":"petit-pois","q":80},{"i":"oignon","q":40},{"i":"sauce-soja","q":15},{"i":"huile-tournesol","q":10},{"i":"sel-poivre","q":2}],"steps":["Cuisez le riz à l'avance et laissez-le refroidir (c'est le secret).","Faites une omelette fine, roulez-la et coupez-la en lanières.","Sautez oignon, jambon et petits pois 5 min, ajoutez le riz à feu vif.","Terminez par l'omelette et la sauce soja."]},{"id":"salade-grecque-boulgour","name":"Salade grecque au boulgour","emoji":"🥗","time":20,"cuisine":"Grèce","tags":["rapide","été","sain"],"items":[{"i":"boulgour","q":80},{"i":"feta","q":50},{"i":"concombre","q":0.4},{"i":"tomate","q":120},{"i":"olive","q":30},{"i":"oignon","q":30},{"i":"huile-olive","q":15},{"i":"citron","q":0.3},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],"steps":["Couvrez le boulgour d'eau bouillante salée, laissez gonfler 12 min.","Coupez concombre, tomates et oignon en dés.","Mélangez tout avec olives, feta émiettée, huile et citron.","Réservez au frais 20 min."]},{"id":"pates-ail-brocoli","name":"Pâtes brocoli, ail et huile d'olive","emoji":"🥦","time":20,"cuisine":"Italie","tags":["rapide","eco","placard"],"items":[{"i":"pates","q":110},{"i":"brocoli","q":200},{"i":"ail","q":8},{"i":"piment","q":1},{"i":"huile-olive","q":20},{"i":"parmesan","q":15},{"i":"sel-poivre","q":2}],"steps":["Cuisez les pâtes et jetez le brocoli en fleurettes dans la même eau 6 min avant la fin.","Faites blondir l'ail émincé avec le piment dans l'huile.","Égouttez et mélangez avec un peu d'eau de cuisson pour lier.","Terminez au parmesan."]},{"id":"soupe-lentilles-chorizo","name":"Soupe de lentilles au chorizo","emoji":"🍲","time":40,"cuisine":"Espagne","tags":["hiver","batch","eco"],"items":[{"i":"lentilles","q":90},{"i":"chorizo","q":30},{"i":"carotte","q":90},{"i":"oignon","q":60},{"i":"pdt","q":100},{"i":"bouillon","q":0.5},{"i":"paprika","q":2},{"i":"ail","q":4},{"i":"huile-olive","q":8},{"i":"pain","q":0.3},{"i":"sel-poivre","q":2}],"steps":["Faites revenir chorizo, oignon et ail 5 min.","Ajoutez paprika, lentilles rincées, légumes en dés et bouillon à hauteur.","Cuisez 30 min à couvert.","Servez avec du pain."]},{"id":"parmigiana","name":"Parmigiana d'aubergines","emoji":"🍆","time":60,"cuisine":"Italie","tags":["four","batch"],"items":[{"i":"aubergine","q":280},{"i":"passata","q":150},{"i":"mozzarella","q":50},{"i":"parmesan","q":20},{"i":"ail","q":4},{"i":"basilic","q":8},{"i":"huile-olive","q":20},{"i":"pain","q":0.3},{"i":"sel-poivre","q":2}],"steps":["Coupez les aubergines en tranches, faites-les griller 4 min par face.","Préparez une sauce tomate rapide à l'ail 10 min.","Alternez aubergines, sauce, mozzarella et parmesan dans un plat.","Enfournez 30 min à 190 °C, laissez reposer 10 min avant de servir."]},{"id":"saucisses-puree","name":"Saucisses, purée et petits pois","emoji":"🌭","time":30,"cuisine":"France","tags":["familial","rapide"],"items":[{"i":"saucisse","q":140},{"i":"pdt","q":280},{"i":"petit-pois","q":120},{"i":"lait","q":60},{"i":"beurre","q":15},{"i":"moutarde","q":8},{"i":"sel-poivre","q":2}],"steps":["Cuisez les pommes de terre 20 min, écrasez-les avec lait et beurre.","Grillez les saucisses 12 min à la poêle en les retournant.","Réchauffez les petits pois 5 min.","Servez avec un peu de moutarde."]},{"id":"poulet-miel-moutarde","name":"Poulet miel-moutarde au four","emoji":"🍯","time":50,"cuisine":"France","tags":["four","familial"],"items":[{"i":"poulet-cuisse","q":190},{"i":"miel","q":15},{"i":"moutarde","q":15},{"i":"pdt","q":230},{"i":"oignon","q":50},{"i":"herbes","q":1},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],"steps":["Mélangez miel, moutarde, huile, sel et poivre.","Enrobez le poulet, disposez-le avec les pommes de terre en quartiers.","Enfournez 45 min à 200 °C en arrosant deux fois.","Servez avec le jus du plat."]},{"id":"wok-crevettes-legumes","name":"Wok de crevettes aux légumes croquants","emoji":"🍤","time":20,"cuisine":"Asie","tags":["rapide","sain"],"items":[{"i":"crevette","q":110},{"i":"legume-wok","q":200},{"i":"riz-basmati","q":85},{"i":"sauce-soja","q":20},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"citron-vert","q":0.3},{"i":"huile-tournesol","q":10},{"i":"sesame","q":4}],"steps":["Lancez le riz basmati.","Saisissez les légumes 5 min à feu très vif.","Ajoutez crevettes, ail et gingembre, 4 min de plus.","Déglacez à la sauce soja, terminez au citron vert et sésame."]},{"id":"veloute-carotte-coco","name":"Velouté carotte-coco et tartines","emoji":"🥕","time":30,"cuisine":"France","tags":["eco","hiver","batch"],"items":[{"i":"carotte","q":300},{"i":"lait-coco","q":70},{"i":"oignon","q":60},{"i":"gingembre","q":5},{"i":"bouillon","q":0.5},{"i":"pain","q":0.4},{"i":"fromage-frais","q":30},{"i":"huile-olive","q":8},{"i":"sel-poivre","q":2}],"steps":["Faites suer oignon et gingembre, ajoutez les carottes en rondelles.","Mouillez au bouillon, cuisez 20 min.","Mixez avec le lait de coco.","Servez avec des tartines au fromage frais."]},{"id":"burger-maison","name":"Burger maison et frites","emoji":"🍔","time":30,"cuisine":"USA","tags":["convivial"],"items":[{"i":"hache-boeuf","q":130},{"i":"pain","q":0.5},{"i":"fromage-rape","q":30},{"i":"tomate","q":60},{"i":"salade","q":0.2},{"i":"oignon","q":40},{"i":"frites-surgele","q":180},{"i":"moutarde","q":8},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],"steps":["Enfournez les frites 25 min à 200 °C.","Formez les steaks, salez au dernier moment, saisissez 3 min par face.","Ajoutez le fromage sur le steak en fin de cuisson pour le faire fondre.","Montez le burger : moutarde, salade, tomate, steak, oignon."]},{"id":"poelee-pois-chiches-epinards","name":"Poêlée de pois chiches aux épinards","emoji":"🌱","time":25,"cuisine":"Méditerranée","tags":["rapide","eco","placard"],"items":[{"i":"pois-chiche","q":130},{"i":"epinard-surgele","q":150},{"i":"tomate-concassee","q":100},{"i":"oignon","q":60},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"ail","q":4},{"i":"semoule","q":70},{"i":"huile-olive","q":12},{"i":"citron","q":0.3},{"i":"sel-poivre","q":2}],"steps":["Faites revenir oignon et ail 5 min avec les épices.","Ajoutez tomates et pois chiches rincés, mijotez 8 min.","Incorporez les épinards, laissez fondre 5 min.","Servez sur la semoule, avec un filet de citron."]},{"id":"gratin-courgettes-riz","name":"Gratin de courgettes au riz","emoji":"🧀","time":50,"cuisine":"France","tags":["four","eco"],"items":[{"i":"courgette","q":250},{"i":"riz","q":70},{"i":"oeuf","q":1},{"i":"fromage-rape","q":35},{"i":"creme-liquide","q":40},{"i":"oignon","q":50},{"i":"ail","q":3},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],"steps":["Cuisez le riz. Faites revenir les courgettes en rondelles 10 min avec l'oignon.","Mélangez riz, courgettes, œufs battus et crème.","Versez dans un plat, couvrez de fromage râpé.","Enfournez 25 min à 190 °C."]},{"id":"nouilles-cacahuete","name":"Nouilles sautées sauce cacahuète","emoji":"🥜","time":20,"cuisine":"Asie","tags":["rapide","eco"],"items":[{"i":"nouilles","q":90},{"i":"cacahuete-beurre","q":30},{"i":"sauce-soja","q":20},{"i":"legume-wok","q":180},{"i":"ail","q":4},{"i":"gingembre","q":4},{"i":"citron-vert","q":0.3},{"i":"huile-tournesol","q":8},{"i":"piment","q":1}],"steps":["Cuisez les nouilles, réservez un peu d'eau de cuisson.","Délayez beurre de cacahuète, sauce soja, citron vert et un peu d'eau chaude.","Sautez les légumes 6 min avec ail et gingembre.","Mélangez nouilles, légumes et sauce hors du feu."]},{"id":"chili-con-carne","name":"Chili con carne","emoji":"🌶️","time":45,"cuisine":"Mexique","tags":["batch","familial"],"items":[{"i":"hache-boeuf","q":110},{"i":"haricot-rouge","q":90},{"i":"tomate-concassee","q":150},{"i":"poivron","q":70},{"i":"oignon","q":60},{"i":"riz","q":80},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"piment","q":1},{"i":"ail","q":4},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],"steps":["Faites revenir oignon, ail et poivron 6 min.","Ajoutez la viande, laissez colorer, puis les épices.","Versez tomates et haricots, mijotez 25 min à feu doux.","Servez avec du riz."]},{"id":"tartiflette-eco","name":"Gratin savoyard express","emoji":"🧀","time":55,"cuisine":"France","tags":["hiver","familial","four"],"items":[{"i":"pdt","q":300},{"i":"lardons","q":60},{"i":"oignon","q":70},{"i":"fromage-rape","q":50},{"i":"creme-liquide","q":50},{"i":"ail","q":3},{"i":"salade","q":0.25},{"i":"sel-poivre","q":2}],"steps":["Cuisez les pommes de terre 15 min à l'eau, coupez-les en rondelles.","Faites rissoler lardons et oignons 8 min.","Alternez dans un plat frotté à l'ail, versez la crème, couvrez de fromage.","Enfournez 25 min à 200 °C. Servez avec la salade."]},{"id":"poisson-polenta","name":"Colin poêlé et polenta crémeuse","emoji":"🐟","time":25,"cuisine":"Italie","tags":["rapide"],"items":[{"i":"colin","q":130},{"i":"polenta","q":70},{"i":"lait","q":120},{"i":"parmesan","q":20},{"i":"epinard-surgele","q":120},{"i":"citron","q":0.3},{"i":"beurre","q":10},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],"steps":["Portez lait et eau à ébullition, versez la polenta en pluie, remuez 5 min.","Incorporez parmesan et beurre.","Poêlez le colin 4 min par face, arrosez de citron.","Faites tomber les épinards à l'ail 5 min et dressez."]},{"id":"salade-cesar-poulet","name":"Salade César au poulet","emoji":"🥗","time":25,"cuisine":"USA","tags":["rapide","été"],"items":[{"i":"poulet-filet","q":110},{"i":"salade","q":0.5},{"i":"pain","q":0.3},{"i":"parmesan","q":20},{"i":"yaourt-nature","q":60},{"i":"moutarde","q":8},{"i":"citron","q":0.3},{"i":"ail","q":3},{"i":"huile-olive","q":12},{"i":"sel-poivre","q":2}],"steps":["Coupez le pain en dés, faites-le dorer à l'huile pour des croûtons.","Grillez le poulet 6 min par face, tranchez-le.","Mélangez yaourt, moutarde, citron, ail et parmesan pour la sauce.","Assemblez salade, poulet, croûtons et sauce."]},{"id":"curry-pois-chiches-epinards","name":"Curry rouge de légumes au tofu","emoji":"🍛","time":30,"cuisine":"Thaïlande","tags":["rapide"],"items":[{"i":"tofu","q":110},{"i":"curry-pate","q":15},{"i":"lait-coco","q":110},{"i":"legume-wok","q":180},{"i":"riz-basmati","q":85},{"i":"citron-vert","q":0.3},{"i":"huile-tournesol","q":10},{"i":"sauce-soja","q":10}],"steps":["Dorez le tofu en cubes 8 min, réservez.","Faites chauffer la pâte de curry 1 min, ajoutez le lait de coco.","Ajoutez les légumes, mijotez 8 min, puis le tofu.","Servez sur le riz basmati avec du citron vert."]},{"id":"frittata-legumes","name":"Frittata aux légumes et feta","emoji":"🍳","time":30,"cuisine":"Italie","tags":["rapide","restes"],"items":[{"i":"oeuf","q":3},{"i":"courgette","q":120},{"i":"poivron","q":70},{"i":"feta","q":35},{"i":"oignon","q":50},{"i":"pain","q":0.3},{"i":"huile-olive","q":12},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],"steps":["Faites revenir les légumes en dés 10 min.","Battez les œufs, salez, poivrez, ajoutez les herbes.","Versez sur les légumes, ajoutez la feta, cuisez 6 min à feu doux.","Terminez 4 min sous le gril et servez avec du pain."]},{"id":"spaghetti-tomate-thon","name":"Spaghetti tomate et thon","emoji":"🍝","time":20,"cuisine":"Italie","tags":["rapide","placard","eco"],"items":[{"i":"spaghetti","q":110},{"i":"thon-boite","q":55},{"i":"passata","q":130},{"i":"ail","q":5},{"i":"olive","q":25},{"i":"piment","q":1},{"i":"huile-olive","q":15},{"i":"persil","q":5},{"i":"sel-poivre","q":2}],"steps":["Faites blondir l'ail dans l'huile avec le piment.","Ajoutez le coulis et les olives, laissez réduire 10 min.","Incorporez le thon égoutté en fin de cuisson.","Mélangez aux spaghetti et parsemez de persil."]},{"id":"hachis-legumes-lentilles","name":"Parmentier de lentilles","emoji":"🥧","time":55,"cuisine":"France","tags":["four","batch","eco"],"items":[{"i":"lentilles","q":80},{"i":"pdt","q":280},{"i":"carotte","q":80},{"i":"oignon","q":60},{"i":"concentre-tomate","q":12},{"i":"lait","q":50},{"i":"beurre","q":12},{"i":"fromage-rape","q":25},{"i":"herbes","q":1},{"i":"ail","q":3},{"i":"huile-olive","q":8},{"i":"sel-poivre","q":2}],"steps":["Cuisez les lentilles 25 min à l'eau, égouttez.","Faites revenir oignon, ail et carotte, ajoutez lentilles et concentré de tomate.","Préparez la purée avec lait et beurre.","Montez, couvrez de fromage, gratinez 20 min à 200 °C."]}]},"stores":{"_comment":"Enseignes belges. base = indice de prix global applique aux prix de reference du catalogue ; aisles = ajustements par rayon. ATTENTION : ces indices sont des ORDRES DE GRANDEUR poses a la main, pas des releves. Recalez-les avec scripts/import_prices.php a partir de data/releves.csv avant toute mise en ligne commerciale.","updated":"2026-08-16","calibrated":false,"stores":[{"id":"colruyt","name":"Colruyt","country":["BE"],"color":"#e30613","base":0.88,"aisles":{"boucherie":0.85,"boissons":0.84,"epicerie-salee":0.9}},{"id":"aldi","name":"Aldi","country":["BE"],"color":"#00447c","base":0.86,"aisles":{"boucherie":0.93,"fruits-legumes":0.87,"epicerie-salee":0.83}},{"id":"lidl","name":"Lidl","country":["BE"],"color":"#0050aa","base":0.87,"aisles":{"boucherie":0.91,"fruits-legumes":0.85,"cremerie":0.84,"boulangerie":0.79}},{"id":"okay","name":"OKay","country":["BE"],"color":"#e30613","base":0.96,"aisles":{"fruits-legumes":1.01}},{"id":"jumbo","name":"Jumbo","country":["BE"],"color":"#eeb111","base":0.97,"aisles":{"epicerie-salee":0.94}},{"id":"intermarche","name":"Intermarché","country":["BE"],"color":"#e2001a","base":0.99,"aisles":{"boucherie":0.94,"poissonnerie":0.96}},{"id":"cora","name":"Cora","country":["BE"],"color":"#e2001a","base":1,"aisles":{"surgeles":0.96}},{"id":"carrefour","name":"Carrefour Hyper","country":["BE"],"color":"#0056a4","base":1.01,"aisles":{"epicerie-salee":0.97,"surgeles":0.95}},{"id":"albert-heijn","name":"Albert Heijn","country":["BE"],"color":"#00a0e2","base":1.05,"aisles":{"cremerie":1,"boulangerie":1.02}},{"id":"alvo","name":"Alvo","country":["BE"],"color":"#c8102e","base":1.05,"aisles":[]},{"id":"carrefour-market","name":"Carrefour Market","country":["BE"],"color":"#0056a4","base":1.06,"aisles":[]},{"id":"match","name":"Match","country":["BE"],"color":"#d2001b","base":1.08,"aisles":[]},{"id":"smatch","name":"Smatch","country":["BE"],"color":"#d2001b","base":1.08,"aisles":[]},{"id":"delhaize","name":"Delhaize","country":["BE"],"color":"#c8102e","base":1.1,"aisles":{"poissonnerie":1.04,"cremerie":1.06}},{"id":"louis-delhaize","name":"Louis Delhaize","country":["BE"],"color":"#a6192e","base":1.12,"aisles":[]},{"id":"proxy-delhaize","name":"Proxy / AD Delhaize","country":["BE"],"color":"#c8102e","base":1.14,"aisles":{"boulangerie":1.08}},{"id":"spar","name":"Spar","country":["BE"],"color":"#00863f","base":1.15,"aisles":{"boulangerie":1.09}},{"id":"carrefour-express","name":"Carrefour Express","country":["BE"],"color":"#0056a4","base":1.18,"aisles":[]},{"id":"shop-go","name":"Shop & Go","country":["BE"],"color":"#c8102e","base":1.23,"aisles":[]},{"id":"delitraiteur","name":"Delitraiteur","country":["BE"],"color":"#004b87","base":1.25,"aisles":{"boulangerie":1.12}},{"id":"bio-planet","name":"Bio-Planet","country":["BE"],"color":"#78be20","base":1.38,"aisles":{"fruits-legumes":1.3,"epicerie-salee":1.34}}]}};</script>
+<script>
+/**
+ * Port JavaScript du moteur (lib/Catalog.php + lib/Engine.php), pour la démo
+ * publique qui tourne entièrement dans le navigateur, sans serveur.
+ *
+ * La logique suit celle du PHP pas à pas — même sélection gloutonne, même coût
+ * marginal sur le panier réel, même réparation budgétaire — pour que la démo
+ * montre bien ce que fait le produit. Le PHP reste la référence : c'est lui qui
+ * est couvert par tests/engine_test.php.
+ */
+(function (global) {
+  'use strict';
+
+  var DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+  var READYMEAL_PER_PERSON = 5.20;
+
+  var PANTRY_DEFAULT = ['sel-poivre', 'huile-olive', 'huile-tournesol', 'vinaigre', 'moutarde',
+    'farine', 'sucre', 'bouillon', 'curry-poudre', 'paprika', 'cumin', 'curcuma',
+    'herbes', 'piment', 'sauce-soja', 'miel'];
+
+  var AISLE_ORDER = {
+    'fruits-legumes': 'Fruits & légumes',
+    'boucherie': 'Boucherie',
+    'poissonnerie': 'Poissonnerie',
+    'cremerie': 'Crèmerie & frais',
+    'boulangerie': 'Boulangerie',
+    'surgeles': 'Surgelés',
+    'epicerie-salee': 'Épicerie salée',
+    'monde': 'Cuisine du monde',
+    'epicerie-sucree': 'Épicerie sucrée',
+    'boissons': 'Boissons'
+  };
+
+  var DIET_EXCLUDES = {
+    omnivore: [],
+    flexitarien: [],
+    'sans-porc': ['pork'],
+    pescetarien: ['meat', 'pork'],
+    vegetarien: ['meat', 'pork', 'fish', 'seafood'],
+    vegan: ['meat', 'pork', 'fish', 'seafood', 'dairy', 'egg', 'honey']
+  };
+
+  var DIET_LABELS = {
+    omnivore: 'Je mange de tout',
+    flexitarien: 'Flexitarien (viande limitée)',
+    'sans-porc': 'Sans porc',
+    pescetarien: 'Pescétarien',
+    vegetarien: 'Végétarien',
+    vegan: 'Végan'
+  };
+
+  var ALLERGENS = {
+    gluten: 'Gluten', crustaces: 'Crustacés', oeufs: 'Œufs', poissons: 'Poissons',
+    arachides: 'Arachides', soja: 'Soja', lait: 'Lait', 'fruits-a-coque': 'Fruits à coque',
+    celeri: 'Céleri', moutarde: 'Moutarde', sesame: 'Sésame', sulfites: 'Sulfites',
+    mollusques: 'Mollusques'
+  };
+
+  // crc32, pour reproduire exactement le jitter déterministe du PHP.
+  var crcTable = (function () {
+    var table = [];
+    for (var n = 0; n < 256; n++) {
+      var c = n;
+      for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+      table[n] = c >>> 0;
+    }
+    return table;
+  })();
+
+  function crc32(str) {
+    var bytes = unescape(encodeURIComponent(str));
+    var crc = 0xFFFFFFFF;
+    for (var i = 0; i < bytes.length; i++) {
+      crc = (crc >>> 8) ^ crcTable[(crc ^ bytes.charCodeAt(i)) & 0xFF];
+    }
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  // ------------------------------------------------------------------ catalogue
+
+  function Catalog(data) {
+    var self = this;
+    this.ingredients = {};
+    this.stores = {};
+    this.recipes = {};
+
+    data.ingredients.ingredients.forEach(function (ing) {
+      ing.pantryDefault = PANTRY_DEFAULT.indexOf(ing.id) >= 0;
+      self.ingredients[ing.id] = ing;
+    });
+    data.stores.stores.forEach(function (store) { self.stores[store.id] = store; });
+    data.recipes.recipes.forEach(function (recipe) {
+      self.recipes[recipe.id] = self.annotate(recipe);
+    });
+  }
+
+  Catalog.prototype.annotate = function (recipe) {
+    var self = this;
+    var types = {}, allergens = {}, kcal = 0, prot = 0;
+
+    recipe.items.forEach(function (item) {
+      var ing = self.ingredients[item.i];
+      if (!ing) throw new Error('Ingrédient inconnu « ' + item.i + ' » dans « ' + recipe.id + ' »');
+      types[ing.type] = true;
+      ing.allergens.forEach(function (a) { allergens[a] = true; });
+      var factor = ing.unit === 'piece' ? item.q : item.q / 100;
+      kcal += ing.kcal * factor;
+      prot += ing.prot * factor;
+    });
+
+    recipe.types = Object.keys(types);
+    recipe.allergens = Object.keys(allergens);
+    recipe.kcal = Math.round(kcal);
+    recipe.prot = Math.round(prot);
+    recipe.diets = Object.keys(DIET_EXCLUDES).filter(function (diet) {
+      return DIET_EXCLUDES[diet].every(function (t) { return recipe.types.indexOf(t) < 0; });
+    });
+    recipe.protein = this.mainProtein(recipe.items);
+    return recipe;
+  };
+
+  Catalog.prototype.mainProtein = function (items) {
+    var self = this;
+    var ranked = ['meat', 'pork', 'fish', 'seafood', 'egg', 'dairy'];
+    var best = null, bestQty = 0;
+    items.forEach(function (item) {
+      var ing = self.ingredients[item.i];
+      if (ranked.indexOf(ing.type) < 0) return;
+      var qty = ing.unit === 'piece' ? item.q * 60 : item.q;
+      if (qty > bestQty) { bestQty = qty; best = item.i; }
+    });
+    return best || 'vegetal';
+  };
+
+  Catalog.prototype.index = function (ingredientId, storeId) {
+    var ing = this.ingredients[ingredientId];
+    var store = this.stores[storeId];
+    if (!store) return 1;
+    var aisles = store.aisles || {};
+    return store.base * (aisles[ing.aisle] !== undefined ? aisles[ing.aisle] : 1);
+  };
+
+  Catalog.prototype.packPrice = function (ingredientId, storeId) {
+    var ing = this.ingredients[ingredientId];
+    return round2(ing.price / ing.ref * ing.pack * this.index(ingredientId, storeId));
+  };
+
+  Catalog.prototype.refPrice = function (ingredientId, storeId) {
+    return round2(this.ingredients[ingredientId].price * this.index(ingredientId, storeId));
+  };
+
+  Catalog.prototype.storesByCountry = function (country) {
+    var self = this;
+    return Object.keys(this.stores)
+      .map(function (id) { return self.stores[id]; })
+      .filter(function (s) { return s.country.indexOf(country) >= 0; });
+  };
+
+  /**
+   * Arrondi à 2 décimales reproduisant celui de PHP. Math.round(1.005 * 100)
+   * rend 100 (1.005 vaut 1.00499… en binaire) là où PHP rend 1.01 : passer par
+   * la notation exponentielle corrige ce décalage, et évite des écarts de
+   * quelques centimes entre la démo et le serveur.
+   */
+  function round2(value) {
+    var shifted = Number(value + 'e2');
+    if (isNaN(shifted)) return Math.round(value * 100) / 100;
+    var result = Number(Math.round(shifted) + 'e-2');
+    return isNaN(result) ? Math.round(value * 100) / 100 : result;
+  }
+
+  // --------------------------------------------------------------------- moteur
+
+  function Engine(catalog) { this.catalog = catalog; }
+
+  Engine.prototype.normalize = function (p) {
+    p = p || {};
+    return {
+      store: p.store || 'colruyt',
+      budget: Math.max(10, Number(p.budget) || 60),
+      people: Math.max(1, Math.min(12, Number(p.people) || 2)),
+      days: Math.max(1, Math.min(7, Number(p.days) || 7)),
+      diet: DIET_EXCLUDES[p.diet] ? p.diet : 'omnivore',
+      allergens: (p.allergens || []).filter(function (a) { return ALLERGENS[a]; }),
+      exclude: (p.exclude || []),
+      maxTime: Number(p.maxTime) || 0,
+      pantry: p.pantry !== undefined ? p.pantry : PANTRY_DEFAULT,
+      seed: String(p.seed === undefined ? '1' : p.seed)
+    };
+  };
+
+  Engine.prototype.candidates = function (prefs) {
+    var self = this;
+    return Object.keys(this.catalog.recipes).map(function (id) {
+      return self.catalog.recipes[id];
+    }).filter(function (recipe) {
+      if (recipe.diets.indexOf(prefs.diet) < 0) return false;
+      if (recipe.allergens.some(function (a) { return prefs.allergens.indexOf(a) >= 0; })) return false;
+      if (prefs.maxTime > 0 && recipe.time > prefs.maxTime) return false;
+      if (prefs.exclude.length) {
+        var ids = recipe.items.map(function (i) { return i.i; });
+        if (ids.some(function (i) { return prefs.exclude.indexOf(i) >= 0; })) return false;
+      }
+      return true;
+    });
+  };
+
+  Engine.prototype.needs = function (recipes, prefs) {
+    var needs = {};
+    recipes.forEach(function (recipe) {
+      recipe.items.forEach(function (item) {
+        needs[item.i] = (needs[item.i] || 0) + item.q * prefs.people;
+      });
+    });
+    return needs;
+  };
+
+  Engine.prototype.basketCost = function (needs, prefs) {
+    var self = this, total = 0;
+    Object.keys(needs).forEach(function (id) {
+      if (prefs.pantry.indexOf(id) >= 0) return;
+      var ing = self.catalog.ingredients[id];
+      var packs = Math.ceil(needs[id] / ing.pack - 1e-9);
+      total += packs * self.catalog.packPrice(id, prefs.store);
+    });
+    return round2(total);
+  };
+
+  Engine.prototype.marginalCost = function (selected, recipe, prefs) {
+    var before = this.basketCost(this.needs(selected, prefs), prefs);
+    var after = this.basketCost(this.needs(selected.concat([recipe]), prefs), prefs);
+    return round2(after - before);
+  };
+
+  Engine.prototype.compositionAllows = function (selected, recipe, prefs) {
+    var proteinCount = 0, cuisineCount = 0, meatCount = 0;
+    selected.forEach(function (r) {
+      if (r.protein === recipe.protein && r.protein !== 'vegetal') proteinCount++;
+      if (r.cuisine === recipe.cuisine) cuisineCount++;
+      if (r.types.indexOf('meat') >= 0 || r.types.indexOf('pork') >= 0) meatCount++;
+    });
+    if (proteinCount >= 2) return false;
+    if (cuisineCount >= 3) return false;
+    if (prefs.diet === 'flexitarien' && meatCount >= 3
+        && (recipe.types.indexOf('meat') >= 0 || recipe.types.indexOf('pork') >= 0)) return false;
+    return true;
+  };
+
+  Engine.prototype.score = function (recipe, selected, marginal, prefs) {
+    var target = prefs.budget / Math.max(1, prefs.days);
+    var ratio = target > 0 ? marginal / target : 1;
+    var score = ratio <= 1 ? (1 - ratio) * 1.2 : -(ratio - 1) * 3.0;
+
+    selected.forEach(function (r) {
+      if (r.cuisine === recipe.cuisine) score -= 0.35;
+      if (r.protein === recipe.protein && r.protein !== 'vegetal') score -= 0.55;
+    });
+
+    if (recipe.prot >= 25) score += 0.25;
+    if (recipe.kcal > 950) score -= 0.20;
+    if (recipe.tags.indexOf('sain') >= 0) score += 0.10;
+
+    var isSea = recipe.types.indexOf('fish') >= 0 || recipe.types.indexOf('seafood') >= 0;
+    var hasSea = selected.some(function (r) {
+      return r.types.indexOf('fish') >= 0 || r.types.indexOf('seafood') >= 0;
+    });
+    if (isSea && !hasSea) score += 0.45;
+
+    if (recipe.time <= 25) score += 0.20;
+    else if (recipe.time >= 60) score -= 0.15;
+
+    return score;
+  };
+
+  function jitter(key) { return (crc32(key) % 1000) / 1000; }
+
+  function picked(selected, id) {
+    return selected.some(function (r) { return r.id === id; });
+  }
+
+  Engine.prototype.select = function (candidates, prefs) {
+    var self = this;
+    var selected = [];
+
+    for (var i = 0; i < prefs.days; i++) {
+      var scored = [];
+      candidates.forEach(function (recipe) {
+        if (picked(selected, recipe.id)) return;
+        if (!self.compositionAllows(selected, recipe, prefs)) return;
+        var marginal = self.marginalCost(selected, recipe, prefs);
+        scored.push({
+          recipe: recipe,
+          score: self.score(recipe, selected, marginal, prefs) + jitter(recipe.id + prefs.seed + i) * 0.30
+        });
+      });
+
+      if (!scored.length) {
+        candidates.forEach(function (recipe) {
+          if (picked(selected, recipe.id)) return;
+          var marginal = self.marginalCost(selected, recipe, prefs);
+          scored.push({ recipe: recipe, score: self.score(recipe, selected, marginal, prefs) });
+        });
+      }
+      if (!scored.length) break;
+
+      scored.sort(function (a, b) { return b.score - a.score; });
+      selected.push(scored[0].recipe);
+    }
+    return selected;
+  };
+
+  Engine.prototype.costliestIndex = function (selected, prefs) {
+    var self = this, worst = 0, worstCost = -1;
+    selected.forEach(function (recipe, i) {
+      var others = selected.filter(function (_, j) { return j !== i; });
+      var cost = self.marginalCost(others, recipe, prefs);
+      if (cost > worstCost) { worstCost = cost; worst = i; }
+    });
+    return worst;
+  };
+
+  Engine.prototype.cheapestAlternative = function (selected, candidates, idx, prefs) {
+    var self = this;
+    var others = selected.filter(function (_, j) { return j !== idx; });
+    var bestCost = this.marginalCost(others, selected[idx], prefs);
+    var best = null;
+
+    candidates.forEach(function (recipe) {
+      if (picked(selected, recipe.id)) return;
+      var cost = self.marginalCost(others, recipe, prefs);
+      if (cost < bestCost - 0.20) { bestCost = cost; best = recipe; }
+    });
+    return best;
+  };
+
+  Engine.prototype.upgrade = function (selected, candidates, prefs, room) {
+    var self = this, bestPlan = null, bestGain = 0;
+
+    selected.forEach(function (current, i) {
+      var others = selected.filter(function (_, j) { return j !== i; });
+      var currentCost = self.marginalCost(others, current, prefs);
+
+      candidates.forEach(function (recipe) {
+        if (picked(selected, recipe.id)) return;
+        if (!self.compositionAllows(others, recipe, prefs)) return;
+        var delta = self.marginalCost(others, recipe, prefs) - currentCost;
+        if (delta <= 0.30 || delta > room) return;
+        var gain = (recipe.prot - current.prot) * 0.02 + delta * 0.10;
+        if (gain > bestGain) {
+          bestGain = gain;
+          bestPlan = selected.slice();
+          bestPlan[i] = recipe;
+        }
+      });
+    });
+    return bestPlan;
+  };
+
+  Engine.prototype.fitBudget = function (selected, candidates, prefs) {
+    var pass;
+    for (pass = 0; pass < 12; pass++) {
+      if (this.basketCost(this.needs(selected, prefs), prefs) <= prefs.budget) break;
+      var worst = this.costliestIndex(selected, prefs);
+      var replacement = this.cheapestAlternative(selected, candidates, worst, prefs);
+      if (!replacement) break;
+      selected[worst] = replacement;
+    }
+    for (pass = 0; pass < 6; pass++) {
+      var total = this.basketCost(this.needs(selected, prefs), prefs);
+      if (total >= prefs.budget * 0.88) break;
+      var upgraded = this.upgrade(selected, candidates, prefs, prefs.budget - total);
+      if (!upgraded) break;
+      selected = upgraded;
+    }
+    return selected;
+  };
+
+  Engine.prototype.orderByDay = function (selected) {
+    var count = selected.length;
+    selected = selected.slice().sort(function (a, b) { return b.time - a.time; });
+
+    var ordered = new Array(count);
+    var weekend = [], week = [];
+    for (var d = 0; d < count; d++) (d >= 5 ? weekend : week).push(d);
+
+    weekend.forEach(function (day) { ordered[day] = selected.shift(); });
+    week.forEach(function (day, i) { ordered[day] = selected[selected.length - 1 - i]; });
+
+    return ordered;
+  };
+
+  Engine.prototype.qtyLabel = function (qty, unit) {
+    if (unit === 'piece') {
+      var rounded = Math.round(qty * 2) / 2;
+      var label = String(rounded).replace('.', ',');
+      return label + ' ' + (rounded > 1 ? 'pièces' : 'pièce');
+    }
+    if (qty >= 1000) {
+      var big = (qty / 1000).toFixed(2).replace(/0+$/, '').replace(/\.$/, '').replace('.', ',');
+      return big + ' ' + (unit === 'ml' ? 'L' : 'kg');
+    }
+    return Math.round(qty) + ' ' + unit;
+  };
+
+  Engine.prototype.recipeLines = function (recipe, prefs) {
+    var self = this;
+    return recipe.items.map(function (item) {
+      var ing = self.catalog.ingredients[item.i];
+      return {
+        id: item.i,
+        name: ing.name,
+        qty: self.qtyLabel(item.q * prefs.people, ing.unit),
+        pantry: prefs.pantry.indexOf(item.i) >= 0
+      };
+    });
+  };
+
+  Engine.prototype.buildPlan = function (selected, prefs) {
+    var self = this;
+    var needs = this.needs(selected, prefs);
+    var store = this.catalog.stores[prefs.store] || null;
+
+    var aisles = {}, pantryLines = [];
+    var total = 0, boughtValue = 0, perishableLoss = 0, carryOver = 0;
+
+    Object.keys(needs).forEach(function (id) {
+      var ing = self.catalog.ingredients[id];
+      var qty = needs[id];
+      var packPrice = self.catalog.packPrice(id, prefs.store);
+      var packs = Math.ceil(qty / ing.pack - 1e-9);
+      var lineTotal = round2(packs * packPrice);
+      var bought = packs * ing.pack;
+      var leftover = Math.max(0, bought - qty);
+      var perishable = ing.shelf <= 10;
+      var leftoverValue = leftover / ing.pack * packPrice;
+
+      var line = {
+        id: id, name: ing.name, aisle: ing.aisle, unit: ing.unit,
+        need: Math.round(qty * 10) / 10,
+        needLabel: self.qtyLabel(qty, ing.unit),
+        packs: packs, packLabel: ing.packLabel,
+        refPrice: self.catalog.refPrice(id, prefs.store),
+        refUnit: ing.unit === 'piece' ? 'pièce' : (ing.unit === 'ml' ? 'L' : 'kg'),
+        price: lineTotal,
+        usedPct: Math.round(Math.min(100, qty / Math.max(bought, 0.001) * 100)),
+        leftover: Math.round(leftover * 10) / 10,
+        leftoverLabel: leftover > 0 ? self.qtyLabel(leftover, ing.unit) : null,
+        perishable: perishable
+      };
+
+      if (prefs.pantry.indexOf(id) >= 0) {
+        line.price = 0;
+        pantryLines.push(line);
+        return;
+      }
+
+      (aisles[ing.aisle] = aisles[ing.aisle] || []).push(line);
+      total += lineTotal;
+      boughtValue += lineTotal;
+      if (perishable) perishableLoss += leftoverValue;
+      else carryOver += leftoverValue;
+    });
+
+    var sortedAisles = [];
+    Object.keys(AISLE_ORDER).forEach(function (aisle) {
+      if (!aisles[aisle]) return;
+      aisles[aisle].sort(function (a, b) { return a.name.localeCompare(b.name); });
+      sortedAisles.push({
+        id: aisle,
+        label: AISLE_ORDER[aisle],
+        items: aisles[aisle],
+        total: round2(aisles[aisle].reduce(function (s, i) { return s + i.price; }, 0))
+      });
+    });
+
+    var days = [], kcal = 0, prot = 0, time = 0;
+    selected.forEach(function (recipe, i) {
+      var others = selected.filter(function (_, j) { return j !== i; });
+      var marginal = self.marginalCost(others, recipe, prefs);
+      days.push({
+        day: DAYS[i] || 'Jour ' + (i + 1),
+        id: recipe.id, name: recipe.name, emoji: recipe.emoji,
+        time: recipe.time, cuisine: recipe.cuisine, tags: recipe.tags,
+        kcal: recipe.kcal, prot: recipe.prot, steps: recipe.steps,
+        items: self.recipeLines(recipe, prefs),
+        cost: marginal,
+        costPerPerson: round2(marginal / prefs.people)
+      });
+      kcal += recipe.kcal; prot += recipe.prot; time += recipe.time;
+    });
+
+    var count = Math.max(1, selected.length);
+    var meals = count * prefs.people;
+    total = round2(total);
+
+    var notice = null;
+    if (total > prefs.budget + 0.01) {
+      var suggested = Math.ceil(total / 5) * 5;
+      notice = {
+        type: 'budget_too_low',
+        message: 'Avec ' + prefs.people + ' personne(s) sur ' + count + ' dîners, le panier le moins cher '
+          + 'que nous ayons trouvé chez ' + (store ? store.name : '') + ' revient à ' + total + ' €. '
+          + 'Comptez plutôt ' + suggested + ' € — ou réduisez le nombre de dîners.',
+        minBudget: suggested
+      };
+    }
+
+    return {
+      ok: true,
+      notice: notice,
+      store: store ? { id: store.id, name: store.name, color: store.color } : null,
+      prefs: prefs,
+      days: days,
+      shopping: {
+        aisles: sortedAisles,
+        pantry: pantryLines,
+        lines: sortedAisles.reduce(function (s, a) { return s + a.items.length; }, 0)
+      },
+      totals: {
+        budget: round2(prefs.budget),
+        total: total,
+        remaining: round2(prefs.budget - total),
+        usedPct: Math.round(total / Math.max(prefs.budget, 0.01) * 100),
+        perMeal: round2(total / meals),
+        perDay: round2(total / count),
+        people: prefs.people,
+        days: count,
+        savedVsReady: round2(Math.max(0, READYMEAL_PER_PERSON * meals - total)),
+        wastePct: boughtValue > 0 ? Math.round(perishableLoss / boughtValue * 100) : 0,
+        wasteValue: round2(perishableLoss),
+        carryOver: round2(carryOver),
+        feasible: total <= prefs.budget + 0.01,
+        kcalPerMeal: Math.round(kcal / count),
+        protPerMeal: Math.round(prot / count),
+        cookMinutes: time
+      }
+    };
+  };
+
+  Engine.prototype.generate = function (prefs) {
+    prefs = this.normalize(prefs);
+    var candidates = this.candidates(prefs);
+
+    if (candidates.length < prefs.days) {
+      return {
+        ok: false,
+        error: 'not_enough_recipes',
+        message: 'Avec ces filtres il ne reste que ' + candidates.length
+          + ' recettes possibles. Retirez un allergène ou un ingrédient exclu.',
+        available: candidates.length
+      };
+    }
+
+    var selected = this.select(candidates, prefs);
+    selected = this.fitBudget(selected, candidates, prefs);
+    selected = this.orderByDay(selected);
+    return this.buildPlan(selected, prefs);
+  };
+
+  Engine.prototype.swapDay = function (prefs, keepIds, replaceId) {
+    var self = this;
+    prefs = this.normalize(prefs);
+    var candidates = this.candidates(prefs);
+
+    var kept = keepIds.filter(function (id) { return id !== replaceId; })
+      .map(function (id) { return self.catalog.recipes[id]; })
+      .filter(Boolean);
+
+    var pool = candidates.filter(function (r) {
+      return r.id !== replaceId && keepIds.indexOf(r.id) < 0;
+    });
+    if (!pool.length) {
+      return { ok: false, error: 'no_alternative', message: 'Aucune alternative disponible avec ces filtres.' };
+    }
+
+    var room = Math.max(0, prefs.budget - this.basketCost(this.needs(kept, prefs), prefs));
+    var best = null, bestScore = -Infinity;
+
+    pool.forEach(function (recipe) {
+      var marginal = self.marginalCost(kept, recipe, prefs);
+      var score = self.score(recipe, kept, marginal, prefs);
+      if (marginal > room) score -= 3.0 * ((marginal - room) / Math.max(room, 1));
+      score += jitter(recipe.id + prefs.seed) * 0.35;
+      if (score > bestScore) { bestScore = score; best = recipe; }
+    });
+
+    return this.buildPlan(this.orderByDay(kept.concat([best])), prefs);
+  };
+
+  global.Budgeat = {
+    Catalog: Catalog,
+    Engine: Engine,
+    DIET_LABELS: DIET_LABELS,
+    ALLERGENS: ALLERGENS,
+    PANTRY_DEFAULT: PANTRY_DEFAULT
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* Interface de la démo publique : même parcours que l'app, sans serveur. */
+(function () {
+  'use strict';
+
+  var catalog = new Budgeat.Catalog(window.BUDGEAT_DATA);
+  var engine = new Budgeat.Engine(catalog);
+  var current = null;
+  var currentPrefs = null;
+
+  var form = document.getElementById('config');
+  var result = document.getElementById('result');
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function money(value) {
+    return value.toFixed(2).replace('.', ',') + ' €';
+  }
+
+  // ------------------------------------------------------- construction du form
+
+  var storesBox = document.getElementById('stores');
+  catalog.storesByCountry('BE')
+    .sort(function (a, b) { return a.base - b.base; })
+    .forEach(function (store, i) {
+      var label = el('label', 'chip');
+      var input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'store';
+      input.value = store.id;
+      if (i === 0) input.checked = true;
+      var span = el('span');
+      var dot = el('span', 'store-dot');
+      dot.style.background = store.color;
+      span.appendChild(dot);
+      span.appendChild(document.createTextNode(store.name));
+      label.appendChild(input);
+      label.appendChild(span);
+      storesBox.appendChild(label);
+    });
+
+  var dietBox = document.getElementById('diets');
+  Object.keys(Budgeat.DIET_LABELS).forEach(function (id, i) {
+    var label = el('label', 'chip');
+    var input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'diet';
+    input.value = id;
+    if (i === 0) input.checked = true;
+    label.appendChild(input);
+    label.appendChild(el('span', null, Budgeat.DIET_LABELS[id]));
+    dietBox.appendChild(label);
+  });
+
+  var allergenBox = document.getElementById('allergens');
+  Object.keys(Budgeat.ALLERGENS).forEach(function (id) {
+    var label = el('label', 'chip');
+    var input = document.createElement('input');
+    input.type = 'checkbox';
+    input.name = 'allergens';
+    input.value = id;
+    label.appendChild(input);
+    label.appendChild(el('span', null, Budgeat.ALLERGENS[id]));
+    allergenBox.appendChild(label);
+  });
+
+  var excludeBox = document.getElementById('exclude');
+  Object.keys(catalog.ingredients)
+    .map(function (id) { return catalog.ingredients[id]; })
+    .filter(function (ing) { return !ing.pantryDefault && ing.id !== 'sel-poivre'; })
+    .sort(function (a, b) { return a.name.localeCompare(b.name); })
+    .forEach(function (ing) {
+      var option = document.createElement('option');
+      option.value = ing.id;
+      option.textContent = ing.name;
+      excludeBox.appendChild(option);
+    });
+
+  // ------------------------------------------------------------------ contrôles
+
+  var budget = document.getElementById('budget');
+  var budgetRange = document.getElementById('budgetRange');
+  var budgetHint = document.getElementById('budgetHint');
+  var people = document.getElementById('people');
+  var days = document.getElementById('days');
+
+  function syncBudgetHint() {
+    var perMeal = Number(budget.value) / Math.max(1, Number(people.value) * Number(days.value));
+    var verdict = '';
+    if (perMeal < 1.6) verdict = ' — très serré, on ira au plus simple';
+    else if (perMeal < 2.6) verdict = ' — petit budget, ça reste faisable';
+    else if (perMeal > 6) verdict = ' — large, on peut viser du poisson et de belles pièces';
+    budgetHint.textContent = 'Soit ' + money(perMeal) + ' par assiette' + verdict + '.';
+  }
+
+  budgetRange.addEventListener('input', function () {
+    budget.value = budgetRange.value;
+    syncBudgetHint();
+  });
+  budget.addEventListener('input', function () {
+    budgetRange.value = Math.min(200, Math.max(20, Number(budget.value) || 20));
+    syncBudgetHint();
+  });
+  document.querySelectorAll('[data-step]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var input = document.getElementById(button.dataset.step);
+      var next = Number(input.value) + Number(button.dataset.delta);
+      input.value = Math.min(Number(input.max), Math.max(Number(input.min), next));
+      syncBudgetHint();
+    });
+  });
+  syncBudgetHint();
+
+  function readPrefs() {
+    var prefs = {
+      store: form.querySelector('input[name=store]:checked').value,
+      budget: Number(budget.value),
+      people: Number(people.value),
+      days: Number(days.value),
+      diet: form.querySelector('input[name=diet]:checked').value,
+      maxTime: Number(document.getElementById('maxTime').value),
+      allergens: [].slice.call(form.querySelectorAll('input[name=allergens]:checked'))
+        .map(function (i) { return i.value; }),
+      exclude: [].slice.call(excludeBox.selectedOptions).map(function (o) { return o.value; }),
+      seed: String(Date.now())
+    };
+    if (document.getElementById('emptyPantry').checked) prefs.pantry = [];
+    return prefs;
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    currentPrefs = readPrefs();
+    run(engine.generate(currentPrefs));
+  });
+
+  function run(plan) {
+    if (!plan.ok) {
+      alert(plan.message);
+      return;
+    }
+    current = plan;
+    render(plan);
+  }
+
+  // ---------------------------------------------------------------------- rendu
+
+  function render(plan) {
+    result.innerHTML = '';
+    result.hidden = false;
+    form.hidden = true;
+    result.appendChild(summary(plan));
+    if (plan.notice) {
+      var warn = el('div', 'flash err');
+      warn.textContent = plan.notice.message;
+      result.appendChild(warn);
+    }
+    result.appendChild(tabs(plan));
+    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function stat(value, label) {
+    var box = el('div', 'summary-stat');
+    box.appendChild(el('strong', null, value));
+    box.appendChild(el('span', null, label));
+    return box;
+  }
+
+  function summary(plan) {
+    var t = plan.totals;
+    var box = el('div', 'card summary');
+
+    var head = el('div', 'summary-head');
+    var left = el('div');
+    left.appendChild(el('div', 'small muted',
+      t.days + ' dîners · ' + t.people + ' personne' + (t.people > 1 ? 's' : '') +
+      ' · ' + (plan.store ? plan.store.name : '')));
+    var total = el('div', 'summary-total');
+    total.appendChild(el('strong', null, money(t.total)));
+    total.appendChild(el('small', null, ' sur ' + money(t.budget) + ' de budget'));
+    left.appendChild(total);
+    head.appendChild(left);
+
+    var actions = el('div', 'summary-actions');
+    var again = el('button', 'btn btn-ghost btn-sm', 'Autre semaine');
+    again.addEventListener('click', function () {
+      currentPrefs.seed = String(Date.now());
+      run(engine.generate(currentPrefs));
+    });
+    var edit = el('button', 'btn btn-ghost btn-sm', 'Modifier mes critères');
+    edit.addEventListener('click', function () {
+      form.hidden = false;
+      result.hidden = true;
+      form.scrollIntoView({ behavior: 'smooth' });
+    });
+    var print = el('button', 'btn btn-ghost btn-sm', 'Imprimer');
+    print.addEventListener('click', function () { window.print(); });
+    actions.appendChild(again);
+    actions.appendChild(edit);
+    actions.appendChild(print);
+    head.appendChild(actions);
+    box.appendChild(head);
+
+    var bar = el('div', 'bar');
+    var fill = el('span');
+    fill.style.width = Math.min(100, t.usedPct) + '%';
+    if (!t.feasible) fill.style.background = 'var(--danger)';
+    bar.appendChild(fill);
+    box.appendChild(bar);
+
+    var stats = el('div', 'summary-stats');
+    stats.appendChild(stat(money(t.perMeal), 'par assiette'));
+    stats.appendChild(stat(money(t.remaining), t.remaining >= 0 ? 'restant sur le budget' : 'au-dessus du budget'));
+    stats.appendChild(stat(money(t.savedVsReady), 'économisés vs plats préparés'));
+    stats.appendChild(stat(t.wastePct + ' %', 'de pertes estimées'));
+    stats.appendChild(stat(t.protPerMeal + ' g', 'de protéines par assiette'));
+    stats.appendChild(stat(Math.round(t.cookMinutes / t.days) + ' min', 'de cuisine par soir'));
+    box.appendChild(stats);
+
+    if (t.carryOver > 0.5) {
+      box.appendChild(el('p', 'small muted carry',
+        'Environ ' + money(t.carryOver) + ' de produits non périssables (riz, conserves, épices) ' +
+        'resteront dans vos placards pour la semaine suivante.'));
+    }
+    return box;
+  }
+
+  function tabs(plan) {
+    var wrap = el('div');
+    var bar = el('div', 'tabs');
+    var tabMenu = el('button', 'tab active', 'Mes dîners');
+    var tabList = el('button', 'tab', 'Liste de courses (' + plan.shopping.lines + ')');
+    bar.appendChild(tabMenu);
+    bar.appendChild(tabList);
+    wrap.appendChild(bar);
+
+    var paneMenu = daysPane(plan);
+    var paneList = shoppingPane(plan);
+    paneList.hidden = true;
+    wrap.appendChild(paneMenu);
+    wrap.appendChild(paneList);
+
+    tabMenu.addEventListener('click', function () {
+      tabMenu.classList.add('active'); tabList.classList.remove('active');
+      paneMenu.hidden = false; paneList.hidden = true;
+    });
+    tabList.addEventListener('click', function () {
+      tabList.classList.add('active'); tabMenu.classList.remove('active');
+      paneList.hidden = false; paneMenu.hidden = true;
+    });
+    return wrap;
+  }
+
+  function daysPane(plan) {
+    var pane = el('div', 'pane days-pane');
+
+    plan.days.forEach(function (day) {
+      var card = el('article', 'day-card');
+
+      var head = el('div', 'day-head');
+      head.appendChild(el('span', 'day-emoji', day.emoji));
+      var meta = el('div', 'day-meta');
+      meta.appendChild(el('span', 'day-name', day.day));
+      meta.appendChild(el('h3', 'day-title', day.name));
+      var tags = el('div', 'day-tags');
+      tags.appendChild(el('span', 'tag', day.time + ' min'));
+      tags.appendChild(el('span', 'tag', day.cuisine));
+      if (day.tags.indexOf('batch') >= 0) tags.appendChild(el('span', 'tag warn', 'reste pour le midi'));
+      meta.appendChild(tags);
+      head.appendChild(meta);
+      var price = el('div', 'day-price');
+      price.appendChild(el('strong', null, money(day.costPerPerson)));
+      price.appendChild(el('span', null, 'par personne'));
+      head.appendChild(price);
+      card.appendChild(head);
+
+      var body = el('div', 'day-body');
+      body.hidden = true;
+      var cols = el('div', 'day-cols');
+      var left = el('div');
+      left.appendChild(el('h4', null, 'Ingrédients'));
+      var ings = el('ul', 'ing-list');
+      day.items.forEach(function (item) {
+        var li = el('li');
+        li.appendChild(el('span', null, item.name));
+        li.appendChild(el('span', 'qty', item.qty + (item.pantry ? ' · placard' : '')));
+        ings.appendChild(li);
+      });
+      left.appendChild(ings);
+      var right = el('div');
+      right.appendChild(el('h4', null, 'Préparation'));
+      var steps = el('ol', 'step-list');
+      day.steps.forEach(function (s) { steps.appendChild(el('li', null, s)); });
+      right.appendChild(steps);
+      cols.appendChild(left);
+      cols.appendChild(right);
+      body.appendChild(cols);
+
+      var actions = el('div', 'day-actions');
+      var toggle = el('button', 'btn btn-ghost btn-sm', 'Voir la recette');
+      toggle.addEventListener('click', function () {
+        body.hidden = !body.hidden;
+        toggle.textContent = body.hidden ? 'Voir la recette' : 'Masquer la recette';
+      });
+      var swap = el('button', 'btn btn-soft btn-sm', 'Changer ce dîner');
+      swap.addEventListener('click', function () {
+        var keep = plan.days.map(function (d) { return d.id; });
+        var next = engine.swapDay(currentPrefs, keep, day.id);
+        if (!next.ok) { alert(next.message); return; }
+        current = next;
+        render(next);
+      });
+      actions.appendChild(toggle);
+      actions.appendChild(swap);
+      card.appendChild(actions);
+      card.appendChild(body);
+
+      pane.appendChild(card);
+    });
+
+    pane.appendChild(el('p', 'hint center marginal-note',
+      'Le prix indiqué est ce que le dîner ajoute réellement à votre panier. ' +
+      'Un plat qui réutilise des ingrédients déjà achetés coûte donc moins cher.'));
+    return pane;
+  }
+
+  function shoppingPane(plan) {
+    var pane = el('div', 'pane');
+
+    var intro = el('div', 'list-head card card-pad');
+    intro.appendChild(el('div', 'small muted', 'Triée dans l\'ordre du magasin. Cochez au fur et à mesure.'));
+    var totalLine = el('div', 'list-total');
+    totalLine.appendChild(el('strong', null, money(plan.totals.total)));
+    totalLine.appendChild(el('span', 'small muted', ' à prévoir en caisse'));
+    intro.appendChild(totalLine);
+    pane.appendChild(intro);
+
+    plan.shopping.aisles.forEach(function (aisle) {
+      var section = el('section', 'aisle card');
+      var head = el('div', 'aisle-head');
+      head.appendChild(el('h3', null, aisle.label));
+      head.appendChild(el('span', 'small muted', money(aisle.total)));
+      section.appendChild(head);
+
+      aisle.items.forEach(function (item) {
+        var row = el('label', 'list-row');
+        var box = document.createElement('input');
+        box.type = 'checkbox';
+        box.addEventListener('change', function () { row.classList.toggle('done', box.checked); });
+
+        var main = el('div', 'list-main');
+        main.appendChild(el('span', 'list-name', item.name));
+        var detail = item.packs + ' × ' + item.packLabel;
+        if (item.packs > 1 || item.usedPct < 100) detail += ' · besoin : ' + item.needLabel;
+        main.appendChild(el('span', 'list-detail', detail));
+        if (item.leftoverLabel && item.perishable) {
+          main.appendChild(el('span', 'list-warn', 'il restera ' + item.leftoverLabel));
+        }
+
+        var price = el('div', 'list-price');
+        price.appendChild(el('strong', null, money(item.price)));
+        price.appendChild(el('span', 'small muted',
+          item.refPrice.toFixed(2).replace('.', ',') + ' €/' + item.refUnit));
+
+        row.appendChild(box);
+        row.appendChild(main);
+        row.appendChild(price);
+        section.appendChild(row);
+      });
+      pane.appendChild(section);
+    });
+
+    if (plan.shopping.pantry.length) {
+      var pantry = el('section', 'aisle card pantry');
+      var phead = el('div', 'aisle-head');
+      phead.appendChild(el('h3', null, 'Déjà dans vos placards'));
+      phead.appendChild(el('span', 'small muted', 'non compté'));
+      pantry.appendChild(phead);
+      pantry.appendChild(el('p', 'small muted pantry-list',
+        plan.shopping.pantry.map(function (i) { return i.name + ' (' + i.needLabel + ')'; }).join(' · ')));
+      pane.appendChild(pantry);
+    }
+
+    var share = el('div', 'card card-pad share');
+    var shareBtn = el('button', 'btn btn-ghost btn-sm', 'Copier la liste');
+    shareBtn.addEventListener('click', function () {
+      var lines = [];
+      plan.shopping.aisles.forEach(function (aisle) {
+        lines.push('— ' + aisle.label + ' —');
+        aisle.items.forEach(function (item) {
+          lines.push('[ ] ' + item.name + ' : ' + item.packs + ' × ' + item.packLabel);
+        });
+      });
+      lines.push('', 'Total estimé : ' + money(plan.totals.total));
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(lines.join('\n')).then(function () {
+          shareBtn.textContent = 'Liste copiée !';
+          setTimeout(function () { shareBtn.textContent = 'Copier la liste'; }, 2000);
+        });
+      }
+    });
+    share.appendChild(shareBtn);
+    pane.appendChild(share);
+    return pane;
+  }
+})();
+
+</script>
