@@ -92,7 +92,7 @@ déduite de la requête : le site fonctionne dès la copie des fichiers.
 php tests/engine_test.php
 ```
 
-47 assertions : cohérence du catalogue, respect du budget sur 8 scénarios, filtres
+50 assertions : cohérence du catalogue, respect du budget sur 8 scénarios, filtres
 régime/allergènes/temps/exclusions, remplacement, liste de courses, performance.
 
 ## Démo publique

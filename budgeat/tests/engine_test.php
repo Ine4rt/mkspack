@@ -28,7 +28,11 @@ $engine  = new Engine($catalog);
 echo "\n== Catalogue ==\n";
 check('ingrédients chargés', count($catalog->ingredients) > 80, (string) count($catalog->ingredients));
 check('recettes chargées', count($catalog->recipes) >= 50, (string) count($catalog->recipes));
-check('enseignes chargées', count($catalog->stores) === 20, (string) count($catalog->stores));
+check('enseignes chargées', count($catalog->stores) >= 20, (string) count($catalog->stores));
+check('toutes les enseignes sont belges', array_filter(
+    $catalog->stores,
+    fn($s) => !in_array('BE', $s['country'], true)
+) === []);
 
 $vegan = array_filter($catalog->recipes, fn($r) => in_array('vegan', $r['diets'], true));
 $vege  = array_filter($catalog->recipes, fn($r) => in_array('vegetarien', $r['diets'], true));
@@ -51,20 +55,22 @@ check(
 );
 
 echo "\n== Indices prix par enseigne ==\n";
-$lidl = $catalog->packPrice('poulet-filet', 'lidl');
-$mono = $catalog->packPrice('poulet-filet', 'monoprix');
-check('Lidl moins cher que Monoprix', $lidl < $mono, "lidl=$lidl monoprix=$mono");
+$aldi = $catalog->packPrice('poulet-filet', 'aldi');
+$cher = $catalog->packPrice('poulet-filet', 'delitraiteur');
+check('un discounter reste moins cher qu\'une supérette', $aldi < $cher, "aldi=$aldi delitraiteur=$cher");
+// Une enseigne inconnue ne doit pas passer silencieusement pour un indice de 1.
+check('toutes les enseignes des tests existent', isset($catalog->stores['aldi'], $catalog->stores['delitraiteur']));
 
 echo "\n== Génération : budget respecté ==\n";
 $scenarios = [
     ['label' => '2 pers / 60 € / Lidl',        'store' => 'lidl',      'budget' => 60,  'people' => 2, 'diet' => 'omnivore'],
     ['label' => '4 pers / 90 € / Colruyt',     'store' => 'colruyt',   'budget' => 90,  'people' => 4, 'diet' => 'omnivore'],
     ['label' => '1 pers / 35 € / Aldi',        'store' => 'aldi',      'budget' => 35,  'people' => 1, 'diet' => 'omnivore'],
-    ['label' => '4 pers / 70 € végé / Leclerc','store' => 'leclerc',   'budget' => 70,  'people' => 4, 'diet' => 'vegetarien'],
+    ['label' => '4 pers / 70 € végé / Jumbo'  ,'store' => 'jumbo',     'budget' => 70,  'people' => 4, 'diet' => 'vegetarien'],
     ['label' => '2 pers / 45 € végan / Lidl',  'store' => 'lidl',      'budget' => 45,  'people' => 2, 'diet' => 'vegan'],
     ['label' => '3 pers / 75 € pesc / Delhaize','store' => 'delhaize', 'budget' => 75,  'people' => 3, 'diet' => 'pescetarien'],
     ['label' => '5 pers / 120 € / Carrefour',  'store' => 'carrefour', 'budget' => 120, 'people' => 5, 'diet' => 'sans-porc'],
-    ['label' => '2 pers / 40 € flexi / Netto', 'store' => 'netto',     'budget' => 40,  'people' => 2, 'diet' => 'flexitarien'],
+    ['label' => '2 pers / 40 € flexi / OKay'  , 'store' => 'okay',      'budget' => 40,  'people' => 2, 'diet' => 'flexitarien'],
 ];
 
 foreach ($scenarios as $n => $s) {
@@ -118,8 +124,9 @@ foreach ($plan['days'] as $d) {
 check('ingrédients exclus absents', $bad === [], implode(',', $bad));
 
 echo "\n== Budget trop serré ==\n";
-$plan = $engine->generate(['store' => 'monoprix', 'budget' => 15, 'people' => 4, 'seed' => 'tight']);
+$plan = $engine->generate(['store' => 'delitraiteur', 'budget' => 15, 'people' => 4, 'seed' => 'tight']);
 check('réponse cohérente en budget impossible', $plan['ok'] === true && $plan['totals']['total'] > 0);
+check('budget intenable signalé', $plan['notice'] !== null && $plan['totals']['feasible'] === false);
 echo "     (budget 15 € pour 4 pers -> plancher atteint : {$plan['totals']['total']} €)\n";
 
 echo "\n== Variété entre deux semaines ==\n";
