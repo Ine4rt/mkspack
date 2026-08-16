@@ -59,7 +59,7 @@ SURGELéS
   Olives noires                  bocal 200 g                ............ €   [1.2 % des paniers]
 
 ========================================================================
-Enseignes à couvrir : Colruyt, Lidl, Aldi, Delhaize, Carrefour Hyper
+Enseignes à couvrir : Colruyt, Aldi, Delhaize, Lidl
 
 Une fois les prix notés, remplissez data/releves.csv puis lancez :
     php scripts/import_prices.php

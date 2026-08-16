@@ -1,0 +1,301 @@
+{
+ "items": [
+  {
+   "id": 1,
+   "category_tag": "en:chicken-breasts",
+   "price": 9.49,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Colruyt",
+    "osm_address_country": "Belgium",
+    "osm_name": "Colruyt test"
+   }
+  },
+  {
+   "id": 2,
+   "category_tag": "en:chicken-breasts",
+   "price": 9.99,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Colruyt",
+    "osm_address_country": "Belgium",
+    "osm_name": "Colruyt test"
+   }
+  },
+  {
+   "id": 3,
+   "category_tag": "en:chicken-breasts",
+   "price": 9.79,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Colruyt",
+    "osm_address_country": "Belgium",
+    "osm_name": "Colruyt test"
+   }
+  },
+  {
+   "id": 4,
+   "category_tag": "en:chicken-breasts",
+   "price": 6.99,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": true,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Colruyt",
+    "osm_address_country": "Belgium",
+    "osm_name": "Colruyt test"
+   }
+  },
+  {
+   "id": 5,
+   "category_tag": "en:chicken-breasts",
+   "price": 9.15,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Lidl",
+    "osm_address_country": "Belgium",
+    "osm_name": "Lidl test"
+   }
+  },
+  {
+   "id": 6,
+   "category_tag": "en:chicken-breasts",
+   "price": 8.95,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Lidl",
+    "osm_address_country": "Belgium",
+    "osm_name": "Lidl test"
+   }
+  },
+  {
+   "id": 7,
+   "category_tag": "en:chicken-breasts",
+   "price": 9.35,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Lidl",
+    "osm_address_country": "Belgium",
+    "osm_name": "Lidl test"
+   }
+  },
+  {
+   "id": 8,
+   "category_tag": "en:chicken-breasts",
+   "price": 11.2,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Carrefour",
+    "osm_address_country": "Belgium",
+    "osm_name": "Carrefour test"
+   }
+  },
+  {
+   "id": 9,
+   "category_tag": "en:chicken-breasts",
+   "price": 8.1,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Colruyt",
+    "osm_address_country": "France",
+    "osm_name": "Colruyt test"
+   }
+  },
+  {
+   "id": 10,
+   "category_tag": "en:butters",
+   "price": 11.4,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Delhaize",
+    "osm_address_country": "Belgium",
+    "osm_name": "Delhaize test"
+   }
+  },
+  {
+   "id": 11,
+   "category_tag": "en:butters",
+   "price": 10.9,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Delhaize",
+    "osm_address_country": "Belgium",
+    "osm_name": "Delhaize test"
+   }
+  },
+  {
+   "id": 12,
+   "category_tag": "en:butters",
+   "price": 11.1,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Delhaize",
+    "osm_address_country": "Belgium",
+    "osm_name": "Delhaize test"
+   }
+  },
+  {
+   "id": 13,
+   "category_tag": "en:butters",
+   "price": 9.2,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "ALDI",
+    "osm_address_country": "Belgium",
+    "osm_name": "ALDI test"
+   }
+  },
+  {
+   "id": 14,
+   "category_tag": "en:butters",
+   "price": 9.6,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "ALDI",
+    "osm_address_country": "Belgium",
+    "osm_name": "ALDI test"
+   }
+  },
+  {
+   "id": 15,
+   "category_tag": "en:chicken-eggs",
+   "price": 3.79,
+   "price_per": "UNIT",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Colruyt",
+    "osm_address_country": "Belgium",
+    "osm_name": "Colruyt test"
+   }
+  },
+  {
+   "id": 16,
+   "category_tag": "en:chicken-eggs",
+   "price": 3.99,
+   "price_per": "UNIT",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Colruyt",
+    "osm_address_country": "Belgium",
+    "osm_name": "Colruyt test"
+   }
+  },
+  {
+   "id": 17,
+   "category_tag": "en:chicken-eggs",
+   "price": 3.89,
+   "price_per": "UNIT",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Colruyt",
+    "osm_address_country": "Belgium",
+    "osm_name": "Colruyt test"
+   }
+  },
+  {
+   "id": 18,
+   "category_tag": "en:chicken-eggs",
+   "price": 6.5,
+   "price_per": "KILOGRAM",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Colruyt",
+    "osm_address_country": "Belgium",
+    "osm_name": "Colruyt test"
+   }
+  },
+  {
+   "id": 19,
+   "category_tag": "en:pastas",
+   "price": 1.35,
+   "price_per": "UNIT",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Aldi",
+    "osm_address_country": "Belgium",
+    "osm_name": "Aldi test"
+   }
+  },
+  {
+   "id": 20,
+   "category_tag": "en:pastas",
+   "price": 1.45,
+   "price_per": "UNIT",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Aldi",
+    "osm_address_country": "Belgium",
+    "osm_name": "Aldi test"
+   }
+  },
+  {
+   "id": 21,
+   "category_tag": "en:pastas",
+   "price": 1.29,
+   "price_per": "UNIT",
+   "currency": "EUR",
+   "price_is_discounted": false,
+   "date": "2026-06-12",
+   "location": {
+    "osm_brands": "Aldi",
+    "osm_address_country": "Belgium",
+    "osm_name": "Aldi test"
+   }
+  }
+ ],
+ "total": 21,
+ "page": 1,
+ "pages": 1
+}

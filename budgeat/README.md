@@ -89,11 +89,15 @@ déduite de la requête : le site fonctionne dès la copie des fichiers.
 ### Tests
 
 ```bash
-php tests/engine_test.php
+php tests/engine_test.php     # 50 assertions — moteur, budgets, filtres, liste
+php tests/prices_test.php     # 14 assertions — collecte et recalage des prix
 ```
 
-50 assertions : cohérence du catalogue, respect du budget sur 8 scénarios, filtres
-régime/allergènes/temps/exclusions, remplacement, liste de courses, performance.
+Le premier couvre la cohérence du catalogue, le respect du budget sur 8 scénarios,
+les filtres régime/allergènes/temps/exclusions, le remplacement d'un dîner, la liste
+de courses et la performance. Le second couvre la chaîne de prix à partir d'une
+réponse d'API figée : filtrage pays et enseigne, exclusion des promotions, conversion
+vers les conditionnements, médiane, seuils, priorité des relevés manuels.
 
 ## Démo publique
 
@@ -145,9 +149,50 @@ budgeat/
 **Les prix livrés sont des ordres de grandeur posés à la main, pas des relevés.**
 `data/stores.json` porte d'ailleurs un drapeau `"calibrated": false`. Ils suffisent à
 faire tourner et démontrer le produit ; ils ne suffisent pas à tenir la promesse
-« pile dans votre budget » devant un client payant. Deux outils font le travail.
+« pile dans votre budget » devant un client payant.
 
-### 1. Savoir quoi relever
+Deux chemins, complémentaires : la collecte automatique couvre vite les produits
+courants, le relevé terrain comble les trous et sert de référence.
+
+### Option A — collecte automatique (Open Prices)
+
+```bash
+php scripts/fetch_openprices.php colruyt,aldi,delhaize,lidl
+php scripts/import_prices.php --dry-run     # inspection
+php scripts/import_prices.php               # application
+```
+
+[Open Prices](https://prices.openfoodfacts.org) est la base de prix d'Open Food Facts :
+les relevés sont contribués par les utilisateurs, avec la photo de l'étiquette en
+preuve, sous licence ouverte ODbL. C'est ce qui permet de les réutiliser légalement,
+là où un scraping de site marchand se heurte aux conditions d'utilisation et au droit
+sui generis sur les bases de données.
+
+Le script interroge l'API par catégorie de produit, ne garde que les magasins belges
+des enseignes demandées, **écarte les prix en promotion** (on cherche le prix habituel),
+convertit les prix au kilo vers nos conditionnements, et retient la médiane quand il y
+a au moins 3 relevés. Il ne touche jamais à un prix que vous avez saisi à la main :
+un relevé terrain prime toujours sur la collecte.
+
+Deux réserves à connaître :
+
+- **La couverture dépend des contributions.** Sur les produits peu documentés en
+  Belgique, le script ne trouvera rien et le dira ; ces produits restent estimés.
+  Ce qui manque se complète par l'option B.
+- **Les tags de catégorie du fichier `data/openprices_map.json` n'ont pas pu être
+  vérifiés en ligne** (l'environnement de développement n'avait pas accès au réseau).
+  Le script liste les catégories qui ne ramènent rien : corrigez le tag fautif dans ce
+  fichier — il se vérifie sur `world.openfoodfacts.org/category/<tag>` — et relancez.
+
+La logique du script est couverte par `tests/prices_test.php`, sur une réponse d'API
+figée. L'appel réseau lui-même, non : c'est la première chose à vérifier chez vous.
+
+### Option B — relevé terrain
+
+C'est la méthode lente mais incontestable, et le complément naturel de la collecte
+automatique sur les produits qu'elle ne couvre pas.
+
+#### 1. Savoir quoi relever
 
 ```bash
 php scripts/carnet_releves.php 30 colruyt,lidl,aldi,delhaize,carrefour
@@ -165,7 +210,7 @@ relevé automatisé : un scraper qui tourne en continu se fait bloquer, et le su
 n'est pas neutre juridiquement. Un relevé manuel trimestriel est plus lent mais
 incontestable.
 
-### 2. Recaler le catalogue
+#### 2. Recaler le catalogue
 
 ```bash
 php scripts/import_prices.php            # ajoute --dry-run pour voir sans écrire
