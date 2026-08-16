@@ -1,0 +1,237 @@
+{
+  "_comment": "Recettes. q = quantite PAR PERSONNE dans l'unite de l'ingredient (g, ml ou piece). Les regimes et allergenes ne sont PAS declares ici : ils sont deduits automatiquement des ingredients par lib/Catalog.php, ce qui evite les incoherences.",
+  "updated": "2026-08-01",
+  "recipes": [
+    { "id": "pates-bolo", "name": "Spaghetti bolognaise maison", "emoji": "🍝", "time": 35, "cuisine": "Italie", "tags": ["familial", "batch"],
+      "items": [{"i":"spaghetti","q":100},{"i":"hache-mixte","q":110},{"i":"tomate-concassee","q":150},{"i":"oignon","q":50},{"i":"carotte","q":50},{"i":"ail","q":4},{"i":"huile-olive","q":8},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],
+      "steps": ["Émincez l'oignon, la carotte et l'ail, faites-les revenir 5 min à l'huile d'olive.", "Ajoutez la viande hachée, laissez colorer 5 min en écrasant à la cuillère.", "Versez les tomates concassées et les herbes, salez, poivrez. Laissez mijoter 20 min à feu doux.", "Cuisez les spaghetti al dente et mélangez-les à la sauce hors du feu."] },
+
+    { "id": "poulet-curry-coco", "name": "Poulet au curry et lait de coco", "emoji": "🍛", "time": 30, "cuisine": "Inde", "tags": ["rapide"],
+      "items": [{"i":"poulet-filet","q":130},{"i":"lait-coco","q":100},{"i":"curry-poudre","q":4},{"i":"oignon","q":60},{"i":"poivron","q":80},{"i":"riz","q":90},{"i":"huile-tournesol","q":8},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],
+      "steps": ["Coupez le poulet en cubes, l'oignon et le poivron en lamelles.", "Saisissez le poulet 5 min, réservez. Faites suer oignon, poivron et ail 5 min.", "Remettez le poulet, saupoudrez de curry, versez le lait de coco et laissez réduire 12 min.", "Servez avec le riz cuit à l'eau salée."] },
+
+    { "id": "chili-sin-carne", "name": "Chili sin carne", "emoji": "🌶️", "time": 30, "cuisine": "Mexique", "tags": ["batch", "eco"],
+      "items": [{"i":"haricot-rouge","q":110},{"i":"mais","q":60},{"i":"tomate-concassee","q":150},{"i":"poivron","q":70},{"i":"oignon","q":60},{"i":"riz","q":80},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"ail","q":4},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites revenir oignon, ail et poivron 6 min.", "Ajoutez cumin et paprika, mélangez 1 min pour libérer les arômes.", "Versez tomates, haricots rincés et maïs. Mijotez 15 min.", "Servez sur un lit de riz."] },
+
+    { "id": "gratin-pdt-jambon", "name": "Gratin de pommes de terre au jambon", "emoji": "🥔", "time": 55, "cuisine": "France", "tags": ["familial", "four"],
+      "items": [{"i":"pdt","q":300},{"i":"jambon","q":60},{"i":"creme-liquide","q":60},{"i":"lait","q":60},{"i":"fromage-rape","q":35},{"i":"ail","q":3},{"i":"beurre","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Préchauffez le four à 180 °C. Épluchez et coupez les pommes de terre en fines rondelles.", "Frottez le plat à l'ail, beurrez-le, disposez les pommes de terre et le jambon en couches.", "Versez le mélange lait-crème, salez, poivrez, couvrez de fromage râpé.", "Enfournez 45 min jusqu'à ce que la lame d'un couteau traverse sans résistance."] },
+
+    { "id": "omelette-pdt", "name": "Omelette paysanne aux pommes de terre", "emoji": "🍳", "time": 25, "cuisine": "France", "tags": ["rapide", "eco"],
+      "items": [{"i":"oeuf","q":3},{"i":"pdt","q":200},{"i":"oignon","q":50},{"i":"persil","q":5},{"i":"huile-tournesol","q":10},{"i":"salade","q":0.25},{"i":"sel-poivre","q":2}],
+      "steps": ["Coupez les pommes de terre en dés, faites-les dorer 15 min à la poêle avec l'oignon.", "Battez les œufs avec le persil, salez, poivrez.", "Versez sur les pommes de terre, couvrez et laissez prendre 5 min à feu doux.", "Servez avec la salade assaisonnée."] },
+
+    { "id": "dahl-corail", "name": "Dahl de lentilles corail", "emoji": "🥘", "time": 30, "cuisine": "Inde", "tags": ["eco", "batch"],
+      "items": [{"i":"lentilles-corail","q":90},{"i":"lait-coco","q":80},{"i":"tomate-concassee","q":100},{"i":"oignon","q":60},{"i":"curcuma","q":2},{"i":"cumin","q":2},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"riz","q":60},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites revenir oignon, ail et gingembre 5 min avec les épices.", "Ajoutez les lentilles rincées, les tomates et 2 volumes d'eau.", "Laissez cuire 20 min à couvert en remuant, puis versez le lait de coco.", "Servez avec un peu de riz."] },
+
+    { "id": "saumon-riz-brocoli", "name": "Pavé de saumon, riz et brocoli", "emoji": "🐟", "time": 25, "cuisine": "France", "tags": ["rapide", "sain"],
+      "items": [{"i":"saumon","q":125},{"i":"riz","q":90},{"i":"brocoli","q":180},{"i":"citron","q":0.4},{"i":"beurre","q":10},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],
+      "steps": ["Lancez le riz. Détaillez le brocoli en fleurettes, cuisez-le 8 min à la vapeur.", "Saisissez le saumon côté peau 4 min, retournez 3 min.", "Déglacez avec le jus de citron et le beurre, arrosez le poisson.", "Dressez saumon, riz et brocoli, terminez à l'ail écrasé."] },
+
+    { "id": "colin-pane-frites", "name": "Colin pané maison et frites au four", "emoji": "🍟", "time": 35, "cuisine": "France", "tags": ["familial"],
+      "items": [{"i":"colin","q":130},{"i":"chapelure","q":40},{"i":"oeuf","q":0.5},{"i":"farine","q":20},{"i":"frites-surgele","q":200},{"i":"citron","q":0.3},{"i":"huile-tournesol","q":12},{"i":"sel-poivre","q":2}],
+      "steps": ["Enfournez les frites à 200 °C pour 25 min.", "Passez les filets de colin dans la farine, l'œuf battu puis la chapelure.", "Faites dorer 4 min de chaque côté à la poêle.", "Servez avec un quartier de citron."] },
+
+    { "id": "wok-poulet-nouilles", "name": "Wok de poulet et nouilles sautées", "emoji": "🥢", "time": 25, "cuisine": "Asie", "tags": ["rapide"],
+      "items": [{"i":"poulet-filet","q":120},{"i":"nouilles","q":80},{"i":"legume-wok","q":180},{"i":"sauce-soja","q":20},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"huile-tournesol","q":10},{"i":"sesame","q":5}],
+      "steps": ["Cuisez les nouilles 3 min, égouttez.", "Saisissez le poulet en lamelles à feu vif 5 min avec ail et gingembre.", "Ajoutez les légumes, sautez 6 min, puis les nouilles et la sauce soja.", "Parsemez de graines de sésame."] },
+
+    { "id": "quiche-lorraine", "name": "Quiche lorraine", "emoji": "🥧", "time": 45, "cuisine": "France", "tags": ["familial", "four"],
+      "items": [{"i":"pate-brisee","q":60},{"i":"lardons","q":50},{"i":"oeuf","q":1},{"i":"creme-liquide","q":50},{"i":"lait","q":40},{"i":"fromage-rape","q":25},{"i":"salade","q":0.25},{"i":"sel-poivre","q":2}],
+      "steps": ["Préchauffez à 190 °C, étalez la pâte dans le moule et piquez-la.", "Faites rissoler les lardons 5 min sans matière grasse, égouttez.", "Battez œufs, crème et lait, salez peu, poivrez. Ajoutez lardons et fromage.", "Versez sur la pâte et enfournez 30 min. Servez avec la salade."] },
+
+    { "id": "tarte-courgette-feta", "name": "Tarte courgette et feta", "emoji": "🥧", "time": 45, "cuisine": "Méditerranée", "tags": ["four"],
+      "items": [{"i":"pate-feuilletee","q":60},{"i":"courgette","q":150},{"i":"feta","q":40},{"i":"oeuf","q":1},{"i":"creme-liquide","q":40},{"i":"herbes","q":1},{"i":"huile-olive","q":6},{"i":"sel-poivre","q":2}],
+      "steps": ["Coupez les courgettes en rondelles, faites-les revenir 8 min à l'huile d'olive.", "Étalez la pâte, répartissez les courgettes et la feta émiettée.", "Versez l'appareil œuf-crème assaisonné aux herbes.", "Enfournez 30 min à 190 °C."] },
+
+    { "id": "boulettes-tomate", "name": "Boulettes de bœuf sauce tomate", "emoji": "🍖", "time": 40, "cuisine": "Méditerranée", "tags": ["familial"],
+      "items": [{"i":"hache-boeuf","q":120},{"i":"chapelure","q":20},{"i":"oeuf","q":0.3},{"i":"passata","q":150},{"i":"oignon","q":50},{"i":"ail","q":4},{"i":"pates","q":90},{"i":"herbes","q":1},{"i":"huile-olive","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Mélangez viande, chapelure, œuf, oignon râpé, sel et poivre. Formez des boulettes.", "Dorez-les 6 min à la poêle, réservez.", "Faites revenir l'ail, versez le coulis et les herbes, remettez les boulettes 20 min.", "Servez avec les pâtes."] },
+
+    { "id": "couscous-poulet", "name": "Couscous poulet et légumes", "emoji": "🍲", "time": 45, "cuisine": "Maghreb", "tags": ["familial", "batch"],
+      "items": [{"i":"poulet-cuisse","q":180},{"i":"semoule","q":90},{"i":"carotte","q":80},{"i":"courgette","q":80},{"i":"pois-chiche","q":60},{"i":"oignon","q":60},{"i":"concentre-tomate","q":15},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"bouillon","q":0.5},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Dorez les cuisses de poulet 8 min dans une cocotte, réservez.", "Faites suer l'oignon, ajoutez les épices et le concentré de tomate.", "Versez le bouillon, les légumes en gros morceaux et le poulet. Mijotez 30 min.", "Ajoutez les pois chiches 5 min avant la fin. Servez sur la semoule gonflée."] },
+
+    { "id": "risotto-champignons", "name": "Risotto aux champignons", "emoji": "🍚", "time": 35, "cuisine": "Italie", "tags": ["confort"],
+      "items": [{"i":"riz","q":90},{"i":"champignon","q":150},{"i":"oignon","q":50},{"i":"parmesan","q":20},{"i":"beurre","q":12},{"i":"bouillon","q":0.5},{"i":"ail","q":3},{"i":"persil","q":5},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites sauter les champignons émincés 8 min à feu vif, réservez.", "Nacrez le riz avec l'oignon dans le beurre 2 min.", "Ajoutez le bouillon chaud louche par louche en remuant 18 min.", "Incorporez champignons, parmesan et persil hors du feu."] },
+
+    { "id": "hachis-parmentier", "name": "Hachis parmentier", "emoji": "🥧", "time": 55, "cuisine": "France", "tags": ["familial", "four", "batch"],
+      "items": [{"i":"pdt","q":280},{"i":"hache-boeuf","q":110},{"i":"oignon","q":60},{"i":"lait","q":60},{"i":"beurre","q":15},{"i":"fromage-rape","q":25},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez les pommes de terre 20 min à l'eau, écrasez-les avec lait et beurre.", "Faites revenir oignon et ail, ajoutez la viande 8 min, assaisonnez.", "Montez le plat : viande puis purée, couvrez de fromage.", "Gratinez 20 min à 200 °C."] },
+
+    { "id": "moules-frites", "name": "Moules marinière et frites", "emoji": "🦪", "time": 30, "cuisine": "Belgique", "tags": ["rapide", "convivial"],
+      "items": [{"i":"moules","q":500},{"i":"frites-surgele","q":200},{"i":"echalote","q":40},{"i":"celeri-branche","q":40},{"i":"creme-liquide","q":25},{"i":"beurre","q":10},{"i":"persil","q":5},{"i":"sel-poivre","q":2}],
+      "steps": ["Enfournez les frites à 200 °C pour 25 min.", "Grattez et rincez les moules, jetez celles qui restent ouvertes.", "Faites suer échalote et céleri au beurre, ajoutez les moules à feu vif, couvrez 6 min.", "Ajoutez crème et persil, secouez la casserole et servez aussitôt."] },
+
+    { "id": "tacos-boeuf", "name": "Tacos de bœuf haricots rouges", "emoji": "🌮", "time": 25, "cuisine": "Mexique", "tags": ["rapide", "convivial"],
+      "items": [{"i":"tortilla","q":80},{"i":"hache-boeuf","q":100},{"i":"haricot-rouge","q":60},{"i":"mais","q":40},{"i":"fromage-rape","q":25},{"i":"salade","q":0.25},{"i":"tomate","q":60},{"i":"paprika","q":2},{"i":"cumin","q":2},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites revenir la viande 6 min avec les épices.", "Ajoutez haricots rincés et maïs, réchauffez 3 min.", "Tiédissez les tortillas 30 s à la poêle sèche.", "Garnissez de viande, salade, tomate et fromage râpé."] },
+
+    { "id": "carbonara", "name": "Pâtes à la carbonara (la vraie)", "emoji": "🍝", "time": 20, "cuisine": "Italie", "tags": ["rapide", "eco"],
+      "items": [{"i":"spaghetti","q":110},{"i":"lardons","q":60},{"i":"oeuf","q":1},{"i":"parmesan","q":25},{"i":"ail","q":2},{"i":"sel-poivre","q":3}],
+      "steps": ["Cuisez les spaghetti al dente, gardez une louche d'eau de cuisson.", "Faites rissoler les lardons à sec avec l'ail écrasé.", "Battez œufs et parmesan, poivrez généreusement.", "Hors du feu, mélangez pâtes, lardons et appareil en détendant à l'eau de cuisson."] },
+
+    { "id": "pates-pesto-tomate", "name": "Pâtes pesto maison et tomates cerises", "emoji": "🌿", "time": 20, "cuisine": "Italie", "tags": ["rapide", "été"],
+      "items": [{"i":"pates","q":110},{"i":"basilic","q":15},{"i":"parmesan","q":20},{"i":"cajou","q":15},{"i":"huile-olive","q":20},{"i":"tomate-cerise","q":100},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],
+      "steps": ["Mixez basilic, cajou, ail, parmesan et huile d'olive en pesto.", "Cuisez les pâtes al dente.", "Coupez les tomates cerises en deux, poêlez-les 3 min.", "Mélangez le tout hors du feu avec un peu d'eau de cuisson."] },
+
+    { "id": "tortilla-espagnole", "name": "Tortilla espagnole", "emoji": "🥘", "time": 35, "cuisine": "Espagne", "tags": ["eco"],
+      "items": [{"i":"oeuf","q":3},{"i":"pdt","q":220},{"i":"oignon","q":70},{"i":"huile-olive","q":20},{"i":"salade","q":0.25},{"i":"sel-poivre","q":2}],
+      "steps": ["Coupez les pommes de terre en fines rondelles, confisez-les 15 min à l'huile avec l'oignon.", "Égouttez et mélangez aux œufs battus salés.", "Cuisez 6 min à feu doux, retournez à l'aide d'une assiette, 5 min de plus.", "Laissez tiédir avant de couper en parts."] },
+
+    { "id": "poulet-roti-legumes", "name": "Cuisses de poulet rôties aux légumes", "emoji": "🍗", "time": 55, "cuisine": "France", "tags": ["four", "familial", "eco"],
+      "items": [{"i":"poulet-cuisse","q":200},{"i":"pdt","q":220},{"i":"carotte","q":100},{"i":"oignon","q":60},{"i":"herbes","q":2},{"i":"ail","q":5},{"i":"huile-olive","q":12},{"i":"sel-poivre","q":2}],
+      "steps": ["Préchauffez à 200 °C. Coupez les légumes en gros morceaux.", "Disposez tout dans un plat, arrosez d'huile, salez, herbes et ail en chemise.", "Enfournez 45 min en retournant à mi-cuisson.", "Servez directement dans le plat."] },
+
+    { "id": "gratin-chou-fleur", "name": "Gratin de chou-fleur béchamel", "emoji": "🧀", "time": 45, "cuisine": "France", "tags": ["four", "eco"],
+      "items": [{"i":"chou-fleur","q":300},{"i":"lait","q":150},{"i":"farine","q":20},{"i":"beurre","q":20},{"i":"fromage-rape","q":35},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez le chou-fleur 12 min à l'eau bouillante salée, égouttez bien.", "Réalisez une béchamel : beurre fondu, farine, puis lait en fouettant 5 min.", "Versez sur le chou-fleur dans un plat, couvrez de fromage.", "Gratinez 20 min à 200 °C."] },
+
+    { "id": "gratin-pates-thon", "name": "Gratin de pâtes au thon", "emoji": "🐟", "time": 40, "cuisine": "France", "tags": ["eco", "four", "placard"],
+      "items": [{"i":"pates","q":100},{"i":"thon-boite","q":55},{"i":"passata","q":120},{"i":"fromage-rape","q":30},{"i":"oignon","q":50},{"i":"creme-liquide","q":30},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez les pâtes 2 min de moins que le temps indiqué.", "Mélangez thon égoutté, coulis, crème, oignon revenu et herbes.", "Réunissez avec les pâtes dans un plat, couvrez de fromage.", "Enfournez 20 min à 190 °C."] },
+
+    { "id": "buddha-bowl-quinoa", "name": "Buddha bowl quinoa et pois chiches rôtis", "emoji": "🥗", "time": 35, "cuisine": "Monde", "tags": ["sain", "four"],
+      "items": [{"i":"quinoa","q":80},{"i":"pois-chiche","q":100},{"i":"patate-douce","q":150},{"i":"concombre","q":0.3},{"i":"citron","q":0.3},{"i":"huile-olive","q":15},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"sel-poivre","q":2}],
+      "steps": ["Coupez la patate douce en dés, mélangez-la aux pois chiches, huile et épices.", "Enfournez 25 min à 200 °C en remuant à mi-cuisson.", "Cuisez le quinoa 12 min à l'eau salée.", "Dressez en bol avec le concombre et un filet de citron."] },
+
+    { "id": "soupe-butternut", "name": "Velouté de butternut et tartines grillées", "emoji": "🎃", "time": 35, "cuisine": "France", "tags": ["hiver", "eco", "batch"],
+      "items": [{"i":"butternut","q":350},{"i":"oignon","q":60},{"i":"creme-liquide","q":30},{"i":"bouillon","q":0.5},{"i":"pain","q":0.4},{"i":"fromage-rape","q":25},{"i":"huile-olive","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites revenir l'oignon, ajoutez la courge en cubes et le bouillon à hauteur.", "Cuisez 20 min à couvert puis mixez finement.", "Ajoutez la crème, rectifiez l'assaisonnement.", "Servez avec des tartines gratinées au fromage."] },
+
+    { "id": "shakshuka", "name": "Shakshuka (œufs pochés aux poivrons)", "emoji": "🍳", "time": 30, "cuisine": "Maghreb", "tags": ["rapide", "eco"],
+      "items": [{"i":"oeuf","q":2},{"i":"tomate-concassee","q":180},{"i":"poivron","q":100},{"i":"oignon","q":60},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"ail","q":4},{"i":"pain","q":0.4},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites fondre oignon et poivron 10 min à l'huile d'olive.", "Ajoutez ail, épices et tomates, laissez épaissir 10 min.", "Creusez des puits, cassez-y les œufs, couvrez 6 min.", "Servez à la poêle avec du pain."] },
+
+    { "id": "gnocchi-tomate-mozza", "name": "Poêlée de gnocchi tomates mozzarella", "emoji": "🥔", "time": 20, "cuisine": "Italie", "tags": ["rapide"],
+      "items": [{"i":"gnocchi","q":220},{"i":"tomate-cerise","q":120},{"i":"mozzarella","q":50},{"i":"basilic","q":8},{"i":"ail","q":4},{"i":"huile-olive","q":12},{"i":"sel-poivre","q":2}],
+      "steps": ["Poêlez les gnocchi 8 min à l'huile d'olive jusqu'à ce qu'ils dorent.", "Ajoutez tomates cerises et ail, poursuivez 5 min.", "Hors du feu, ajoutez la mozzarella en morceaux et le basilic.", "Couvrez 2 min pour la faire fondre."] },
+
+    { "id": "crevettes-ail-riz", "name": "Crevettes à l'ail et riz citronné", "emoji": "🍤", "time": 20, "cuisine": "Méditerranée", "tags": ["rapide"],
+      "items": [{"i":"crevette","q":120},{"i":"riz","q":90},{"i":"ail","q":6},{"i":"persil","q":6},{"i":"citron","q":0.4},{"i":"huile-olive","q":15},{"i":"piment","q":1},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez le riz, arrosez-le de jus de citron.", "Faites chauffer l'huile avec l'ail émincé et le piment 1 min.", "Ajoutez les crevettes, saisissez 4 min à feu vif.", "Parsemez de persil et servez sur le riz."] },
+
+    { "id": "salade-pdt-sardines", "name": "Salade de pommes de terre aux sardines", "emoji": "🥗", "time": 25, "cuisine": "France", "tags": ["eco", "placard", "été"],
+      "items": [{"i":"pdt","q":280},{"i":"sardine-boite","q":60},{"i":"oeuf","q":1},{"i":"echalote","q":30},{"i":"cornichon","q":25},{"i":"moutarde","q":8},{"i":"huile-olive","q":15},{"i":"vinaigre","q":8},{"i":"persil","q":5},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez les pommes de terre en robe des champs 20 min, laissez tiédir.", "Faites cuire les œufs durs 9 min.", "Fouettez moutarde, vinaigre et huile en vinaigrette.", "Mélangez pommes de terre coupées, sardines, échalote, cornichons et œufs."] },
+
+    { "id": "salade-pates-thon", "name": "Salade de pâtes thon et maïs", "emoji": "🥗", "time": 20, "cuisine": "France", "tags": ["rapide", "été", "placard"],
+      "items": [{"i":"pates","q":100},{"i":"thon-boite","q":55},{"i":"mais","q":60},{"i":"tomate","q":80},{"i":"olive","q":25},{"i":"huile-olive","q":15},{"i":"vinaigre","q":8},{"i":"moutarde","q":6},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez les pâtes, rincez-les à l'eau froide et égouttez.", "Préparez la vinaigrette moutarde-vinaigre-huile.", "Mélangez pâtes, thon, maïs, tomates et olives.", "Réservez 30 min au frais avant de servir."] },
+
+    { "id": "boeuf-carottes", "name": "Bœuf carottes mijoté", "emoji": "🥕", "time": 105, "cuisine": "France", "tags": ["batch", "hiver", "mijote"],
+      "items": [{"i":"boeuf-bourgui","q":150},{"i":"carotte","q":200},{"i":"oignon","q":70},{"i":"concentre-tomate","q":15},{"i":"bouillon","q":0.5},{"i":"farine","q":10},{"i":"herbes","q":2},{"i":"ail","q":4},{"i":"huile-tournesol","q":10},{"i":"pdt","q":150},{"i":"sel-poivre","q":2}],
+      "steps": ["Saisissez la viande sur toutes ses faces, réservez.", "Faites revenir oignon et ail, singez à la farine, ajoutez le concentré.", "Remettez la viande, mouillez au bouillon, ajoutez carottes et herbes.", "Laissez mijoter 1h30 à couvert, ajoutez les pommes de terre 30 min avant la fin."] },
+
+    { "id": "poulet-basquaise", "name": "Poulet basquaise", "emoji": "🌶️", "time": 50, "cuisine": "France", "tags": ["mijote", "batch"],
+      "items": [{"i":"poulet-cuisse","q":180},{"i":"poivron","q":120},{"i":"tomate-concassee","q":150},{"i":"chorizo","q":25},{"i":"oignon","q":60},{"i":"riz","q":80},{"i":"ail","q":4},{"i":"paprika","q":2},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],
+      "steps": ["Dorez les cuisses 8 min, réservez.", "Faites revenir oignon, poivrons et chorizo 8 min.", "Ajoutez tomates, ail, paprika et le poulet. Mijotez 30 min à couvert.", "Servez avec du riz."] },
+
+    { "id": "tofu-teriyaki", "name": "Tofu teriyaki et légumes sautés", "emoji": "🥢", "time": 25, "cuisine": "Asie", "tags": ["rapide", "sain"],
+      "items": [{"i":"tofu","q":120},{"i":"riz-basmati","q":85},{"i":"legume-wok","q":180},{"i":"sauce-soja","q":25},{"i":"sucre","q":10},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"huile-tournesol","q":10},{"i":"sesame","q":5}],
+      "steps": ["Pressez le tofu 10 min, coupez-le en cubes et faites-le dorer 8 min.", "Mélangez sauce soja, sucre, ail et gingembre, versez sur le tofu et laissez caraméliser 3 min.", "Sautez les légumes 6 min à feu vif.", "Servez sur le riz, parsemé de sésame."] },
+
+    { "id": "curry-legumes-patate-douce", "name": "Curry de légumes et patate douce", "emoji": "🍛", "time": 35, "cuisine": "Inde", "tags": ["batch", "sain"],
+      "items": [{"i":"patate-douce","q":200},{"i":"pois-chiche","q":90},{"i":"lait-coco","q":100},{"i":"epinard-surgele","q":80},{"i":"oignon","q":60},{"i":"curry-poudre","q":4},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"riz","q":70},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites revenir oignon, ail et gingembre 5 min avec le curry.", "Ajoutez la patate douce en cubes et le lait de coco, mijotez 20 min.", "Incorporez pois chiches et épinards, poursuivez 5 min.", "Servez avec le riz."] },
+
+    { "id": "croque-monsieur", "name": "Croque-monsieur et salade", "emoji": "🥪", "time": 20, "cuisine": "France", "tags": ["rapide", "eco"],
+      "items": [{"i":"pain","q":0.6},{"i":"jambon","q":60},{"i":"fromage-rape","q":45},{"i":"lait","q":50},{"i":"farine","q":10},{"i":"beurre","q":12},{"i":"salade","q":0.3},{"i":"vinaigre","q":6},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],
+      "steps": ["Préparez une béchamel express : beurre, farine, lait, 4 min en fouettant.", "Tartinez le pain, garnissez de jambon et de fromage.", "Passez 10 min au four à 200 °C jusqu'à gratiner.", "Servez avec la salade vinaigrette."] },
+
+    { "id": "pizza-maison", "name": "Pizza maison jambon-champignons", "emoji": "🍕", "time": 30, "cuisine": "Italie", "tags": ["convivial", "four"],
+      "items": [{"i":"pate-pizza","q":80},{"i":"passata","q":70},{"i":"mozzarella","q":45},{"i":"jambon","q":40},{"i":"champignon","q":60},{"i":"herbes","q":1},{"i":"huile-olive","q":6},{"i":"sel-poivre","q":2}],
+      "steps": ["Préchauffez à 240 °C avec la plaque à l'intérieur.", "Étalez la pâte, nappez de coulis, ajoutez herbes et garniture.", "Terminez par la mozzarella déchirée et un filet d'huile.", "Enfournez 12 min sur la plaque brûlante."] },
+
+    { "id": "papillote-cabillaud", "name": "Papillote de cabillaud aux légumes", "emoji": "🐟", "time": 30, "cuisine": "France", "tags": ["sain", "four"],
+      "items": [{"i":"cabillaud","q":130},{"i":"courgette","q":120},{"i":"carotte","q":80},{"i":"citron","q":0.3},{"i":"riz","q":85},{"i":"huile-olive","q":10},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],
+      "steps": ["Taillez les légumes en fines lamelles (économe).", "Déposez poisson et légumes sur un papier cuisson, arrosez d'huile et de citron.", "Fermez hermétiquement et enfournez 20 min à 190 °C.", "Servez avec le riz."] },
+
+    { "id": "riz-cantonais", "name": "Riz cantonais maison", "emoji": "🍚", "time": 25, "cuisine": "Asie", "tags": ["rapide", "eco", "restes"],
+      "items": [{"i":"riz","q":100},{"i":"oeuf","q":1},{"i":"jambon","q":50},{"i":"petit-pois","q":80},{"i":"oignon","q":40},{"i":"sauce-soja","q":15},{"i":"huile-tournesol","q":10},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez le riz à l'avance et laissez-le refroidir (c'est le secret).", "Faites une omelette fine, roulez-la et coupez-la en lanières.", "Sautez oignon, jambon et petits pois 5 min, ajoutez le riz à feu vif.", "Terminez par l'omelette et la sauce soja."] },
+
+    { "id": "salade-grecque-boulgour", "name": "Salade grecque au boulgour", "emoji": "🥗", "time": 20, "cuisine": "Grèce", "tags": ["rapide", "été", "sain"],
+      "items": [{"i":"boulgour","q":80},{"i":"feta","q":50},{"i":"concombre","q":0.4},{"i":"tomate","q":120},{"i":"olive","q":30},{"i":"oignon","q":30},{"i":"huile-olive","q":15},{"i":"citron","q":0.3},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],
+      "steps": ["Couvrez le boulgour d'eau bouillante salée, laissez gonfler 12 min.", "Coupez concombre, tomates et oignon en dés.", "Mélangez tout avec olives, feta émiettée, huile et citron.", "Réservez au frais 20 min."] },
+
+    { "id": "pates-ail-brocoli", "name": "Pâtes brocoli, ail et huile d'olive", "emoji": "🥦", "time": 20, "cuisine": "Italie", "tags": ["rapide", "eco", "placard"],
+      "items": [{"i":"pates","q":110},{"i":"brocoli","q":200},{"i":"ail","q":8},{"i":"piment","q":1},{"i":"huile-olive","q":20},{"i":"parmesan","q":15},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez les pâtes et jetez le brocoli en fleurettes dans la même eau 6 min avant la fin.", "Faites blondir l'ail émincé avec le piment dans l'huile.", "Égouttez et mélangez avec un peu d'eau de cuisson pour lier.", "Terminez au parmesan."] },
+
+    { "id": "soupe-lentilles-chorizo", "name": "Soupe de lentilles au chorizo", "emoji": "🍲", "time": 40, "cuisine": "Espagne", "tags": ["hiver", "batch", "eco"],
+      "items": [{"i":"lentilles","q":90},{"i":"chorizo","q":30},{"i":"carotte","q":90},{"i":"oignon","q":60},{"i":"pdt","q":100},{"i":"bouillon","q":0.5},{"i":"paprika","q":2},{"i":"ail","q":4},{"i":"huile-olive","q":8},{"i":"pain","q":0.3},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites revenir chorizo, oignon et ail 5 min.", "Ajoutez paprika, lentilles rincées, légumes en dés et bouillon à hauteur.", "Cuisez 30 min à couvert.", "Servez avec du pain."] },
+
+    { "id": "parmigiana", "name": "Parmigiana d'aubergines", "emoji": "🍆", "time": 60, "cuisine": "Italie", "tags": ["four", "batch"],
+      "items": [{"i":"aubergine","q":280},{"i":"passata","q":150},{"i":"mozzarella","q":50},{"i":"parmesan","q":20},{"i":"ail","q":4},{"i":"basilic","q":8},{"i":"huile-olive","q":20},{"i":"pain","q":0.3},{"i":"sel-poivre","q":2}],
+      "steps": ["Coupez les aubergines en tranches, faites-les griller 4 min par face.", "Préparez une sauce tomate rapide à l'ail 10 min.", "Alternez aubergines, sauce, mozzarella et parmesan dans un plat.", "Enfournez 30 min à 190 °C, laissez reposer 10 min avant de servir."] },
+
+    { "id": "saucisses-puree", "name": "Saucisses, purée et petits pois", "emoji": "🌭", "time": 30, "cuisine": "France", "tags": ["familial", "rapide"],
+      "items": [{"i":"saucisse","q":140},{"i":"pdt","q":280},{"i":"petit-pois","q":120},{"i":"lait","q":60},{"i":"beurre","q":15},{"i":"moutarde","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez les pommes de terre 20 min, écrasez-les avec lait et beurre.", "Grillez les saucisses 12 min à la poêle en les retournant.", "Réchauffez les petits pois 5 min.", "Servez avec un peu de moutarde."] },
+
+    { "id": "poulet-miel-moutarde", "name": "Poulet miel-moutarde au four", "emoji": "🍯", "time": 50, "cuisine": "France", "tags": ["four", "familial"],
+      "items": [{"i":"poulet-cuisse","q":190},{"i":"miel","q":15},{"i":"moutarde","q":15},{"i":"pdt","q":230},{"i":"oignon","q":50},{"i":"herbes","q":1},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],
+      "steps": ["Mélangez miel, moutarde, huile, sel et poivre.", "Enrobez le poulet, disposez-le avec les pommes de terre en quartiers.", "Enfournez 45 min à 200 °C en arrosant deux fois.", "Servez avec le jus du plat."] },
+
+    { "id": "wok-crevettes-legumes", "name": "Wok de crevettes aux légumes croquants", "emoji": "🍤", "time": 20, "cuisine": "Asie", "tags": ["rapide", "sain"],
+      "items": [{"i":"crevette","q":110},{"i":"legume-wok","q":200},{"i":"riz-basmati","q":85},{"i":"sauce-soja","q":20},{"i":"gingembre","q":5},{"i":"ail","q":4},{"i":"citron-vert","q":0.3},{"i":"huile-tournesol","q":10},{"i":"sesame","q":4}],
+      "steps": ["Lancez le riz basmati.", "Saisissez les légumes 5 min à feu très vif.", "Ajoutez crevettes, ail et gingembre, 4 min de plus.", "Déglacez à la sauce soja, terminez au citron vert et sésame."] },
+
+    { "id": "veloute-carotte-coco", "name": "Velouté carotte-coco et tartines", "emoji": "🥕", "time": 30, "cuisine": "France", "tags": ["eco", "hiver", "batch"],
+      "items": [{"i":"carotte","q":300},{"i":"lait-coco","q":70},{"i":"oignon","q":60},{"i":"gingembre","q":5},{"i":"bouillon","q":0.5},{"i":"pain","q":0.4},{"i":"fromage-frais","q":30},{"i":"huile-olive","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites suer oignon et gingembre, ajoutez les carottes en rondelles.", "Mouillez au bouillon, cuisez 20 min.", "Mixez avec le lait de coco.", "Servez avec des tartines au fromage frais."] },
+
+    { "id": "burger-maison", "name": "Burger maison et frites", "emoji": "🍔", "time": 30, "cuisine": "USA", "tags": ["convivial"],
+      "items": [{"i":"hache-boeuf","q":130},{"i":"pain","q":0.5},{"i":"fromage-rape","q":30},{"i":"tomate","q":60},{"i":"salade","q":0.2},{"i":"oignon","q":40},{"i":"frites-surgele","q":180},{"i":"moutarde","q":8},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Enfournez les frites 25 min à 200 °C.", "Formez les steaks, salez au dernier moment, saisissez 3 min par face.", "Ajoutez le fromage sur le steak en fin de cuisson pour le faire fondre.", "Montez le burger : moutarde, salade, tomate, steak, oignon."] },
+
+    { "id": "poelee-pois-chiches-epinards", "name": "Poêlée de pois chiches aux épinards", "emoji": "🌱", "time": 25, "cuisine": "Méditerranée", "tags": ["rapide", "eco", "placard"],
+      "items": [{"i":"pois-chiche","q":130},{"i":"epinard-surgele","q":150},{"i":"tomate-concassee","q":100},{"i":"oignon","q":60},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"ail","q":4},{"i":"semoule","q":70},{"i":"huile-olive","q":12},{"i":"citron","q":0.3},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites revenir oignon et ail 5 min avec les épices.", "Ajoutez tomates et pois chiches rincés, mijotez 8 min.", "Incorporez les épinards, laissez fondre 5 min.", "Servez sur la semoule, avec un filet de citron."] },
+
+    { "id": "gratin-courgettes-riz", "name": "Gratin de courgettes au riz", "emoji": "🧀", "time": 50, "cuisine": "France", "tags": ["four", "eco"],
+      "items": [{"i":"courgette","q":250},{"i":"riz","q":70},{"i":"oeuf","q":1},{"i":"fromage-rape","q":35},{"i":"creme-liquide","q":40},{"i":"oignon","q":50},{"i":"ail","q":3},{"i":"huile-olive","q":10},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez le riz. Faites revenir les courgettes en rondelles 10 min avec l'oignon.", "Mélangez riz, courgettes, œufs battus et crème.", "Versez dans un plat, couvrez de fromage râpé.", "Enfournez 25 min à 190 °C."] },
+
+    { "id": "nouilles-cacahuete", "name": "Nouilles sautées sauce cacahuète", "emoji": "🥜", "time": 20, "cuisine": "Asie", "tags": ["rapide", "eco"],
+      "items": [{"i":"nouilles","q":90},{"i":"cacahuete-beurre","q":30},{"i":"sauce-soja","q":20},{"i":"legume-wok","q":180},{"i":"ail","q":4},{"i":"gingembre","q":4},{"i":"citron-vert","q":0.3},{"i":"huile-tournesol","q":8},{"i":"piment","q":1}],
+      "steps": ["Cuisez les nouilles, réservez un peu d'eau de cuisson.", "Délayez beurre de cacahuète, sauce soja, citron vert et un peu d'eau chaude.", "Sautez les légumes 6 min avec ail et gingembre.", "Mélangez nouilles, légumes et sauce hors du feu."] },
+
+    { "id": "chili-con-carne", "name": "Chili con carne", "emoji": "🌶️", "time": 45, "cuisine": "Mexique", "tags": ["batch", "familial"],
+      "items": [{"i":"hache-boeuf","q":110},{"i":"haricot-rouge","q":90},{"i":"tomate-concassee","q":150},{"i":"poivron","q":70},{"i":"oignon","q":60},{"i":"riz","q":80},{"i":"cumin","q":2},{"i":"paprika","q":2},{"i":"piment","q":1},{"i":"ail","q":4},{"i":"huile-tournesol","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites revenir oignon, ail et poivron 6 min.", "Ajoutez la viande, laissez colorer, puis les épices.", "Versez tomates et haricots, mijotez 25 min à feu doux.", "Servez avec du riz."] },
+
+    { "id": "tartiflette-eco", "name": "Gratin savoyard express", "emoji": "🧀", "time": 55, "cuisine": "France", "tags": ["hiver", "familial", "four"],
+      "items": [{"i":"pdt","q":300},{"i":"lardons","q":60},{"i":"oignon","q":70},{"i":"fromage-rape","q":50},{"i":"creme-liquide","q":50},{"i":"ail","q":3},{"i":"salade","q":0.25},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez les pommes de terre 15 min à l'eau, coupez-les en rondelles.", "Faites rissoler lardons et oignons 8 min.", "Alternez dans un plat frotté à l'ail, versez la crème, couvrez de fromage.", "Enfournez 25 min à 200 °C. Servez avec la salade."] },
+
+    { "id": "poisson-polenta", "name": "Colin poêlé et polenta crémeuse", "emoji": "🐟", "time": 25, "cuisine": "Italie", "tags": ["rapide"],
+      "items": [{"i":"colin","q":130},{"i":"polenta","q":70},{"i":"lait","q":120},{"i":"parmesan","q":20},{"i":"epinard-surgele","q":120},{"i":"citron","q":0.3},{"i":"beurre","q":10},{"i":"ail","q":3},{"i":"sel-poivre","q":2}],
+      "steps": ["Portez lait et eau à ébullition, versez la polenta en pluie, remuez 5 min.", "Incorporez parmesan et beurre.", "Poêlez le colin 4 min par face, arrosez de citron.", "Faites tomber les épinards à l'ail 5 min et dressez."] },
+
+    { "id": "salade-cesar-poulet", "name": "Salade César au poulet", "emoji": "🥗", "time": 25, "cuisine": "USA", "tags": ["rapide", "été"],
+      "items": [{"i":"poulet-filet","q":110},{"i":"salade","q":0.5},{"i":"pain","q":0.3},{"i":"parmesan","q":20},{"i":"yaourt-nature","q":60},{"i":"moutarde","q":8},{"i":"citron","q":0.3},{"i":"ail","q":3},{"i":"huile-olive","q":12},{"i":"sel-poivre","q":2}],
+      "steps": ["Coupez le pain en dés, faites-le dorer à l'huile pour des croûtons.", "Grillez le poulet 6 min par face, tranchez-le.", "Mélangez yaourt, moutarde, citron, ail et parmesan pour la sauce.", "Assemblez salade, poulet, croûtons et sauce."] },
+
+    { "id": "curry-pois-chiches-epinards", "name": "Curry rouge de légumes au tofu", "emoji": "🍛", "time": 30, "cuisine": "Thaïlande", "tags": ["rapide"],
+      "items": [{"i":"tofu","q":110},{"i":"curry-pate","q":15},{"i":"lait-coco","q":110},{"i":"legume-wok","q":180},{"i":"riz-basmati","q":85},{"i":"citron-vert","q":0.3},{"i":"huile-tournesol","q":10},{"i":"sauce-soja","q":10}],
+      "steps": ["Dorez le tofu en cubes 8 min, réservez.", "Faites chauffer la pâte de curry 1 min, ajoutez le lait de coco.", "Ajoutez les légumes, mijotez 8 min, puis le tofu.", "Servez sur le riz basmati avec du citron vert."] },
+
+    { "id": "frittata-legumes", "name": "Frittata aux légumes et feta", "emoji": "🍳", "time": 30, "cuisine": "Italie", "tags": ["rapide", "restes"],
+      "items": [{"i":"oeuf","q":3},{"i":"courgette","q":120},{"i":"poivron","q":70},{"i":"feta","q":35},{"i":"oignon","q":50},{"i":"pain","q":0.3},{"i":"huile-olive","q":12},{"i":"herbes","q":1},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites revenir les légumes en dés 10 min.", "Battez les œufs, salez, poivrez, ajoutez les herbes.", "Versez sur les légumes, ajoutez la feta, cuisez 6 min à feu doux.", "Terminez 4 min sous le gril et servez avec du pain."] },
+
+    { "id": "spaghetti-tomate-thon", "name": "Spaghetti tomate et thon", "emoji": "🍝", "time": 20, "cuisine": "Italie", "tags": ["rapide", "placard", "eco"],
+      "items": [{"i":"spaghetti","q":110},{"i":"thon-boite","q":55},{"i":"passata","q":130},{"i":"ail","q":5},{"i":"olive","q":25},{"i":"piment","q":1},{"i":"huile-olive","q":15},{"i":"persil","q":5},{"i":"sel-poivre","q":2}],
+      "steps": ["Faites blondir l'ail dans l'huile avec le piment.", "Ajoutez le coulis et les olives, laissez réduire 10 min.", "Incorporez le thon égoutté en fin de cuisson.", "Mélangez aux spaghetti et parsemez de persil."] },
+
+    { "id": "hachis-legumes-lentilles", "name": "Parmentier de lentilles", "emoji": "🥧", "time": 55, "cuisine": "France", "tags": ["four", "batch", "eco"],
+      "items": [{"i":"lentilles","q":80},{"i":"pdt","q":280},{"i":"carotte","q":80},{"i":"oignon","q":60},{"i":"concentre-tomate","q":12},{"i":"lait","q":50},{"i":"beurre","q":12},{"i":"fromage-rape","q":25},{"i":"herbes","q":1},{"i":"ail","q":3},{"i":"huile-olive","q":8},{"i":"sel-poivre","q":2}],
+      "steps": ["Cuisez les lentilles 25 min à l'eau, égouttez.", "Faites revenir oignon, ail et carotte, ajoutez lentilles et concentré de tomate.", "Préparez la purée avec lait et beurre.", "Montez, couvrez de fromage, gratinez 20 min à 200 °C."] }
+  ]
+}

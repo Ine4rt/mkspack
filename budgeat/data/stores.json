@@ -1,0 +1,26 @@
+{
+  "_comment": "Indice de prix par enseigne. base = multiplicateur global applique au prix de reference du catalogue. aisles = ajustements specifiques par rayon (multiplie l'indice de base). Sources : releves de prix moyens paniers types 2025-2026, a reactualiser via scripts/import_prices.php.",
+  "updated": "2026-08-01",
+  "stores": [
+    { "id": "lidl",        "name": "Lidl",           "country": ["BE","FR"], "color": "#0050aa", "base": 0.86, "aisles": { "boucherie": 0.90, "fruits-legumes": 0.84, "cremerie": 0.83, "boulangerie": 0.78 } },
+    { "id": "aldi",        "name": "Aldi",           "country": ["BE","FR"], "color": "#00447c", "base": 0.85, "aisles": { "boucherie": 0.92, "fruits-legumes": 0.86, "epicerie-salee": 0.82 } },
+    { "id": "colruyt",     "name": "Colruyt",        "country": ["BE"],      "color": "#e30613", "base": 0.92, "aisles": { "boucherie": 0.88, "boissons": 0.85 } },
+    { "id": "okay",        "name": "OKay",           "country": ["BE"],      "color": "#e30613", "base": 0.97, "aisles": { "fruits-legumes": 1.02 } },
+    { "id": "delhaize",    "name": "Delhaize",       "country": ["BE"],      "color": "#c8102e", "base": 1.12, "aisles": { "poissonnerie": 1.05, "cremerie": 1.08 } },
+    { "id": "carrefour",   "name": "Carrefour Hyper","country": ["BE","FR"], "color": "#0056a4", "base": 1.02, "aisles": { "epicerie-salee": 0.98, "surgeles": 0.96 } },
+    { "id": "carrefour-market", "name": "Carrefour Market", "country": ["BE","FR"], "color": "#0056a4", "base": 1.08, "aisles": {} },
+    { "id": "intermarche", "name": "Intermarché",    "country": ["FR"],      "color": "#e2001a", "base": 1.01, "aisles": { "boucherie": 0.94, "poissonnerie": 0.95 } },
+    { "id": "leclerc",     "name": "E.Leclerc",      "country": ["FR"],      "color": "#0060a9", "base": 0.95, "aisles": { "epicerie-salee": 0.92, "boissons": 0.90 } },
+    { "id": "auchan",      "name": "Auchan",         "country": ["FR"],      "color": "#e2001a", "base": 1.00, "aisles": { "surgeles": 0.95 } },
+    { "id": "super-u",     "name": "Super U",        "country": ["FR"],      "color": "#e2001a", "base": 1.03, "aisles": { "fruits-legumes": 0.99 } },
+    { "id": "casino",      "name": "Casino",         "country": ["FR"],      "color": "#d40511", "base": 1.13, "aisles": {} },
+    { "id": "monoprix",    "name": "Monoprix",       "country": ["FR"],      "color": "#e5007d", "base": 1.24, "aisles": { "fruits-legumes": 1.18 } },
+    { "id": "cora",        "name": "Cora",           "country": ["BE","FR"], "color": "#e2001a", "base": 1.02, "aisles": {} },
+    { "id": "match",       "name": "Match",          "country": ["BE"],      "color": "#d2001b", "base": 1.10, "aisles": {} },
+    { "id": "spar",        "name": "Spar",           "country": ["BE"],      "color": "#00863f", "base": 1.19, "aisles": { "boulangerie": 1.10 } },
+    { "id": "albert-heijn","name": "Albert Heijn",   "country": ["BE"],      "color": "#00a0e2", "base": 1.07, "aisles": { "cremerie": 1.02 } },
+    { "id": "jumbo",       "name": "Jumbo",          "country": ["BE"],      "color": "#eeb111", "base": 0.99, "aisles": {} },
+    { "id": "netto",       "name": "Netto",          "country": ["FR"],      "color": "#ffd500", "base": 0.89, "aisles": { "boucherie": 0.93 } },
+    { "id": "grand-frais", "name": "Grand Frais",    "country": ["FR"],      "color": "#8bc34a", "base": 1.06, "aisles": { "fruits-legumes": 0.88, "poissonnerie": 0.97, "boucherie": 1.02 } }
+  ]
+}

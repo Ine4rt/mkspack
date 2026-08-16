@@ -1,0 +1,18 @@
+{
+  "name": "Budgeat — dîners dans votre budget",
+  "short_name": "Budgeat",
+  "start_url": "/app.php",
+  "display": "standalone",
+  "background_color": "#fbfaf5",
+  "theme_color": "#1f7a4d",
+  "lang": "fr",
+  "description": "Vos dîners de la semaine et la liste de courses, pile dans votre budget.",
+  "icons": [
+    {
+      "src": "/assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
