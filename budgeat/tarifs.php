@@ -70,7 +70,7 @@ layout_head(
         <form method="post" action="/api/checkout.php" style="margin-top:auto">
           <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
           <input type="hidden" name="kind" value="monthly">
-          <button class="btn btn-primary btn-block">Passer en illimité</button>
+          <button type="submit" class="btn btn-primary btn-block">Passer en illimité</button>
         </form>
       </div>
 
@@ -91,7 +91,7 @@ layout_head(
         <form method="post" action="/api/checkout.php" style="margin-top:auto">
           <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
           <input type="hidden" name="kind" value="lifetime">
-          <button class="btn btn-ghost btn-block">Payer une seule fois</button>
+          <button type="submit" class="btn btn-ghost btn-block">Payer une seule fois</button>
         </form>
       </div>
     </div>

@@ -58,7 +58,7 @@ layout_head(
         <?php endif; ?>
       </label>
 
-      <button class="btn btn-primary btn-block">
+      <button type="submit" class="btn btn-primary btn-block">
         <?= $mode === 'inscription' ? 'Créer mon compte' : 'Se connecter' ?>
       </button>
     </form>

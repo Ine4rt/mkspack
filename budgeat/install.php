@@ -284,7 +284,7 @@ $ok = $blocking === 0 && $dbReady;
         <input type="password" name="password" required minlength="8">
         <span class="hint">8 caractères minimum.</span>
       </label>
-      <button class="btn btn-primary btn-block">Créer le compte</button>
+      <button type="submit" class="btn btn-primary btn-block">Créer le compte</button>
     </form>
   <?php endif; ?>
 

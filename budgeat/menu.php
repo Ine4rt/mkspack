@@ -40,7 +40,7 @@ layout_head("Semaine du $date ‚Äî " . $app->config['app_name'], 'Menu enregistr√
       </div>
       <div class="summary-actions">
         <a href="/app.php" class="btn btn-ghost btn-sm">Nouvelle semaine</a>
-        <button class="btn btn-ghost btn-sm" onclick="window.print()">Imprimer</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="window.print()">Imprimer</button>
       </div>
     </div>
     <div class="bar"><span style="width:<?= min(100, (int) $totals['usedPct']) ?>%"></span></div>

@@ -176,8 +176,8 @@ layout_head(
       <div class="day-price"></div>
     </div>
     <div class="day-actions">
-      <button class="btn btn-ghost btn-sm" data-toggle>Voir la recette</button>
-      <button class="btn btn-soft btn-sm" data-swap>Changer ce dîner</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-toggle>Voir la recette</button>
+      <button type="button" class="btn btn-soft btn-sm" data-swap>Changer ce dîner</button>
     </div>
     <div class="day-body" hidden>
       <div class="day-cols">

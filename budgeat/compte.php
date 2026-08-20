@@ -86,7 +86,7 @@ layout_head('Mon compte — ' . $app->config['app_name'], 'Vos menus, votre form
       </p>
       <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
         <input type="text" id="refLink" value="<?= e($shareUrl) ?>" readonly style="flex:1;min-width:240px">
-        <button class="btn btn-soft btn-sm" onclick="
+        <button type="button" class="btn btn-soft btn-sm" onclick="
           document.getElementById('refLink').select();
           navigator.clipboard.writeText(document.getElementById('refLink').value);
           this.textContent='Copié !';">Copier</button>
