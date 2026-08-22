@@ -1,0 +1,9 @@
+{
+  "name": "NEON SURGE",
+  "short_name": "Neon Surge",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#070b18",
+  "theme_color": "#070b18"
+}
