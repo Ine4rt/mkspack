@@ -59,7 +59,7 @@ const unitSpeed    = () => 7.6 + SAVE.up.speed * 0.85;
 /* --------------------------------- canvas -------------------------------- */
 const cv  = document.getElementById('game');
 const ctx = cv.getContext('2d', { alpha:false });
-let W = 0, H = 0, DPR = 1, HZ = 0, FX = 0, CAMH = 0;
+let W = 0, H = 0, DPR = 1, FX = 0, FY = 0;
 
 function resize(){
   DPR = Math.min(window.devicePixelRatio || 1, 2.5);
@@ -67,26 +67,67 @@ function resize(){
   cv.width  = Math.round(W * DPR);
   cv.height = Math.round(H * DPR);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  HZ   = H * 0.15;                 // ligne d'horizon
-  FX   = 0.475 * W * D0 / TW;      // focale horizontale : la piste remplit l'écran au canon
-  CAMH = 0.71 * D0 * H;            // hauteur caméra pré-multipliée par la focale verticale (= H)
-  YN   = HZ + CAMH / D0;           // bas de piste (au canon)
-  YF   = HZ + CAMH / DEND;         // fond de piste (noyau ennemi)
+  solveCamera();
+  const A0  = D0 - CAMZ;
+  const zv0 = CAMY * SN + A0 * CS;
+  const yv0 = -CAMY * CS + A0 * SN;
+  FY = (0.5 - Y_NEAR) * H * zv0 / yv0;   // yv0 est négatif : FY ressort positif
+  FX = 0.47 * W * zv0 / TW;              // la piste remplit la largeur au canon
 }
 window.addEventListener('resize', resize);
 
-/* Mélange perspective / linéaire : la perspective pure tasse trop le fond de
-   piste. On garde l'échelle perspective (les objets lointains restent petits)
-   mais on étire la position verticale pour dégager le fond. */
-const YMIX = 0.60;
-let YN = 0, YF = 0;
+/* ---------------------------------------------------------------------------
+   Caméra inclinée. Au lieu d'une perspective rasante au ras du sol, on regarde
+   la piste depuis un point surélevé et penché : PITCH règle à lui seul « plus
+   ou moins vue de haut ». La hauteur de caméra et la focale ne sont pas des
+   constantes tâtonnées mais sont RÉSOLUES pour que le canon et le noyau adverse
+   tombent toujours aux mêmes hauteurs à l'écran, quel que soit l'angle choisi.
+   --------------------------------------------------------------------------- */
+const PITCH    = 46 * Math.PI / 180;   // 0 = ras du sol, 90 = plongée verticale
+const CAM_BACK = 8;                    // recul de la caméra derrière le canon
+const Y_NEAR   = 0.86;                 // hauteur écran du canon
+const Y_FAR    = 0.21;                 // hauteur écran du noyau adverse
 
-/** Projette un point (x latéral, d profondeur) vers l'écran. */
+let CS = 0, SN = 0, CAMY = 0, CAMZ = 0, FYH = 0;
+solveCamera();
+
+function solveCamera(){
+  CS = Math.cos(PITCH); SN = Math.sin(PITCH);
+  CAMZ = D0 - CAM_BACK;
+  const A0 = D0 - CAMZ, A1 = DEND - CAMZ;
+  const R = (0.5 - Y_FAR) / (0.5 - Y_NEAR);
+  const a = CS * SN * (R - 1);
+  const b = -A0*CS*CS + A1*SN*SN + R*A1*CS*CS - R*A0*SN*SN;
+  const c = A0 * A1 * SN * CS * (1 - R);
+  const disc = Math.sqrt(Math.max(0, b * b - 4 * a * c));
+  CAMY = Math.max((-b + disc) / (2 * a), (-b - disc) / (2 * a));
+  const zv0 = CAMY * SN + A0 * CS, yv0 = -CAMY * CS + A0 * SN;
+  FYH = (0.5 - Y_NEAR) * zv0 / yv0;      // FY/H : ne dépend pas de la taille écran
+}
+
+/** Inverse de la projection : profondeur monde correspondant à une hauteur
+    d'écran donnée (en fraction de H). Le rapport ne dépendant que de la caméra,
+    le résultat est identique sur tous les formats d'écran. */
+function depthAtY(f){
+  const m = (0.5 - f) / FYH;
+  return CAMZ + CAMY * (m * SN + CS) / (SN - m * CS);
+}
+
+/** Projette un point au sol (x latéral, d profondeur) vers l'écran. */
 function proj(x, d){
-  const s  = FX / d;
+  const A  = d - CAMZ;
+  const zv = CAMY * SN + A * CS;          // profondeur dans l'axe de visée
+  const yv = -CAMY * CS + A * SN;
+  const s  = FX / zv;                     // px par unité monde, à l'horizontale
   const t  = (d - D0) / LEN;
-  const y  = (HZ + CAMH / d) * (1 - YMIX) + (YN + (YF - YN) * t) * YMIX;
-  return { x: W * 0.5 + x * s, y, s, t, sv: s * (1 + 1.1 * Math.max(0, t)) };
+  return {
+    x: W * 0.5 + x * s,
+    y: H * 0.5 - FY * yv / zv,
+    s,
+    sg: FY * CAMY / (zv * zv),            // px par unité de PROFONDEUR au sol
+    t,
+    sv: s * (1 + 0.35 * Math.max(0, t))   // léger réhaussement pour la lisibilité
+  };
 }
 
 /* --------------------------------- audio --------------------------------- */
@@ -142,9 +183,16 @@ function buildLevel(n){
      sans ça, un niveau peut n'avoir aucun trajet viable. */
   const gx = (rnd() * 2 - 1) * TW * 0.86;
   let xRows = 0;
+  /* Réparties régulièrement à l'ÉCRAN et non en profondeur monde : la piste
+     restant perspective, un espacement régulier en profondeur tasse les rangées
+     lointaines les unes sur les autres. */
+  const rowD = [];
   for(let i = 0; i < rows; i++){
     const t = rows === 1 ? .5 : i / (rows - 1);
-    const d = D0 + LEN * (0.17 + 0.64 * t);
+    rowD.push(depthAtY(0.72 - 0.45 * t));
+  }
+  for(let i = 0; i < rows; i++){
+    const d = rowD[i];
     const segs = (n >= 6 && rnd() < 0.42) ? 3 : 2;
     const good = Math.min(segs - 1, Math.floor((gx + TW) / (2 * TW) * segs));
     for(let k = 0; k < segs; k++){
@@ -169,15 +217,23 @@ function buildLevel(n){
     }
   }
 
-  /* --- murs à percer ---------------------------------------------------
-     Toujours placés après la première rangée de portails : un mur en amont
-     ponctionne une foule encore non multipliée et casse net la progression. */
+  /* Intervalles disponibles entre deux rangées : chaque obstacle en consomme un,
+     sinon deux murs (ou un mur et une tour) se retrouvent empilés au même
+     endroit. Le premier intervalle est exclu : un obstacle en amont de la
+     première rangée ponctionne une foule encore non multipliée. */
+  const slots = [];
+  for(let k = 1; k < rowD.length; k++) slots.push((rowD[k - 1] + rowD[k]) / 2);
+  for(let i = slots.length - 1; i > 0; i--){          // mélange de Fisher-Yates
+    const j = Math.floor(rnd() * (i + 1));
+    const tmp = slots[i]; slots[i] = slots[j]; slots[j] = tmp;
+  }
+  const takeSlot = () => slots.length ? slots.pop() : (rowD[0] + rowD[rowD.length - 1]) / 2;
+
+  /* --- murs à percer --------------------------------------------------- */
   if(n >= 3){
-    const firstGate = Math.min.apply(null, lv.gates.map(g => g.d));
     const count = Math.min(2, 1 + Math.floor((n - 3) / 6));
     for(let i = 0; i < count; i++){
-      const lo = Math.max(0.34, (firstGate - D0) / LEN + 0.06);
-      const d  = D0 + LEN * (lo + (0.80 - lo) * rnd());
+      const d = takeSlot();
       const hw = 0.9 + rnd() * 1.5;
       const cxw = (rnd() * 2 - 1) * (TW - hw);
       const hp = 3 + Math.floor(rnd() * (4 + n * 0.8));
@@ -191,7 +247,7 @@ function buildLevel(n){
     for(let i = 0; i < count; i++){
       const hp = 5 + Math.floor(rnd() * (4 + n));
       lv.towers.push({
-        d: D0 + LEN * (0.42 + 0.40 * rnd()),
+        d: takeSlot(),
         x: (rnd() * 2 - 1) * (TW - 0.7),
         owner:'enemy', hp, max:hp, cd: 1 + rnd(), flash:0
       });
@@ -497,24 +553,65 @@ function stepParticles(dt){
 /* =========================================================================
    RENDU
    ========================================================================= */
-function makeOrb(hex, rgb){
-  const S = 72, c = document.createElement('canvas');
-  c.width = c.height = S;
+
+function roundRect(g, x, y, w, h, r){
+  r = Math.min(r, w / 2, h / 2);
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y,     x + w, y + h, r);
+  g.arcTo(x + w, y + h, x,     y + h, r);
+  g.arcTo(x,     y + h, x,     y,     r);
+  g.arcTo(x,     y,     x + w, y,     r);
+  g.closePath();
+}
+
+/* Personnage pré-rendu une fois puis blitté : un dessin par unité à l'écran
+   coûterait bien trop cher avec plusieurs centaines d'unités. */
+function makeChar(hex, rgb, dark){
+  const W0 = 96, H0 = 120;
+  const c = document.createElement('canvas');
+  c.width = W0; c.height = H0;
   const g = c.getContext('2d');
-  const halo = g.createRadialGradient(S/2, S/2, 0, S/2, S/2, S/2);
-  halo.addColorStop(0,   'rgba(' + rgb + ',.85)');
-  halo.addColorStop(.35, 'rgba(' + rgb + ',.35)');
+
+  const halo = g.createRadialGradient(W0/2, H0*.58, 0, W0/2, H0*.58, W0*.52);
+  halo.addColorStop(0,   'rgba(' + rgb + ',.45)');
+  halo.addColorStop(.55, 'rgba(' + rgb + ',.13)');
   halo.addColorStop(1,   'rgba(' + rgb + ',0)');
-  g.fillStyle = halo; g.fillRect(0, 0, S, S);
-  const core = g.createRadialGradient(S*.42, S*.4, S*.02, S/2, S/2, S*.24);
-  core.addColorStop(0, '#ffffff');
-  core.addColorStop(.45, hex);
-  core.addColorStop(1, 'rgba(' + rgb + ',.25)');
-  g.fillStyle = core;
-  g.beginPath(); g.arc(S/2, S/2, S*.24, 0, 6.2832); g.fill();
+  g.fillStyle = halo;
+  g.fillRect(0, 0, W0, H0);
+
+  /* jambes */
+  g.fillStyle = dark;
+  roundRect(g, W0*.34, H0*.74, W0*.12, H0*.18, W0*.06); g.fill();
+  roundRect(g, W0*.54, H0*.74, W0*.12, H0*.18, W0*.06); g.fill();
+
+  /* corps */
+  const bx = W0*.20, by = H0*.20, bw = W0*.60, bh = H0*.58;
+  roundRect(g, bx, by, bw, bh, bw*.34);
+  const bg = g.createLinearGradient(0, by, 0, by + bh);
+  bg.addColorStop(0,   '#ffffff');
+  bg.addColorStop(.22, hex);
+  bg.addColorStop(1,   dark);
+  g.fillStyle = bg; g.fill();
+  g.lineWidth = W0*.035;
+  g.strokeStyle = 'rgba(255,255,255,.5)';
+  g.stroke();
+
+  /* visière */
+  roundRect(g, bx + bw*.14, by + bh*.20, bw*.72, bh*.26, bh*.13);
+  g.fillStyle = 'rgba(5,9,20,.88)'; g.fill();
+  roundRect(g, bx + bw*.24, by + bh*.27, bw*.40, bh*.09, bh*.045);
+  g.fillStyle = 'rgba(255,255,255,.92)'; g.fill();
+
+  /* liseré d'énergie */
+  roundRect(g, bx + bw*.26, by + bh*.66, bw*.48, bh*.10, bh*.05);
+  g.fillStyle = 'rgba(' + rgb + ',.9)'; g.fill();
   return c;
 }
-const ORB = { p:makeOrb(PAL.cyan, '34,224,255'), e:makeOrb(PAL.mag, '255,45,120') };
+const CHAR = {
+  p: makeChar(PAL.cyan, '34,224,255', '#0a5f7d'),
+  e: makeChar(PAL.mag,  '255,45,120', '#7d1038')
+};
 
 function render(){
   ctx.save();
@@ -522,7 +619,7 @@ function render(){
     const m = G.shake * 9;
     ctx.translate((Math.random()*2-1)*m, (Math.random()*2-1)*m);
   }
-  drawSky();
+  drawBackdrop();
   drawTrack();
   if(G.lv){
     drawBaseCore();
@@ -535,115 +632,121 @@ function render(){
   ctx.restore();
 }
 
-function drawSky(){
+/* En vue plongeante la ligne d'horizon sort de l'écran : il n'y a plus de ciel
+   à dessiner, seulement un fond sombre et la lueur du noyau adverse. */
+function drawBackdrop(){
   const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0,   '#050818');
-  g.addColorStop(.16, '#0b1440');
-  g.addColorStop(.34, '#0a1024');
-  g.addColorStop(1,   PAL.bg);
+  g.addColorStop(0,   '#05070f');
+  g.addColorStop(.45, '#080d20');
+  g.addColorStop(1,   '#04060e');
   ctx.fillStyle = g;
   ctx.fillRect(-40, -40, W + 80, H + 80);
 
-  /* lueur d'horizon */
-  const gl = ctx.createRadialGradient(W/2, HZ, 0, W/2, HZ, W * .75);
-  gl.addColorStop(0,  'rgba(255,45,120,.30)');
-  gl.addColorStop(.4, 'rgba(90,40,140,.14)');
-  gl.addColorStop(1,  'rgba(0,0,0,0)');
+  const b = proj(0, DEND);
+  const gl = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, W * .9);
+  gl.addColorStop(0,   'rgba(255,45,120,.20)');
+  gl.addColorStop(.45, 'rgba(118,42,150,.08)');
+  gl.addColorStop(1,   'rgba(0,0,0,0)');
   ctx.fillStyle = gl;
-  ctx.fillRect(0, 0, W, HZ * 2.4);
-
-  /* étoiles fixes (bruit déterministe) */
-  ctx.fillStyle = 'rgba(255,255,255,.55)';
-  for(let i = 0; i < 60; i++){
-    const a = (i * 9301 % 233280) / 233280, b = (i * 49297 % 233280) / 233280;
-    ctx.globalAlpha = .12 + b * .4;
-    ctx.fillRect(a * W, b * HZ * .95, 1.6, 1.6);
-  }
-  ctx.globalAlpha = 1;
+  ctx.fillRect(0, 0, W, H);
 }
 
 function drawTrack(){
-  const nl = proj(-TW, D0 - 2.2), nr = proj(TW, D0 - 2.2);
-  const fl = proj(-TW, DEND + 1),  fr = proj(TW, DEND + 1);
+  const D1 = D0 - 2.6, D2 = DEND + 1.2;
+  const nl = proj(-TW, D1), nr = proj(TW, D1);
+  const fl = proj(-TW, D2), fr = proj(TW, D2);
 
+  /* plateau */
   ctx.beginPath();
   ctx.moveTo(nl.x, nl.y); ctx.lineTo(nr.x, nr.y);
   ctx.lineTo(fr.x, fr.y); ctx.lineTo(fl.x, fl.y);
   ctx.closePath();
   const g = ctx.createLinearGradient(0, fl.y, 0, nl.y);
-  g.addColorStop(0, '#101a44');
-  g.addColorStop(1, '#0a1030');
-  ctx.fillStyle = g; ctx.fill();
+  g.addColorStop(0, '#0e1740');
+  g.addColorStop(1, '#0a1130');
+  ctx.fillStyle = g;
+  ctx.fill();
 
+  ctx.save();
+  ctx.clip();
   /* barres transversales en défilement */
-  ctx.save(); ctx.clip();
-  for(let k = 0; k < 24; k++){
-    const d = D0 - 2 + ((k * 1.8 + G.flow) % (LEN + 3));
-    const a = proj(-TW, d), b = proj(TW, d);
-    ctx.globalAlpha = Math.max(0, .16 * (1 - (d - D0) / LEN)) + .03;
+  for(let k = 0; k < 26; k++){
+    const d = D1 + ((k * 1.7 + G.flow) % (LEN + 4));
+    const p = proj(-TW, d), q = proj(TW, d);
+    ctx.globalAlpha = .05 + .10 * (1 - (d - D0) / LEN);
     ctx.strokeStyle = PAL.cyan;
-    ctx.lineWidth = Math.max(.6, a.s * .035);
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    ctx.lineWidth = Math.max(.7, p.sg * .06);
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
   }
   ctx.globalAlpha = 1;
-  /* couloirs longitudinaux */
-  ctx.strokeStyle = 'rgba(34,224,255,.09)';
-  ctx.lineWidth = 1;
+  /* séparations de couloirs */
+  ctx.strokeStyle = 'rgba(34,224,255,.10)';
+  ctx.lineWidth = 1.2;
   for(const x of [-TW/3, TW/3]){
-    const a = proj(x, D0 - 2.2), b = proj(x, DEND + 1);
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    const p = proj(x, D1), q = proj(x, D2);
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
   }
   ctx.restore();
 
-  /* rambardes lumineuses */
-  for(const [x, col] of [[-TW, PAL.cyan], [TW, PAL.cyan]]){
-    const a = proj(x, D0 - 2.2), b = proj(x, DEND + 1);
-    const lg = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-    lg.addColorStop(0, col); lg.addColorStop(1, 'rgba(34,224,255,.05)');
-    ctx.strokeStyle = lg; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-    ctx.globalAlpha = .25; ctx.lineWidth = 9;
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-    ctx.globalAlpha = 1;
+  /* bordures en relief : c'est l'épaisseur du plateau qui donne le volume */
+  const LIP = 0.42;
+  for(const sx of [-1, 1]){
+    const n = proj(sx * TW, D1), f = proj(sx * TW, D2);
+    ctx.beginPath();
+    ctx.moveTo(n.x, n.y);
+    ctx.lineTo(f.x, f.y);
+    ctx.lineTo(f.x, f.y - LIP * f.s);
+    ctx.lineTo(n.x, n.y - LIP * n.s);
+    ctx.closePath();
+    const lg = ctx.createLinearGradient(n.x, n.y, f.x, f.y);
+    lg.addColorStop(0, 'rgba(34,224,255,.55)');
+    lg.addColorStop(1, 'rgba(34,224,255,.10)');
+    ctx.fillStyle = lg;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(120,245,255,.85)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(n.x, n.y - LIP * n.s);
+    ctx.lineTo(f.x, f.y - LIP * f.s);
+    ctx.stroke();
   }
 }
 
 function drawBaseCore(){
   const p = proj(0, DEND);
-  const s = p.sv, hgt = 3.4 * s, hw = TW * p.s;
+  const s = p.s, hgt = 3.1 * s, hw = TW * s;
   const ratio = G.base.max > 0 ? Math.max(0, G.base.hp / G.base.max) : 1;
 
-  /* arche */
-  ctx.strokeStyle = PAL.mag; ctx.lineWidth = Math.max(2, s * .07);
-  ctx.globalAlpha = .9;
+  const g = ctx.createLinearGradient(0, p.y - hgt, 0, p.y);
+  g.addColorStop(0, 'rgba(255,45,120,.04)');
+  g.addColorStop(1, 'rgba(255,45,120,' + (.16 + .18 * ratio).toFixed(3) + ')');
+  ctx.fillStyle = g;
+  ctx.fillRect(p.x - hw, p.y - hgt, hw * 2, hgt);
+
+  ctx.strokeStyle = PAL.mag;
+  ctx.lineWidth = Math.max(2, s * .05);
   ctx.beginPath();
   ctx.moveTo(p.x - hw, p.y);
   ctx.lineTo(p.x - hw, p.y - hgt);
   ctx.lineTo(p.x + hw, p.y - hgt);
   ctx.lineTo(p.x + hw, p.y);
   ctx.stroke();
-  ctx.globalAlpha = 1;
 
-  /* voile d'énergie */
-  const g = ctx.createLinearGradient(0, p.y - hgt, 0, p.y);
-  g.addColorStop(0, 'rgba(255,45,120,.05)');
-  g.addColorStop(1, 'rgba(255,45,120,' + (.18 + .2 * ratio).toFixed(3) + ')');
-  ctx.fillStyle = g;
-  ctx.fillRect(p.x - hw, p.y - hgt, hw * 2, hgt);
-
-  /* noyau hexagonal */
-  const r = hgt * .3 * (.8 + .2 * ratio);
+  const r = hgt * .30 * (.8 + .2 * ratio);
   const cy = p.y - hgt * .55;
   ctx.beginPath();
   for(let i = 0; i < 6; i++){
     const a = i / 6 * 6.2832 - 1.5708 + performance.now() / 2600;
-    const px = p.x + Math.cos(a) * r, py = cy + Math.sin(a) * r * .82;
+    const px = p.x + Math.cos(a) * r, py = cy + Math.sin(a) * r;
     i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
   }
   ctx.closePath();
   const cg = ctx.createRadialGradient(p.x, cy, 0, p.x, cy, r);
-  cg.addColorStop(0, '#ffd7e6'); cg.addColorStop(.5, PAL.mag); cg.addColorStop(1, PAL.magDim);
-  ctx.fillStyle = cg; ctx.fill();
+  cg.addColorStop(0, '#ffe2ec');
+  cg.addColorStop(.5, PAL.mag);
+  cg.addColorStop(1, PAL.magDim);
+  ctx.fillStyle = cg;
+  ctx.fill();
 }
 
 function drawScenery(){
@@ -661,89 +764,116 @@ function drawScenery(){
 
 function drawGate(g){
   const a = proj(g.x1, g.d), b = proj(g.x2, g.d);
-  const s = a.sv, hgt = 1.62 * s;
   const good = (g.op === 'x' || g.op === '+');
-  const base = good ? '157,255,60' : '255,45,120';
-  const y0 = a.y - hgt, w = b.x - a.x;
+  const rgb  = good ? '157,255,60' : '255,45,120';
+  const hgt  = 1.05 * a.sv;
+  const y0   = a.y - hgt, w = b.x - a.x;
+
+  /* empreinte au sol : rappelle que le portail est posé sur la piste */
+  ctx.fillStyle = 'rgba(' + rgb + ',' + (.22 + g.flash * .3).toFixed(3) + ')';
+  ctx.fillRect(a.x, a.y - a.sg * .16, w, a.sg * .32);
 
   const grd = ctx.createLinearGradient(0, y0, 0, a.y);
-  grd.addColorStop(0, 'rgba(' + base + ',.06)');
-  grd.addColorStop(1, 'rgba(' + base + ',' + (.30 + g.flash * .35).toFixed(3) + ')');
+  grd.addColorStop(0, 'rgba(' + rgb + ',.05)');
+  grd.addColorStop(1, 'rgba(' + rgb + ',' + (.26 + g.flash * .3).toFixed(3) + ')');
   ctx.fillStyle = grd;
   ctx.fillRect(a.x, y0, w, hgt);
 
-  ctx.strokeStyle = 'rgba(' + base + ',' + (.85 + g.flash * .15).toFixed(3) + ')';
-  ctx.lineWidth = Math.max(1.5, s * .055);
+  ctx.strokeStyle = 'rgba(' + rgb + ',' + (.85 + g.flash * .15).toFixed(3) + ')';
+  ctx.lineWidth = Math.max(1.4, a.s * .028);
   ctx.beginPath();
-  ctx.moveTo(a.x, a.y); ctx.lineTo(a.x, y0); ctx.lineTo(b.x, y0); ctx.lineTo(b.x, a.y);
+  ctx.moveTo(a.x, a.y); ctx.lineTo(a.x, y0);
+  ctx.lineTo(b.x, y0);  ctx.lineTo(b.x, a.y);
   ctx.stroke();
+
+  /* linteau plein : donne au portail une vraie lecture de cadre */
+  ctx.fillStyle = 'rgba(' + rgb + ',' + (.75 + g.flash * .25).toFixed(3) + ')';
+  ctx.fillRect(a.x, y0 - hgt * .07, w, hgt * .1);
 
   const label = g.op === 'x' ? '×' + g.val
               : g.op === '+' ? '+' + g.val
               : g.op === '/' ? '÷' + g.val
               : '−' + g.val;
-  const fs = Math.min(H * .045, Math.max(9, hgt * .42));
+  const fs = Math.min(H * .04, Math.max(10, hgt * .46));
   ctx.font = '700 ' + fs.toFixed(0) + 'px Orbitron, sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(0,0,0,.45)';
-  ctx.fillText(label, a.x + w / 2, y0 + hgt * .5 + fs * .08);
-  ctx.fillStyle = good ? '#e9ffd0' : '#ffe0ec';
-  ctx.fillText(label, a.x + w / 2, y0 + hgt * .5);
+  ctx.fillStyle = 'rgba(0,0,0,.5)';
+  ctx.fillText(label, a.x + w/2, y0 + hgt*.5 + fs*.07);
+  ctx.fillStyle = good ? '#eeffd8' : '#ffe3ed';
+  ctx.fillText(label, a.x + w/2, y0 + hgt*.5);
 }
 
 function drawWall(w){
   const a = proj(w.x1, w.d), b = proj(w.x2, w.d);
-  const s = a.sv, hgt = 1.35 * s, y0 = a.y - hgt;
+  const hgt = 1.05 * a.sv, y0 = a.y - hgt;
   const wear = w.hp / w.max;
 
-  ctx.fillStyle = '#1b2450';
+  /* face supérieure : bien visible en vue plongeante */
+  const dep = a.sg * .45;
+  ctx.fillStyle = '#2c3663';
+  ctx.beginPath();
+  ctx.moveTo(a.x, y0); ctx.lineTo(b.x, y0);
+  ctx.lineTo(b.x, y0 - dep); ctx.lineTo(a.x, y0 - dep);
+  ctx.closePath(); ctx.fill();
+
+  ctx.fillStyle = '#1a2350';
   ctx.fillRect(a.x, y0, b.x - a.x, hgt);
-  ctx.fillStyle = 'rgba(255,199,58,' + (.10 + (1 - wear) * .18 + w.flash * .3).toFixed(3) + ')';
+  ctx.fillStyle = 'rgba(255,199,58,' + (.08 + (1 - wear) * .20 + w.flash * .3).toFixed(3) + ')';
   ctx.fillRect(a.x, y0, b.x - a.x, hgt);
-  ctx.strokeStyle = PAL.amber; ctx.lineWidth = Math.max(1.2, s * .04);
+  ctx.strokeStyle = PAL.amber;
+  ctx.lineWidth = Math.max(1.4, a.s * .03);
   ctx.strokeRect(a.x, y0, b.x - a.x, hgt);
 
-  /* stries */
-  ctx.strokeStyle = 'rgba(255,199,58,.22)'; ctx.lineWidth = 1;
-  for(let i = 1; i < 4; i++){
-    const y = y0 + hgt * i / 4;
+  ctx.strokeStyle = 'rgba(255,199,58,.20)';
+  ctx.lineWidth = 1;
+  for(let i = 1; i < 3; i++){
+    const y = y0 + hgt * i / 3;
     ctx.beginPath(); ctx.moveTo(a.x, y); ctx.lineTo(b.x, y); ctx.stroke();
   }
-  const fs = Math.max(8, hgt * .46);
+  const fs = Math.min(H * .035, Math.max(9, hgt * .5));
   ctx.font = '700 ' + fs.toFixed(0) + 'px Orbitron, sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#ffeec2';
-  ctx.fillText(String(w.hp), (a.x + b.x) / 2, y0 + hgt * .5);
+  ctx.fillStyle = '#fff1cd';
+  ctx.fillText(String(w.hp), (a.x + b.x)/2, y0 + hgt*.5);
 }
 
 function drawTower(t){
   const p = proj(t.x, t.d);
-  const s = p.sv, hgt = 2.4 * s, hw = .62 * p.s;
+  const hgt = 1.25 * p.sv, hw = .55 * p.s;
   const mine = t.owner === 'p';
   const col = mine ? PAL.cyan : PAL.mag;
   const rgb = mine ? '34,224,255' : '255,45,120';
 
+  /* socle au sol */
+  ctx.beginPath();
+  ctx.ellipse(p.x, p.y, hw * 1.25, p.sg * .55, 0, 0, 6.2832);
+  ctx.fillStyle = 'rgba(' + rgb + ',.22)';
+  ctx.fill();
+
   ctx.beginPath();
   ctx.moveTo(p.x - hw, p.y);
-  ctx.lineTo(p.x - hw * .5, p.y - hgt);
-  ctx.lineTo(p.x + hw * .5, p.y - hgt);
+  ctx.lineTo(p.x - hw * .52, p.y - hgt);
+  ctx.lineTo(p.x + hw * .52, p.y - hgt);
   ctx.lineTo(p.x + hw, p.y);
   ctx.closePath();
   const g = ctx.createLinearGradient(0, p.y - hgt, 0, p.y);
-  g.addColorStop(0, 'rgba(' + rgb + ',' + (.55 + t.flash * .4).toFixed(3) + ')');
-  g.addColorStop(1, 'rgba(10,16,45,.9)');
+  g.addColorStop(0, 'rgba(' + rgb + ',' + (.6 + t.flash * .4).toFixed(3) + ')');
+  g.addColorStop(1, 'rgba(10,16,45,.92)');
   ctx.fillStyle = g; ctx.fill();
-  ctx.strokeStyle = col; ctx.lineWidth = Math.max(1.2, s * .04); ctx.stroke();
+  ctx.strokeStyle = col;
+  ctx.lineWidth = Math.max(1.4, p.s * .03);
+  ctx.stroke();
 
-  /* balise */
-  const r = hw * .45, cy = p.y - hgt - r * .6;
+  const r = hw * .26, cy = p.y - hgt - r * .8;
   ctx.beginPath(); ctx.arc(p.x, cy, r, 0, 6.2832);
   ctx.fillStyle = col; ctx.fill();
-  ctx.globalAlpha = .25;
-  ctx.beginPath(); ctx.arc(p.x, cy, r * (2 + Math.sin(performance.now() / 300) * .4), 0, 6.2832);
-  ctx.fill(); ctx.globalAlpha = 1;
+  ctx.globalAlpha = .22;
+  ctx.beginPath();
+  ctx.arc(p.x, cy, r * (2 + Math.sin(performance.now()/300) * .4), 0, 6.2832);
+  ctx.fill();
+  ctx.globalAlpha = 1;
 
-  const fs = Math.max(8, hgt * .24);
+  const fs = Math.min(H * .022, Math.max(8, hgt * .3));
   ctx.font = '700 ' + fs.toFixed(0) + 'px Orbitron, sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = '#fff';
@@ -753,71 +883,81 @@ function drawTower(t){
 function drawUnits(){
   /* tri en place : l'ordre du tableau n'a aucune incidence sur la simulation */
   G.units.sort((a, b) => b.d - a.d);
-  const shadows = G.units.length < 240;
-  if(shadows) ctx.fillStyle = 'rgba(0,0,0,.32)';
+  const shadows = G.units.length < 260;
   for(let i = 0; i < G.units.length; i++){
     const u = G.units[i];
-    if(u.d < D0 - 1 || u.d > DEND + 1) continue;
+    if(u.d < D0 - 1.5 || u.d > DEND + 1) continue;
     const p = proj(u.x, u.d);
-    const r = UR * p.sv * .8;
-    if(r < .4) continue;
-    if(shadows && r > 2.5){
-      ctx.beginPath(); ctx.ellipse(p.x, p.y, r * 1.15, r * .42, 0, 0, 6.2832); ctx.fill();
-      ctx.fillStyle = 'rgba(0,0,0,.32)';
+    const w = 2.15 * UR * p.sv;
+    if(w < 2) continue;
+    if(shadows){
+      ctx.fillStyle = 'rgba(0,0,0,.34)';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, w * .40, p.sg * UR * .95, 0, 0, 6.2832);
+      ctx.fill();
     }
-    const q = r * 2.2;
-    ctx.drawImage(u.side === 'p' ? ORB.p : ORB.e, p.x - q, p.y - r * 1.2 - q, q * 2, q * 2);
+    const h = w * 1.25;
+    ctx.drawImage(u.side === 'p' ? CHAR.p : CHAR.e, p.x - w/2, p.y - h * .92, w, h);
   }
 }
 
 function drawCannon(){
   const p = proj(G.cannon.x, D0);
-  const s = p.s, hw = .78 * s, hgt = .95 * s;
+  const hw = .85 * p.s, hgt = .80 * p.s;
 
-  /* ligne de visée */
   if(G.state === 'play'){
     const far = proj(G.cannon.x, DEND);
     ctx.save();
-    ctx.setLineDash([6, 10]);
-    ctx.strokeStyle = 'rgba(34,224,255,.22)';
+    ctx.setLineDash([7, 11]);
+    ctx.strokeStyle = 'rgba(34,224,255,.20)';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(far.x, far.y); ctx.stroke();
     ctx.restore();
   }
 
-  ctx.fillStyle = 'rgba(0,0,0,.4)';
-  ctx.beginPath(); ctx.ellipse(p.x, p.y, hw * 1.2, hw * .34, 0, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,.42)';
+  ctx.beginPath();
+  ctx.ellipse(p.x, p.y, hw * 1.15, p.sg * .5, 0, 0, 6.2832);
+  ctx.fill();
 
-  /* socle trapézoïdal */
   ctx.beginPath();
   ctx.moveTo(p.x - hw, p.y);
-  ctx.lineTo(p.x - hw * .55, p.y - hgt);
-  ctx.lineTo(p.x + hw * .55, p.y - hgt);
+  ctx.lineTo(p.x - hw * .58, p.y - hgt);
+  ctx.lineTo(p.x + hw * .58, p.y - hgt);
   ctx.lineTo(p.x + hw, p.y);
   ctx.closePath();
   const g = ctx.createLinearGradient(0, p.y - hgt, 0, p.y);
-  g.addColorStop(0, '#2ff0ff'); g.addColorStop(1, '#0b3f6b');
+  g.addColorStop(0, '#3ff5ff');
+  g.addColorStop(1, '#0a3a63');
   ctx.fillStyle = g; ctx.fill();
   ctx.strokeStyle = PAL.cyan; ctx.lineWidth = 2; ctx.stroke();
 
-  /* bouche du canon, pulsée par la cadence */
+  /* face supérieure du canon : visible car on regarde d'en haut */
+  ctx.beginPath();
+  ctx.ellipse(p.x, p.y - hgt, hw * .58, p.sg * .3, 0, 0, 6.2832);
+  ctx.fillStyle = '#7ffaff';
+  ctx.fill();
+
   const pulse = 1 - Math.min(1, G.cannon.cd / Math.max(.001, fireInterval()));
-  const r = hw * (.34 + .12 * pulse);
-  ctx.beginPath(); ctx.arc(p.x, p.y - hgt * 1.05, r, 0, 6.2832);
-  const cg = ctx.createRadialGradient(p.x, p.y - hgt * 1.05, 0, p.x, p.y - hgt * 1.05, r);
-  cg.addColorStop(0, '#fff'); cg.addColorStop(.6, PAL.cyan); cg.addColorStop(1, 'rgba(34,224,255,0)');
+  const r = hw * (.32 + .12 * pulse);
+  const cy = p.y - hgt;
+  ctx.beginPath(); ctx.arc(p.x, cy, r, 0, 6.2832);
+  const cg = ctx.createRadialGradient(p.x, cy, 0, p.x, cy, r);
+  cg.addColorStop(0, '#fff');
+  cg.addColorStop(.6, PAL.cyan);
+  cg.addColorStop(1, 'rgba(34,224,255,0)');
   ctx.fillStyle = cg; ctx.fill();
 }
 
 function drawParticles(){
   for(const p of G.parts){
     const k = 1 - p.t / p.life;
-    const pr = proj(p.x, Math.max(1, p.d));
-    const r = Math.max(1, .1 * pr.s * k);
+    const pr = proj(p.x, p.d);
+    const r = Math.max(1, .09 * pr.s * k);
     ctx.globalAlpha = k * .9;
     ctx.fillStyle = p.color;
     ctx.beginPath();
-    ctx.arc(pr.x, pr.y - p.vy * p.t * pr.s * .35 - r, r, 0, 6.2832);
+    ctx.arc(pr.x, pr.y - p.vy * p.t * pr.s * .3 - r, r, 0, 6.2832);
     ctx.fill();
   }
   ctx.globalAlpha = 1;
@@ -828,13 +968,14 @@ function drawPops(){
   for(const q of G.pops){
     const k = 1 - q.t / q.life;
     const p = proj(q.x, q.d);
-    const fs = Math.max(12, .5 * p.sv * (1 + (1 - k) * .35));
+    const fs = Math.min(H * .05, Math.max(13, .42 * p.sv * (1 + (1 - k) * .3)));
     ctx.globalAlpha = Math.min(1, k * 1.6);
     ctx.font = '900 ' + fs.toFixed(0) + 'px Orbitron, sans-serif';
+    const y = p.y - 1.35 * p.sv - (1 - k) * 42;
     ctx.fillStyle = 'rgba(0,0,0,.5)';
-    ctx.fillText(q.text, p.x + 2, p.y - 2.1 * p.sv - (1 - k) * 60 + 2);
+    ctx.fillText(q.text, p.x + 2, y + 2);
     ctx.fillStyle = q.color;
-    ctx.fillText(q.text, p.x, p.y - 2.1 * p.sv - (1 - k) * 60);
+    ctx.fillText(q.text, p.x, y);
   }
   ctx.globalAlpha = 1;
 }

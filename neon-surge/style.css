@@ -106,8 +106,9 @@ h2.lose{color:var(--mag);text-shadow:0 0 24px rgba(255,45,120,.45)}
 .timer span{display:block;height:100%;width:100%;transform-origin:left;
   background:linear-gradient(90deg,var(--lime),var(--amber))}
 .hint{
-  position:absolute;left:0;right:0;bottom:36%;text-align:center;font-size:13px;letter-spacing:.16em;
-  color:rgba(234,246,255,.65);text-transform:uppercase;animation:pulse 1.6s ease-in-out infinite
+  position:absolute;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom));text-align:center;
+  font-size:12px;letter-spacing:.14em;color:rgba(234,246,255,.55);text-transform:uppercase;
+  text-shadow:0 2px 8px rgba(0,0,0,.8);animation:pulse 1.6s ease-in-out infinite
 }
 .hint.hidden{display:none}
 @keyframes pulse{0%,100%{opacity:.25}50%{opacity:.85}}
