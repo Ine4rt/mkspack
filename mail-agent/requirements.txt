@@ -1,0 +1,5 @@
+anthropic>=1.8,<2
+python-telegram-bot>=22.0,<23
+openai>=3.0,<4
+edge-tts>=7.0,<8
+python-dotenv>=1.0
