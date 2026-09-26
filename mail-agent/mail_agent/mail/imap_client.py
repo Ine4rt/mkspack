@@ -214,3 +214,62 @@ class ImapMailbox:
             )
             if typ != "OK":
                 raise MailboxError(f"APPEND a échoué : {data!r}")
+
+    # --- utilitaires de configuration ----------------------------------------
+    def list_folders(self) -> list[tuple[set[str], str]]:
+        """Retourne [(attributs, nom)] des dossiers du compte."""
+        with self._connect() as conn:
+            typ, data = conn.list()
+            if typ != "OK":
+                raise MailboxError(f"LIST a échoué : {data!r}")
+            return parse_list_response(data)
+
+    def find_sent_folder(self) -> str:
+        """Trouve le dossier des mails envoyés (attribut \\Sent, sinon par nom)."""
+        return pick_sent_folder(self.list_folders())
+
+    def count_unread(self) -> int:
+        with self._connect() as conn:
+            self._examine(conn, self.settings.inbox)
+            typ, data = conn.uid("SEARCH", "UNSEEN")
+            return len((data[0] or b"").split()) if typ == "OK" else 0
+
+
+_LIST_RE = re.compile(rb'\((?P<attrs>[^)]*)\)\s+(?:"[^"]*"|NIL)\s+(?P<name>.+)$')
+_SENT_NAMES = ["sent", "inbox.sent", "sent items", "sent messages", "inbox.sent items",
+               "inbox.sent messages", "éléments envoyés", "envoyés", "inbox.envoyés"]
+
+
+def _decode_folder_name(raw: bytes) -> str:
+    name = raw.strip()
+    if name.startswith(b'"') and name.endswith(b'"'):
+        name = name[1:-1].replace(b'\\"', b'"').replace(b"\\\\", b"\\")
+    text = name.decode("utf-8", errors="replace")
+    # Noms non ASCII encodés en « UTF-7 modifié » (RFC 3501), ex. &AMk-l&AOk-ments
+    return re.sub(r"&([^-]*)-", lambda m: "&" if not m.group(1) else
+                  ("+" + m.group(1).replace(",", "/") + "-").encode().decode("utf-7"), text)
+
+
+def parse_list_response(data: list) -> list[tuple[set[str], str]]:
+    folders = []
+    for item in data:
+        if isinstance(item, tuple):
+            item = item[0] + b' "' + item[1] + b'"'
+        if not isinstance(item, bytes):
+            continue
+        m = _LIST_RE.match(item)
+        if m:
+            attrs = {a.lower() for a in m.group("attrs").decode().split()}
+            folders.append((attrs, _decode_folder_name(m.group("name"))))
+    return folders
+
+
+def pick_sent_folder(folders: list[tuple[set[str], str]]) -> str:
+    for attrs, name in folders:
+        if "\\sent" in attrs:
+            return name
+    by_lower = {name.lower(): name for _, name in folders}
+    for candidate in _SENT_NAMES:
+        if candidate in by_lower:
+            return by_lower[candidate]
+    return ""

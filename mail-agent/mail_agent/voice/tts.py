@@ -3,13 +3,14 @@
 Fournisseurs :
 * ``openai`` : API OpenAI (sortie Opus native, aucune dépendance système) ;
 * ``edge``   : voix neuronales Microsoft Edge via ``edge-tts`` (gratuit, mais
-  service non officiel ; conversion MP3 → OGG par ``ffmpeg``) ;
+  service non officiel ; conversion MP3 → OGG par PyAV ou ``ffmpeg``) ;
 * ``none``   : réponses texte uniquement.
 """
 
 from __future__ import annotations
 
 import asyncio
+import io
 import logging
 import shutil
 import subprocess
@@ -53,14 +54,51 @@ class OpenAITTS:
         return response.read(), "ogg"
 
 
+def mp3_to_ogg_opus(mp3: bytes) -> bytes | None:
+    """Convertit du MP3 en OGG/Opus (note vocale Telegram).
+
+    Utilise PyAV (installé avec faster-whisper), sinon ffmpeg s'il est présent.
+    Retourne None si aucun des deux n'est disponible.
+    """
+    try:
+        import av
+    except ImportError:
+        av = None
+    if av is not None:
+        src = av.open(io.BytesIO(mp3))
+        buf = io.BytesIO()
+        dst = av.open(buf, "w", format="ogg")
+        stream = dst.add_stream("libopus", rate=48000, layout="mono")
+        stream.bit_rate = 32000
+        resampler = av.AudioResampler(format="s16", layout="mono", rate=48000)
+        for frame in src.decode(audio=0):
+            for resampled in resampler.resample(frame):
+                for packet in stream.encode(resampled):
+                    dst.mux(packet)
+        for resampled in resampler.resample(None):
+            for packet in stream.encode(resampled):
+                dst.mux(packet)
+        for packet in stream.encode(None):
+            dst.mux(packet)
+        dst.close()
+        src.close()
+        return buf.getvalue()
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg:
+        proc = subprocess.run(
+            [ffmpeg, "-loglevel", "error", "-i", "pipe:0", "-c:a", "libopus",
+             "-b:a", "32k", "-f", "ogg", "pipe:1"],
+            input=mp3, capture_output=True, check=True, timeout=60,
+        )
+        return proc.stdout
+    return None
+
+
 class EdgeTTS:
     def __init__(self, settings: VoiceSettings):
         import edge_tts  # noqa: F401  (vérifie la présence de la dépendance)
 
         self.settings = settings
-        self.ffmpeg = shutil.which("ffmpeg")
-        if not self.ffmpeg:
-            log.warning("ffmpeg absent : les réponses vocales seront envoyées en MP3 (fichier audio)")
 
     async def _mp3(self, text: str) -> bytes:
         import edge_tts
@@ -73,14 +111,12 @@ class EdgeTTS:
 
     def synthesize(self, text: str) -> tuple[bytes, str]:
         mp3 = asyncio.run(self._mp3(text))  # appelé depuis un thread de travail
-        if not self.ffmpeg:
-            return mp3, "mp3"
-        proc = subprocess.run(
-            [self.ffmpeg, "-loglevel", "error", "-i", "pipe:0", "-c:a", "libopus",
-             "-b:a", "32k", "-f", "ogg", "pipe:1"],
-            input=mp3, capture_output=True, check=True, timeout=60,
-        )
-        return proc.stdout, "ogg"
+        try:
+            ogg = mp3_to_ogg_opus(mp3)
+        except Exception:
+            log.exception("Conversion OGG impossible, envoi en MP3")
+            ogg = None
+        return (ogg, "ogg") if ogg else (mp3, "mp3")
 
 
 def build_tts(settings: VoiceSettings) -> TextToSpeech | None:

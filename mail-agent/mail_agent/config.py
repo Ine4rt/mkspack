@@ -11,6 +11,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
+# Dossier du projet (celui qui contient .env), quel que soit le dossier courant :
+# le bot peut ainsi être lancé au démarrage de l'ordinateur.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+ENV_FILE = PROJECT_ROOT / ".env"
+
+
 class ConfigError(RuntimeError):
     pass
 
@@ -131,7 +137,7 @@ def load_settings(*, require_telegram: bool = True) -> Settings:
     try:
         from dotenv import load_dotenv
 
-        load_dotenv()
+        load_dotenv(ENV_FILE if ENV_FILE.exists() else None)
     except ImportError:  # python-dotenv est optionnel
         pass
 
@@ -192,7 +198,9 @@ def load_settings(*, require_telegram: bool = True) -> Settings:
             "TELEGRAM_ALLOWED_USER_IDS est obligatoire (votre identifiant Telegram numérique)."
         )
 
-    data_dir = Path(_get("DATA_DIR", "./data")).expanduser()
+    data_dir = Path(_get("DATA_DIR", "data")).expanduser()
+    if not data_dir.is_absolute():
+        data_dir = PROJECT_ROOT / data_dir
     data_dir.mkdir(parents=True, exist_ok=True)
 
     return Settings(
