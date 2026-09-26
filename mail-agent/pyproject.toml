@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mail-agent"
+version = "0.1.0"
+description = "Assistant e-mail vocal personnel (Telegram + IMAP/SMTP + Claude)"
+requires-python = ">=3.10"
+readme = "README.md"
+dependencies = [
+    "anthropic>=1.8,<2",
+    "python-telegram-bot>=22.0,<23",
+    "openai>=3.0,<4",
+    "edge-tts>=7.0,<8",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+local-stt = ["faster-whisper>=1.2"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+mail-agent = "mail_agent.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["mail_agent*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

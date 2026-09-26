@@ -1,0 +1,16 @@
+# Service systemd (alternative à Docker). À copier dans /etc/systemd/system/
+[Unit]
+Description=Assistant e-mail vocal (Telegram)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=mailagent
+WorkingDirectory=/opt/mail-agent
+EnvironmentFile=/opt/mail-agent/.env
+ExecStart=/opt/mail-agent/.venv/bin/python -m mail_agent
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
