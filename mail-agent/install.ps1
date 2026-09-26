@@ -1,7 +1,10 @@
 # Installation de l'assistant e-mail vocal sur Windows.
 #
-# Dans PowerShell (clic droit sur Demarrer > Terminal), coller :
-#   irm https://raw.githubusercontent.com/Ine4rt/mkspack/refs/heads/claude/voice-email-agent-telegram-186hnq/mail-agent/install.ps1 | iex
+# Deux facons de lancer l'installation :
+#  - sans Internet pour le code : extraire le ZIP puis double-cliquer sur Installer.bat
+#    (le programme est pris dans le dossier extrait, rien n'est telecharge depuis GitHub) ;
+#  - ou dans PowerShell (clic droit sur Demarrer > Terminal), coller :
+#    irm https://raw.githubusercontent.com/Ine4rt/mkspack/refs/heads/claude/voice-email-agent-telegram-186hnq/mail-agent/install.ps1 | iex
 #
 # Le script : telecharge le programme, installe Python si besoin, installe les
 # dependances, lance la configuration guidee, puis demarre le bot et le
@@ -43,21 +46,27 @@ function Find-Python {
 }
 
 # --------------------------------------------------------------------------
-Step "1/5 Telechargement du programme"
-$zip = Join-Path $env:TEMP "mailagent.zip"
-$tmp = Join-Path $env:TEMP "mailagent_src"
-Invoke-WebRequest "https://github.com/$Repo/archive/refs/heads/$Branch.zip" -OutFile $zip -UseBasicParsing
-Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
-Expand-Archive $zip $tmp -Force
-$src = Join-Path (Get-ChildItem $tmp -Directory | Select-Object -First 1).FullName "mail-agent"
-if (-not (Test-Path (Join-Path $src "mail_agent"))) { throw "Archive inattendue : dossier mail-agent introuvable" }
+$local = $PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot "mail_agent"))
+if ($local) {
+    Step "1/5 Copie du programme (depuis le dossier extrait)"
+    $src = $PSScriptRoot
+} else {
+    Step "1/5 Telechargement du programme"
+    $zip = Join-Path $env:TEMP "mailagent.zip"
+    $tmp = Join-Path $env:TEMP "mailagent_src"
+    Invoke-WebRequest "https://github.com/$Repo/archive/refs/heads/$Branch.zip" -OutFile $zip -UseBasicParsing
+    Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
+    Expand-Archive $zip $tmp -Force
+    $src = Join-Path (Get-ChildItem $tmp -Directory | Select-Object -First 1).FullName "mail-agent"
+    if (-not (Test-Path (Join-Path $src "mail_agent"))) { throw "Archive inattendue : dossier mail-agent introuvable" }
+}
 
 Stop-Bot
 New-Item -ItemType Directory -Force $Dest | Out-Null
 # On garde la configuration (.env), les donnees et l'environnement Python existants.
 robocopy $src $Dest /E /XD data .venv /XF .env /NFL /NDL /NJH /NJS /NP | Out-Null
 Copy-Item (Join-Path $src "windows\*.bat") $Dest -Force
-Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue
+if (-not $local) { Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue }
 Write-Host "Installe dans $Dest"
 
 # --------------------------------------------------------------------------
