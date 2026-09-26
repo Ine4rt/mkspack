@@ -137,7 +137,7 @@ def load_settings(*, require_telegram: bool = True) -> Settings:
     try:
         from dotenv import load_dotenv
 
-        load_dotenv(ENV_FILE if ENV_FILE.exists() else None)
+        load_dotenv(ENV_FILE if ENV_FILE.exists() else None, interpolate=False)
     except ImportError:  # python-dotenv est optionnel
         pass
 

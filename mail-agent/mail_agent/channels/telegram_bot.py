@@ -103,4 +103,5 @@ class TelegramChannel:
     def run(self) -> None:
         log.info("Bot Telegram démarré (long polling). Utilisateurs autorisés : %s",
                  sorted(self.allowed))
-        self.app.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
+        self.app.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True,
+                             bootstrap_retries=-1, close_loop=False)

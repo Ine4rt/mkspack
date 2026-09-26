@@ -19,6 +19,45 @@ Agent 🔊 « C'est envoyé à Jean Dupont. Le mail d'origine est maintenant mar
 L'analyse, l'architecture et les choix techniques sont détaillés dans
 [ARCHITECTURE.md](ARCHITECTURE.md).
 
+## Installation rapide sur Windows (recommandé)
+
+Tout se fait avec **une seule commande**, puis quelques questions.
+
+**Avant de commencer, prépare :**
+- ton téléphone avec Telegram ;
+- une clé API Anthropic : <https://console.anthropic.com> → *API Keys* (ajoute un peu de crédit dans *Billing*) ;
+- l'adresse et le mot de passe de ta boîte one.com.
+
+**Ensuite :**
+1. Sur l'ordinateur, clic droit sur le bouton Démarrer → **Terminal** (ou « Windows PowerShell »).
+2. Colle cette commande puis Entrée :
+
+   ```powershell
+   irm https://raw.githubusercontent.com/Ine4rt/mkspack/refs/heads/claude/voice-email-agent-telegram-186hnq/mail-agent/install.ps1 | iex
+   ```
+
+3. Réponds aux questions. L'assistant :
+   - installe Python et les composants si besoin (voix gratuite comprise) ;
+   - t'aide à créer le bot avec @BotFather et reconnaît ton compte Telegram tout seul
+     (il suffit d'appuyer sur « Démarrer » dans la conversation avec ton bot) ;
+   - vérifie la clé Claude ;
+   - teste la connexion à one.com (réception **et** envoi, sans rien envoyer ni marquer lu)
+     et trouve le dossier « Envoyés » ;
+   - démarre le bot en arrière-plan et le relance à chaque ouverture de session Windows.
+
+C'est tout : sur ton téléphone, parle à ton bot dans Telegram.
+
+Un raccourci **« Assistant e-mail »** apparaît sur le Bureau, avec :
+`Demarrer.bat`, `Arreter.bat`, `Journal.bat` (voir ce qui se passe),
+`Reconfigurer.bat` et `Tester-en-mode-texte.bat`.
+Relancer la même commande met le programme à jour en gardant la configuration.
+
+> L'ordinateur doit rester **allumé, connecté à Internet et la session ouverte**
+> (l'installateur propose de désactiver la mise en veille sur secteur).
+> Le programme est installé dans `%LOCALAPPDATA%\MailAgent` ; la configuration
+> (mots de passe compris) est dans le fichier `.env` de ce dossier, qui ne quitte
+> jamais l'ordinateur.
+
 ## Ce que fait le MVP
 
 - Bot Telegram : messages texte et vocaux, réponse texte + note vocale.
@@ -36,7 +75,8 @@ L'analyse, l'architecture et les choix techniques sont détaillés dans
 ```
 mail-agent/
 ├── mail_agent/
-│   ├── __main__.py          # démarrage (bot Telegram ou --console)
+│   ├── __main__.py          # démarrage (bot Telegram, --setup ou --console)
+│   ├── setup_wizard.py      # configuration guidée avec tests de connexion
 │   ├── config.py            # configuration par variables d'environnement
 │   ├── assistant.py         # orchestrateur indépendant du canal
 │   ├── confirmation.py      # « oui / non / attends » → décision, sans IA
@@ -59,13 +99,15 @@ mail-agent/
 │   └── channels/
 │       ├── base.py          # logique commune des canaux
 │       └── telegram_bot.py  # adaptateur Telegram (WhatsApp : même principe)
-├── tests/                   # 60 tests (pytest), sans réseau
+├── tests/                   # 64 tests (pytest), sans réseau
+├── install.ps1              # installation Windows en une commande
+├── windows/                 # Demarrer / Arreter / Journal / Reconfigurer (.bat)
 ├── .env.example
 ├── Dockerfile / docker-compose.yml / deploy/mail-agent.service
 └── ARCHITECTURE.md
 ```
 
-## Installation
+## Installation manuelle (Linux, Mac, serveur)
 
 ### 1. Prérequis
 
@@ -88,6 +130,7 @@ mail-agent/
 
 | Fournisseur | IMAP | SMTP | Remarques |
 |---|---|---|---|
+| **one.com** | `imap.one.com:993` | `send.one.com:587` (starttls) | Réglages appliqués automatiquement par `--setup` ; dossier des envoyés détecté automatiquement |
 | Gmail / Google Workspace | `imap.gmail.com:993` | `smtp.gmail.com:465` (ssl) | Activez la validation en 2 étapes puis créez un **mot de passe d'application** (<https://myaccount.google.com/apppasswords>). Laissez `IMAP_SENT_FOLDER` vide. |
 | OVH (Exchange/MX Plan) | `ssl0.ovh.net:993` | `ssl0.ovh.net:465` (ssl) | `IMAP_SENT_FOLDER=Sent` (ou `INBOX.Sent`) |
 | Infomaniak | `mail.infomaniak.com:993` | `mail.infomaniak.com:465` (ssl) | `IMAP_SENT_FOLDER=Sent` |
@@ -103,8 +146,8 @@ cd mail-agent
 python3 -m venv .venv
 source .venv/bin/activate          # Windows : .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env
-# éditez .env (token, identifiant Telegram, clés API, IMAP/SMTP, signature)
+python -m mail_agent --setup      # configuration guidée (écrit .env)
+# ou : cp .env.example .env puis éditez .env à la main
 ```
 
 Toutes les variables sont décrites dans [.env.example](.env.example). Aucun

@@ -5,8 +5,9 @@ from __future__ import annotations
 
 import smtplib
 import ssl
+from contextlib import contextmanager
 from email.message import EmailMessage
-from typing import Protocol
+from typing import Iterator, Protocol
 
 from ..config import SmtpSettings
 
@@ -23,7 +24,9 @@ class SmtpSender:
     def __init__(self, settings: SmtpSettings):
         self.settings = settings
 
-    def send(self, message: EmailMessage) -> None:
+    @contextmanager
+    def _session(self) -> Iterator[smtplib.SMTP]:
+        """Connexion chiffrée et identifiée ; convertit toute erreur en SendError."""
         s = self.settings
         context = ssl.create_default_context()
         try:
@@ -36,9 +39,18 @@ class SmtpSender:
                     server.starttls(context=context)
                 if s.user:
                     server.login(s.user, s.password)
-                refused = server.send_message(message)
+                yield server
         except (smtplib.SMTPException, OSError) as exc:
             raise SendError(f"Échec SMTP : {exc}") from exc
+
+    def send(self, message: EmailMessage) -> None:
+        with self._session() as server:
+            refused = server.send_message(message)
         if refused:
             # Au moins un destinataire refusé : on considère l'envoi comme échoué.
             raise SendError(f"Destinataires refusés : {', '.join(refused)}")
+
+    def test_login(self) -> None:
+        """Vérifie la connexion et l'identification SMTP, sans rien envoyer."""
+        with self._session():
+            pass
